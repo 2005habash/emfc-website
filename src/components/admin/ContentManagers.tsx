@@ -935,6 +935,18 @@ export function AdminsManager() {
     }
   }
 
+  async function deny(a: Account) {
+    if (!confirm(`Deny ${a.email}? Their account is deleted, so they can't sign in. They can sign up again later.`)) return;
+    setBusy(a.user_id);
+    const { error } = await supabase.rpc("deny_account" as never, { _user_id: a.user_id } as never);
+    setBusy(null);
+    if (error) toast.error(error.message);
+    else {
+      toast.success(`${a.email} was denied`);
+      load();
+    }
+  }
+
   if (error) {
     return (
       <div className="rounded-lg border border-border bg-card p-6 text-sm">
@@ -952,7 +964,7 @@ export function AdminsManager() {
     <div className="space-y-4">
       <p className="text-sm text-muted-foreground">
         New admins create an account on this page ("New admin? Create your account") and confirm their email. They
-        then appear here, and any admin can give them access.
+        then appear here, and any admin can give them access, or deny the sign-up.
       </p>
       <ul className="divide-y divide-border rounded-lg border border-border bg-card">
         {rows.map((a) => (
@@ -977,9 +989,14 @@ export function AdminsManager() {
                 Remove admin access
               </button>
             ) : (
-              <button className={primary} disabled={!a.confirmed || busy === a.user_id} onClick={() => setAdmin(a, true)}>
-                {busy === a.user_id ? <Loader2 className="h-4 w-4 animate-spin" /> : "Give admin access"}
-              </button>
+              <div className="flex gap-2">
+                <button className={button} disabled={busy === a.user_id} onClick={() => deny(a)}>
+                  Deny
+                </button>
+                <button className={primary} disabled={!a.confirmed || busy === a.user_id} onClick={() => setAdmin(a, true)}>
+                  {busy === a.user_id ? <Loader2 className="h-4 w-4 animate-spin" /> : "Give admin access"}
+                </button>
+              </div>
             )}
           </li>
         ))}
