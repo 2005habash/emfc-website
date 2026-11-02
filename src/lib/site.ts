@@ -31,7 +31,7 @@ export const IMAGES = {
 } as const;
 
 /** The live address. Link previews need full addresses for their pictures, not paths. */
-export const SITE_URL = "https://emfc.es";
+export const SITE_URL = "https://www.emfc.es";
 export const absoluteUrl = (path: string) => (/^https?:\/\//.test(path) ? path : `${SITE_URL}${path}`);
 
 /**
