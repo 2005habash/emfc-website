@@ -89,7 +89,7 @@ export function Footer() {
         <div className="flex flex-col gap-6">
           <div
             aria-hidden
-            className="font-serif text-[13vw]/none italic tracking-[-0.01em] whitespace-nowrap text-[#15205A] md:text-[7.4vw]/none min-[1440px]:text-[104px]/none"
+            className="font-serif text-[13vw]/none italic tracking-[-0.01em] whitespace-nowrap text-bull md:text-[7.4vw]/none min-[1440px]:text-[104px]/none"
           >
             <span className="md:hidden">EMFC</span>
             <span className="hidden md:inline">ESADE Master's Finance Club</span>
