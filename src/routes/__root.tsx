@@ -12,6 +12,7 @@ import { useEffect, type ReactNode } from "react";
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { Toaster } from "@/components/ui/sonner";
+import { absoluteUrl, IMAGES } from "@/lib/site";
 
 function NotFoundComponent() {
   return (
@@ -78,13 +79,11 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         content: "The finance club at ESADE. A community built around careers, companies and the people you meet along the way.",
       },
       { property: "og:type", content: "website" },
+      { property: "og:site_name", content: "EMFC" },
+      // Pages can set their own picture; the rest use this one. X reads the og: tags when there are no twitter: ones.
+      { property: "og:image", content: absoluteUrl(IMAGES.share) },
+      { property: "og:image:alt", content: "The EMFC bull and name over the club's group photo" },
       { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:title", content: "EMFC, ESADE Master's Finance Club" },
-      { name: "description", content: "EMIS Associate Portal is a recruiting website for a Master's-only finance society at ESADE Business School." },
-      { property: "og:description", content: "EMIS Associate Portal is a recruiting website for a Master's-only finance society at ESADE Business School." },
-      { name: "twitter:description", content: "EMIS Associate Portal is a recruiting website for a Master's-only finance society at ESADE Business School." },
-      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/a1142b93-b327-47c1-9fa2-503a966ce871/id-preview-a49e31b8--b9bee638-8e32-4555-8526-d464bafe95a2.lovable.app-1782833701427.png" },
-      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/a1142b93-b327-47c1-9fa2-503a966ce871/id-preview-a49e31b8--b9bee638-8e32-4555-8526-d464bafe95a2.lovable.app-1782833701427.png" },
     ],
     links: [
       { rel: "stylesheet", href: appCss },
@@ -126,6 +125,15 @@ function RootShell({ children }: { children: ReactNode }) {
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
+  useEffect(() => {
+    // Links in the admin emails (new password, confirm your email) belong on the admin page. If the
+    // database's list of allowed addresses sends one to another page, carry it on with the link intact.
+    const hash = window.location.hash;
+    if (window.location.pathname === "/club-office") return;
+    if (/[#&](type=(recovery|signup|invite|magiclink|email_change)|error_code=)/.test(hash)) {
+      window.location.replace(`/club-office${hash.includes("type=recovery") ? "?reset=1" : ""}${hash}`);
+    }
+  }, []);
   return (
     <QueryClientProvider client={queryClient}>
       <Outlet />

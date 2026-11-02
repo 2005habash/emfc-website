@@ -201,6 +201,9 @@ export const EVENTS: EventItem[] = [
   },
 ];
 
+/** Every clip has a still of the same name, shown before it plays (the admin page makes one on upload). */
+export const clipPoster = (src: string) => src.replace(/\.(mp4|webm|mov)$/i, ".jpg");
+
 export const eventsFor = (events: EventItem[], department: string, desk?: string) =>
   events.filter((e) =>
     desk ? e.desks?.includes(`${department}/${desk}`) : e.departments.includes(department),

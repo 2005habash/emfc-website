@@ -2,7 +2,7 @@
  "about": "Portraits that don't come straight from the member form. tools/import-members.mjs uses 'photo' for the member with this slug. Processed portraits are in public/images/team; source files stay in the club Drive.",
  "overrides": [
   { "slug": "fabian-luis-seher", "photo": "/images/team/fabian-luis-seher.jpg", "note": "New photo sent through Zaid on 2 November 2026 (WhatsApp Image 2026-10-28 at 15.17.40.jpeg), replacing the one from the member form." },
-  { "slug": "diogo-oliveira", "photo": "/images/team/diogo-oliveira.jpg", "note": "Form photo too small (400 x 400). The 27 October site photo, reframed to the house framing." },
+  { "slug": "diogo-oliveira", "photo": "/images/team/diogo-oliveira.jpg", "note": "His photo from the member form (400 x 400), chosen by Zaid on 2 November 2026 in place of the 27 October site photo. It is small, so the portrait is upscaled; a larger original would be sharper." },
   { "slug": "vasco-lemos", "photo": "/images/team/vasco-lemos.jpg", "note": "Form photo too small (390 x 352). The 27 October site photo, reframed." },
   { "slug": "luka-thomson", "photo": "/images/team/luka-thomson.jpg", "note": "Form photo too small (200 x 200). The 27 October site photo, reframed." },
   { "slug": "luis-laboreiro", "photo": "/images/team/luis-laboreiro.jpg", "note": "Not in the form. The 27 October site photo, reframed." },

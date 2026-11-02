@@ -103,7 +103,7 @@ Replace the hand-kept lists (`people` in `src/lib/departments.ts`; `PRESIDENTS`,
 - Order inside each department as in `members.json`: Head, CIO, Vice-Presidents, then Associates by desk. Fixed Income follows its own order, in two groups.
 - New on the site: Moritz Muellner (Vice-President, Corporate Relations) and 46 associates.
 - Brand: David Villar becomes "Head of Brand", and his five associates "Associate, Brand". The package says "Marketing".
-- Photos: Diogo Oliveira, Vasco Lemos and Luka Thomson keep their current site photos. Lara Koch, Aaron Kark and Aditya Sunil Shajwani have no usable photo yet and get an initials tile until one arrives. David Villar's form photo replaces the LinkedIn one.
+- Photos: Vasco Lemos and Luka Thomson keep their current site photos. Diogo Oliveira uses his photo from the form after all (Zaid, 2 Nov). Lara Koch, Aaron Kark and Aditya Sunil Shajwani have no usable photo yet and get an initials tile until one arrives. David Villar's form photo replaces the LinkedIn one.
 - CHECKLIST A1 to A4, B1 to B5 and E1.
 
 ### 6.2 Departments and desks: a page for every desk
@@ -207,7 +207,7 @@ One rule for the whole site: anything clickable has a visible sign at rest (a bu
 ### 7.5 One moving logo band (28 Oct)
 The homepage has two bands that do the same job: the moving department ticker and the static "Where our members come from" strip. Keep one, a slow band of member-firm logos.
 - **Content:** the 12 firms from 6.5, plus more from the "more options" list if it looks thin.
-- **Behaviour:** monochrome, pauses on hover, static for reduced motion.
+- **Behaviour:** in colour (Zaid, 2 Nov, instead of monochrome), pauses on hover, static for reduced motion.
 - **Logos:** one-colour SVGs from each firm's press page. Until a logo is sourced, its name appears in the serif typeface instead.
 
 ## 8. Phase 3: page by page

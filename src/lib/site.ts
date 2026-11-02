@@ -26,7 +26,13 @@ export const IMAGES = {
   teamGroup: "/images/team-group.jpg",
   bullMark: "/images/logo/bull-mark.png",
   bullTile: "/images/logo/bull-tile.png",
+  /** The picture LinkedIn, WhatsApp and others show when a link is shared (1200 x 630, from tools/share-card.html). */
+  share: "/images/share/emfc.jpg",
 } as const;
+
+/** The live address. Link previews need full addresses for their pictures, not paths. */
+export const SITE_URL = "https://emfc.es";
+export const absoluteUrl = (path: string) => (/^https?:\/\//.test(path) ? path : `${SITE_URL}${path}`);
 
 /**
  * Logos come from logo.dev by domain, with the same publishable key the 2026 Lovable site used.
@@ -44,7 +50,7 @@ export const MEMBER_FIRMS = [
   { name: "HSBC", domain: "hsbc.com" },
   { name: "Santander", domain: "santander.com" },
   { name: "Ardian", domain: "ardian.com" },
-  { name: "Lazard Asset Management", domain: "lazard.com" },
+  { name: "Lazard Asset Management", domain: "lazardassetmanagement.com" }, // lazard.com only has a black letter
   { name: "Allianz Global Investors", domain: "allianzgi.com" },
   { name: "William Blair", domain: "williamblair.com" },
   { name: "Euronext", domain: "euronext.com" },

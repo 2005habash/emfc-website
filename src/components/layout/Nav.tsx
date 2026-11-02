@@ -1,6 +1,7 @@
 import { Link, useRouterState } from "@tanstack/react-router";
 import { ChevronDown, Instagram, Linkedin, Menu, Moon, Sun, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
+import { flushSync } from "react-dom";
 import { cn } from "@/lib/utils";
 import { departments, type Department } from "@/lib/departments";
 import { IMAGES, NAV_LINKS, SOCIAL } from "@/lib/site";
@@ -46,16 +47,43 @@ function deskGroups(d: Department) {
   }));
 }
 
+/**
+ * Arrow keys inside the Departments menu: up and down go through a column's links (and on to the
+ * next column), left and right jump to the neighbouring column, Home and End to the first and last link.
+ */
+function moveInMenu(e: React.KeyboardEvent<HTMLDivElement>) {
+  const columns = Array.from(e.currentTarget.querySelectorAll("[data-menu-column]"), (c) =>
+    Array.from(c.querySelectorAll<HTMLAnchorElement>("a")),
+  );
+  const col = columns.findIndex((c) => c.includes(document.activeElement as HTMLAnchorElement));
+  if (col < 0) return;
+  const row = columns[col].indexOf(document.activeElement as HTMLAnchorElement);
+  const beside = (by: number) => columns[(col + by + columns.length) % columns.length];
+  const moves: Record<string, () => HTMLElement | undefined> = {
+    ArrowDown: () => columns[col][row + 1] ?? beside(1)[0],
+    ArrowUp: () => columns[col][row - 1] ?? beside(-1).at(-1),
+    ArrowRight: () => beside(1)[Math.min(row, beside(1).length - 1)],
+    ArrowLeft: () => beside(-1)[Math.min(row, beside(-1).length - 1)],
+    Home: () => columns[0][0],
+    End: () => columns.at(-1)?.at(-1),
+  };
+  const target = moves[e.key]?.();
+  if (!target) return;
+  e.preventDefault();
+  target.focus();
+}
+
 /** The wide Departments menu: one column per department, its desks under it. */
 function DepartmentsMenu({ id, onNavigate }: { id: string; onNavigate: () => void }) {
   return (
     <div
       id={id}
+      onKeyDown={moveInMenu}
       className="absolute inset-x-0 top-full border-b border-white/20 bg-[#000B3D] text-left normal-case tracking-normal shadow-[0_24px_48px_rgb(0_0_0/0.25)]"
     >
       <div className="gutter grid grid-cols-6 gap-6 py-9 xl:gap-8">
         {departments.map((d) => (
-          <div key={d.slug} className="flex flex-col gap-4">
+          <div key={d.slug} data-menu-column className="flex flex-col gap-4">
             <Link
               to="/departments/$department"
               params={{ department: d.slug }}
@@ -191,11 +219,20 @@ export function Nav({ overlay = false }: { overlay?: boolean }) {
                 onMouseEnter={() => hover(true)}
                 onMouseLeave={() => hover(false)}
                 onFocus={(e) => {
-                  // Keyboard focus opens the menu; a mouse click on the chevron just toggles it.
+                  // Keyboard focus arriving from outside opens the menu; a mouse click on the chevron just
+                  // toggles it, and focus coming back from the menu (after Escape) leaves it closed.
+                  if (e.currentTarget.contains(e.relatedTarget as Node)) return;
                   if ((e.target as HTMLElement).matches(":focus-visible")) setMenu(true);
                 }}
                 onBlur={(e) => {
                   if (!e.currentTarget.contains(e.relatedTarget as Node)) setMenu(false);
+                }}
+                onKeyDown={(e) => {
+                  // Down arrow on "Departments" or its chevron opens the menu and moves into it.
+                  if (e.key !== "ArrowDown" || (e.target as HTMLElement).closest("#departments-menu")) return;
+                  e.preventDefault();
+                  flushSync(() => setMenu(true));
+                  document.querySelector<HTMLAnchorElement>("#departments-menu a")?.focus();
                 }}
               >
                 <Link

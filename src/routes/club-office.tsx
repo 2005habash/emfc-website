@@ -1,4 +1,5 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import type { Session } from "@supabase/supabase-js";
 import { useEffect, useMemo, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { SiteLayout } from "@/components/layout/SiteLayout";
@@ -33,55 +34,99 @@ type Application = {
   created_at: string;
 };
 
+type Account = { userId: string; email: string };
+const toAccount = (s: Session | null): Account | null =>
+  s?.user ? { userId: s.user.id, email: s.user.email ?? "" } : null;
+
 function Admin() {
-  const [session, setSession] = useState<{ userId: string } | null>(null);
+  const navigate = useNavigate();
+  const [account, setAccount] = useState<Account | null>(null);
   const [isAdmin, setIsAdmin] = useState<boolean | null>(null);
   const [checking, setChecking] = useState(true);
+  // The link in a "new password" email signs the person in and lands here with ?reset=1; an expired
+  // link lands with an error instead. Both are read on the first render, before anything else happens.
+  const [resetting, setResetting] = useState(
+    () => typeof window !== "undefined" && new URLSearchParams(window.location.search).has("reset"),
+  );
+  const [notice] = useState(() => {
+    if (typeof window === "undefined") return null;
+    const problem = new URLSearchParams(window.location.hash.slice(1)).get("error_description");
+    return problem && `${problem.replace(/\.$/, "")}. Ask for a new link below.`;
+  });
 
   useEffect(() => {
     let mounted = true;
-    supabase.auth.getSession().then(async ({ data }) => {
+    supabase.auth.getSession().then(({ data }) => {
       if (!mounted) return;
-      if (data.session?.user) {
-        setSession({ userId: data.session.user.id });
-        const { data: roleData } = await supabase
-          .from("user_roles" as never)
-          .select("role")
-          .eq("user_id", data.session.user.id)
-          .eq("role", "admin")
-          .maybeSingle();
-        setIsAdmin(!!roleData);
-      }
+      setAccount(toAccount(data.session));
       setChecking(false);
     });
-    const { data: sub } = supabase.auth.onAuthStateChange((_e, s) => {
-      if (s?.user) setSession({ userId: s.user.id });
-      else { setSession(null); setIsAdmin(null); }
+    const { data: sub } = supabase.auth.onAuthStateChange((event, s) => {
+      if (event === "PASSWORD_RECOVERY") setResetting(true);
+      setAccount(toAccount(s));
     });
     return () => { mounted = false; sub.subscription.unsubscribe(); };
   }, []);
 
-  if (checking) {
-    return <SiteLayout><div className="container-emis py-24 text-center text-muted-foreground"><Loader2 className="mx-auto h-6 w-6 animate-spin" /></div></SiteLayout>;
-  }
+  // The admin role is checked for every account that signs in, also straight after the sign-in form.
+  const userId = account?.userId;
+  useEffect(() => {
+    setIsAdmin(null);
+    if (!userId) return;
+    let live = true;
+    supabase
+      .from("user_roles" as never)
+      .select("role")
+      .eq("user_id", userId)
+      .eq("role", "admin")
+      .maybeSingle()
+      .then(({ data, error }) => {
+        if (!live) return;
+        if (error) toast.error(error.message);
+        setIsAdmin(!!data);
+      });
+    return () => { live = false; };
+  }, [userId]);
 
-  if (!session) return <SiteLayout><Login /></SiteLayout>;
-  if (isAdmin === false) {
+  const waiting = <SiteLayout><div className="container-emis py-24 text-center text-muted-foreground"><Loader2 className="mx-auto h-6 w-6 animate-spin" /></div></SiteLayout>;
+  if (checking) return waiting;
+  if (account && resetting) {
     return (
       <SiteLayout>
-        <div className="container-emis py-24 text-center">
-          <h1 className="font-serif text-3xl text-navy">Not authorised</h1>
-          <p className="mt-2 text-muted-foreground">Your account does not have admin access.</p>
-          <button onClick={() => supabase.auth.signOut()} className="mt-6 inline-flex h-10 items-center rounded-md border border-border px-4 text-sm">Sign out</button>
-        </div>
+        <NewPassword
+          email={account.email}
+          onDone={() => {
+            setResetting(false);
+            navigate({ to: "/club-office", replace: true });
+          }}
+        />
       </SiteLayout>
     );
   }
-  if (!isAdmin) {
-    return <SiteLayout><div className="container-emis py-24 text-center text-muted-foreground"><Loader2 className="mx-auto h-6 w-6 animate-spin" /></div></SiteLayout>;
-  }
-
+  if (!account) return <SiteLayout><Login notice={notice} /></SiteLayout>;
+  if (isAdmin === null) return waiting;
+  if (!isAdmin) return <SiteLayout><NoAccess email={account.email} /></SiteLayout>;
   return <SiteLayout><AdminTabs /></SiteLayout>;
+}
+
+function NoAccess({ email }: { email: string }) {
+  return (
+    <div className="container-emis py-24 text-center">
+      <h1 className="font-serif text-3xl text-navy">No admin access yet</h1>
+      <p className="mx-auto mt-3 max-w-md text-muted-foreground">
+        You're signed in as <span className="font-medium text-foreground">{email}</span>, but this account doesn't have
+        admin access. Ask the site owner to switch it on, then check again.
+      </p>
+      <div className="mt-6 flex justify-center gap-2">
+        <button onClick={() => window.location.reload()} className="inline-flex h-10 items-center rounded-md bg-navy px-4 text-sm font-medium text-primary-foreground">
+          Check again
+        </button>
+        <button onClick={() => supabase.auth.signOut()} className="inline-flex h-10 items-center rounded-md border border-border px-4 text-sm">
+          Sign out
+        </button>
+      </div>
+    </div>
+  );
 }
 
 const TABS = [
@@ -126,30 +171,130 @@ function AdminTabs() {
   );
 }
 
-function Login() {
+const input = "h-11 w-full rounded-md border border-input bg-background px-3 text-sm";
+const submitButton =
+  "inline-flex h-11 w-full items-center justify-center rounded-md bg-navy text-sm font-medium text-primary-foreground disabled:opacity-60";
+const textButton = "self-start text-left text-sm text-navy underline-offset-4 hover:underline";
+
+type Mode = "sign-in" | "forgot" | "create";
+const MODES: Record<Mode, { title: string; action: string }> = {
+  "sign-in": { title: "Sign in", action: "Sign in" },
+  forgot: { title: "Forgot your password?", action: "Email me a link" },
+  create: { title: "Create your account", action: "Create account" },
+};
+
+function Login({ notice }: { notice: string | null }) {
+  const [mode, setMode] = useState<Mode>(notice ? "forgot" : "sign-in");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [busy, setBusy] = useState(false);
+  const [sent, setSent] = useState<string | null>(null);
+  const switchTo = (m: Mode) => {
+    setMode(m);
+    setSent(null);
+    setPassword("");
+  };
+
   async function submit(e: React.FormEvent) {
     e.preventDefault();
+    const here = `${window.location.origin}/club-office`;
     setBusy(true);
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    if (mode === "sign-in") {
+      const { error } = await supabase.auth.signInWithPassword({ email, password });
+      if (error) toast.error(error.message);
+    } else if (mode === "forgot") {
+      const { error } = await supabase.auth.resetPasswordForEmail(email, { redirectTo: `${here}?reset=1` });
+      if (error) toast.error(error.message);
+      else setSent(`If ${email} has an account, an email with a link to choose a new password is on its way. The link works once.`);
+    } else {
+      const { data, error } = await supabase.auth.signUp({ email, password, options: { emailRedirectTo: here } });
+      if (error) toast.error(error.message);
+      // When the address has to be confirmed first, there is no session until the email's link is opened.
+      else if (!data.session) setSent(`Check ${email} for an email to confirm the address, and open its link. Then ask the site owner to give your account admin access.`);
+    }
     setBusy(false);
-    if (error) toast.error(error.message);
+  }
+
+  return (
+    <div className="container-emis flex min-h-[60vh] items-center justify-center py-16">
+      <form onSubmit={submit} className="flex w-full max-w-sm flex-col gap-4 rounded-xl border border-border bg-card p-8">
+        <div>
+          <p className="eyebrow">Admin</p>
+          <h1 className="mt-2 font-serif text-2xl text-navy">{MODES[mode].title}</h1>
+        </div>
+        {notice && mode === "forgot" && !sent && <p className="rounded-md bg-secondary p-3 text-sm">{notice}</p>}
+        {sent ? (
+          <p role="status" className="text-sm">{sent}</p>
+        ) : (
+          <>
+            {mode === "forgot" && <p className="text-sm text-muted-foreground">We'll email you a link to choose a new one.</p>}
+            <input type="email" required autoComplete="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} className={input} />
+            {mode !== "forgot" && (
+              <input
+                type="password"
+                required
+                minLength={mode === "create" ? 8 : undefined}
+                autoComplete={mode === "create" ? "new-password" : "current-password"}
+                placeholder={mode === "create" ? "Password, at least 8 characters" : "Password"}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className={input}
+              />
+            )}
+            <button disabled={busy} type="submit" className={submitButton}>
+              {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : MODES[mode].action}
+            </button>
+          </>
+        )}
+        <div className="flex flex-col gap-1.5">
+          {mode === "sign-in" ? (
+            <>
+              <button type="button" className={textButton} onClick={() => switchTo("forgot")}>Forgot your password?</button>
+              <button type="button" className={textButton} onClick={() => switchTo("create")}>New admin? Create your account</button>
+            </>
+          ) : (
+            <button type="button" className={textButton} onClick={() => switchTo("sign-in")}>Back to sign in</button>
+          )}
+        </div>
+        <p className="text-xs text-muted-foreground">For EMFC admins. A new account opens nothing until the site owner gives it admin access.</p>
+      </form>
+    </div>
+  );
+}
+
+function NewPassword({ email, onDone }: { email: string; onDone: () => void }) {
+  const [password, setPassword] = useState("");
+  const [repeat, setRepeat] = useState("");
+  const [busy, setBusy] = useState(false);
+  async function submit(e: React.FormEvent) {
+    e.preventDefault();
+    if (password !== repeat) {
+      toast.error("The two passwords are different.");
+      return;
+    }
+    setBusy(true);
+    const { error } = await supabase.auth.updateUser({ password });
+    setBusy(false);
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
+    toast.success("New password saved");
+    onDone();
   }
   return (
     <div className="container-emis flex min-h-[60vh] items-center justify-center py-16">
-      <form onSubmit={submit} className="w-full max-w-sm space-y-4 rounded-xl border border-border bg-card p-8">
+      <form onSubmit={submit} className="flex w-full max-w-sm flex-col gap-4 rounded-xl border border-border bg-card p-8">
         <div>
           <p className="eyebrow">Admin</p>
-          <h1 className="mt-2 font-serif text-2xl text-navy">Sign in</h1>
+          <h1 className="mt-2 font-serif text-2xl text-navy">Choose a new password</h1>
+          <p className="mt-2 text-sm text-muted-foreground">For {email}.</p>
         </div>
-        <input type="email" required placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} className="h-11 w-full rounded-md border border-input bg-background px-3 text-sm" />
-        <input type="password" required placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} className="h-11 w-full rounded-md border border-input bg-background px-3 text-sm" />
-        <button disabled={busy} type="submit" className="inline-flex h-11 w-full items-center justify-center rounded-md bg-navy text-sm font-medium text-primary-foreground disabled:opacity-60">
-          {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : "Sign in"}
+        <input type="password" required minLength={8} autoComplete="new-password" placeholder="New password, at least 8 characters" value={password} onChange={(e) => setPassword(e.target.value)} className={input} />
+        <input type="password" required autoComplete="new-password" placeholder="The same password again" value={repeat} onChange={(e) => setRepeat(e.target.value)} className={input} />
+        <button disabled={busy} type="submit" className={submitButton}>
+          {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : "Save password"}
         </button>
-        <p className="text-xs text-muted-foreground">Restricted to EMFC admins. Contact a co-president for access.</p>
       </form>
     </div>
   );

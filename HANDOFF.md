@@ -42,6 +42,8 @@ npm run dev        # http://localhost:8080 (Lovable's default port)
 | People helpers (leadership, associates by desk, homepage strip) | `src/lib/team.ts` |
 | Shared pieces: portraits, person cards and profiles, page sections | `src/components/site/ui.tsx`, `src/components/site/sections.tsx` |
 | Admin page content tabs | `src/components/admin/ContentManagers.tsx` |
+| An event's page, also used for the admin page's preview | `src/components/site/EventArticle.tsx` |
+| The picture shown when a link to the site is shared | `public/images/share/emfc.jpg`, made from `tools/share-card.html` (instructions inside) |
 | The full fund page, hidden until `FUND_PAGE_LIVE` is true | `src/components/fund/FundFull.tsx` |
 | Pages | `src/routes/`: `index`, `departments.index` (overview), `departments.$department`, `departments.$department_.$desk` (the `_` stops it nesting), `team`, `events`, `events_.$eventId`, `resources`, `fund`, `sponsorship`, `privacy`, `club-office` (admin) |
 | Database changes for this launch | `supabase/migrations/20261102180000_events_reports_enquiries.sql` |
@@ -50,7 +52,7 @@ npm run dev        # http://localhost:8080 (Lovable's default port)
 
 ## 5. Updating the content
 
-- **Events and reports:** once the database is set up (section 8), add and edit them on the admin page at `/club-office`, with photo and PDF uploads. Until then, edit `src/data/events.ts` and `src/data/reports.ts`.
+- **Events and reports:** once the database is set up (section 8), add and edit them on the admin page at `/club-office`, with photo and PDF uploads. An event also takes short MP4 clips (a still for each is made on upload) and the Brand team's recap slides, and **Preview** shows the event page before it is saved or shown. Until then, edit `src/data/events.ts` and `src/data/reports.ts`.
 - **People (each September):** export the member form to `content/<date>/members.json`, then run `node tools/import-members.mjs content/<date>`. People kept from before go in `kept-members.json`; photos that don't come from the form go in `photo-overrides.json`.
 - **Portraits:** write a list `[{ "in": "<photo>", "out": "public/images/team/<slug>.jpg" }]` (add `"crop": [x, y, w, h]` for screenshots) and run `swift tools/portraits.swift <list.json>` (macOS 14+). It cuts out the person, frames the head and keeps the body to the bottom edge. Look at every result. Match photos to people only by how the sender labelled them, never by faces.
 - **Fund:** set `FUND_PAGE_LIVE = true` in `src/lib/site.ts` once there are holdings; the full page is ready behind it.
@@ -78,7 +80,11 @@ The full list, with what each item blocks, is in `REVAMP-PLAN.md` section 13.
 1. **GitHub:** in Lovable, connect the project to GitHub, clone the new repo, and compare its code with this folder's `main` branch (the September zip). Carry over anything changed on the live site since, then bring the `revamp` branch in and merge. Follow `AGENTS.md`: never force-push or rewrite pushed history, and keep the branch working, because commits sync straight into Lovable.
 2. **Database:** apply `supabase/migrations/20261102180000_events_reports_enquiries.sql` (ask Lovable to run it). It creates the events, reports and sponsorship enquiries tables, their access rules, the upload buckets, and loads the launch events and reports.
 3. **Email:** create a Resend account and set, in Lovable's project settings, `RESEND_API_KEY`, `SPONSORSHIP_RECIPIENTS` (comma-separated addresses) and, once emfc.es is verified in Resend, `SPONSORSHIP_FROM` (for example `EMFC website <website@emfc.es>`). Without them, live enquiries are saved but not emailed; locally the enquiry is printed to the server log instead.
-4. **Admin logins:** give the two Co-Presidents, the Head of Brand and the site owner the `admin` role in `user_roles`.
+4. **Admin logins** for the two Co-Presidents, the Head of Brand and the site owner:
+   - Each of them opens `/club-office`, chooses "New admin? Create your account" and confirms the email if asked. The account opens nothing yet.
+   - The site owner then gives it the `admin` role in `user_roles` (ask Lovable: "give the admin role to <email>"). The page shows "No admin access yet" until then, with the account's email.
+   - Forgotten passwords: "Forgot your password?" on the same page emails a link that comes back to `/club-office`. If sign-ups are switched off in Lovable Cloud, create the accounts there instead and have each person use that link to choose their own password.
+   - Check that Lovable Cloud's sign-in settings allow `https://emfc.es` as a return address. If an email link lands on another page of the site, the site forwards it to `/club-office`.
 5. **Check, then publish:** test the sponsorship form with all three recipients, add one event and one report on the admin page, check every page in light and dark mode at phone width, then publish from Lovable.
 6. **Accounts:** move Lovable, GitHub, Supabase, the domain registrar and Resend under one club-owned login before handing over (decided 2 November).
 
@@ -86,10 +92,11 @@ The full list, with what each item blocks, is in `REVAMP-PLAN.md` section 13.
 
 - `npx tsc` reports one error in `src/routes/__root.tsx` (ErrorComponent props, from Lovable's template). It was there before and doesn't affect the build.
 - Renaming or moving a route file while `npm run dev` runs can leave a stale error in the browser; reload the page.
-- Firm and resource logos load from logo.dev with the publishable key the old site used (in `src/lib/site.ts`); it is public by design.
+- Firm and resource logos load from logo.dev with the publishable key the old site used (in `src/lib/site.ts`); it is public by design. The homepage band shows them in colour, on white tiles in dark mode. If a logo looks wrong, try the firm's other domains: Lazard uses `lazardassetmanagement.com`, because `lazard.com` only returns a black letter.
+- Link previews (LinkedIn, WhatsApp) need full addresses, so pictures in page tags go through `absoluteUrl()` with `SITE_URL` (`src/lib/site.ts`). Pages without their own picture use the share image.
 - Between about 1024 and 1280px wide, the logo's subtitle and the social icons are hidden so the menu fits.
 - Don't add Tailwind, React, path-alias or Nitro plugins to `vite.config.ts`; Lovable's config already includes them.
-- The admin page's event, report and enquiry tabs have not been tested end to end yet: they need the database tables and an admin login.
+- The admin page's event, report and enquiry tabs have not been tested end to end yet: they need the database tables and an admin login. The event form, its preview and the clip stills were checked on a temporary copy of the form without the database, and the sign-in page's modes and expired-link message in the browser.
 
 ## 10. Other files made along the way
 

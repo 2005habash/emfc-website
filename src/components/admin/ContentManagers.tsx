@@ -1,9 +1,11 @@
-import { Eye, EyeOff, Loader2, Pencil, Plus, Trash2, Upload, X } from "lucide-react";
-import { useEffect, useState } from "react";
+import { ChevronLeft, ChevronRight, Eye, EyeOff, Loader2, Pencil, Plus, Trash2, Upload, X } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
+import { EventArticle } from "@/components/site/EventArticle";
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { supabase } from "@/integrations/supabase/client";
 import { invalidateContent } from "@/lib/content";
-import { EVENT_TYPE_COLORS, type EventPhoto, type EventType } from "@/data/events";
+import { clipPoster, EVENT_TYPE_COLORS, type EventPhoto, type EventType } from "@/data/events";
 import { departments } from "@/lib/departments";
 import { formatDay } from "@/lib/site";
 import { cn } from "@/lib/utils";
@@ -33,7 +35,7 @@ const slugify = (s: string) =>
 class UnreadablePhoto extends Error {}
 
 /** Shrinks a photo in the browser before upload (longest side 1600 px, JPEG), so storage lasts. */
-async function shrink(file: File, max = 1600): Promise<Blob> {
+async function shrink(file: File, max = 1600, quality = 0.82): Promise<Blob> {
   let bitmap: ImageBitmap;
   try {
     bitmap = await createImageBitmap(file);
@@ -45,8 +47,54 @@ async function shrink(file: File, max = 1600): Promise<Blob> {
   canvas.width = Math.round(bitmap.width * scale);
   canvas.height = Math.round(bitmap.height * scale);
   canvas.getContext("2d")!.drawImage(bitmap, 0, 0, canvas.width, canvas.height);
-  return new Promise((resolve) => canvas.toBlob((b) => resolve(b ?? file), "image/jpeg", 0.82));
+  return new Promise((resolve) => canvas.toBlob((b) => resolve(b ?? file), "image/jpeg", quality));
 }
+
+/** A clip this browser can't play, so many visitors couldn't either. */
+class UnplayableClip extends Error {}
+
+/** The storage's limit for one file. Short clips are a few MB. */
+const MAX_CLIP_MB = 50;
+
+/**
+ * Takes a still from a clip, half a second in, for the picture shown before it plays. Resolves with
+ * null when the browser won't load the clip in the background (some phones), so it goes up without one.
+ */
+async function posterFrom(file: File, max = 1080): Promise<Blob | null> {
+  const url = URL.createObjectURL(file);
+  const video = document.createElement("video");
+  video.muted = true;
+  video.playsInline = true;
+  video.preload = "auto";
+  const reached = (event: "loadeddata" | "seeked") =>
+    new Promise<boolean>((resolve, reject) => {
+      const timer = setTimeout(() => resolve(false), 15000);
+      video.addEventListener(event, () => (clearTimeout(timer), resolve(true)), { once: true });
+      video.addEventListener("error", () => (clearTimeout(timer), reject(new UnplayableClip(file.name))), { once: true });
+    });
+  try {
+    const loaded = reached("loadeddata");
+    video.src = url;
+    if (!(await loaded)) return null;
+    if (!video.videoWidth) throw new UnplayableClip(file.name);
+    const seeked = reached("seeked");
+    video.currentTime = Math.min(0.5, (video.duration || 1) / 2);
+    if (!(await seeked)) return null;
+    const scale = Math.min(1, max / Math.max(video.videoWidth, video.videoHeight));
+    const canvas = document.createElement("canvas");
+    canvas.width = Math.round(video.videoWidth * scale);
+    canvas.height = Math.round(video.videoHeight * scale);
+    canvas.getContext("2d")!.drawImage(video, 0, 0, canvas.width, canvas.height);
+    return await new Promise<Blob | null>((resolve) => canvas.toBlob(resolve, "image/jpeg", 0.8));
+  } finally {
+    video.removeAttribute("src");
+    video.load();
+    URL.revokeObjectURL(url);
+  }
+}
+
+/** Files in name order, so numbered exports (slide-1, slide-2, ...) keep their order. */
+const byName = (a: File, b: File) => a.name.localeCompare(b.name, undefined, { numeric: true });
 
 /**
  * Adds a new row, with a unique id if the one made from its title is taken, or updates an existing
@@ -176,6 +224,8 @@ export function EventsManager() {
               <p className="text-xs text-muted-foreground">
                 <span className="mr-1.5 inline-block h-2 w-2 rounded-full" style={{ background: EVENT_TYPE_COLORS[e.type] }} />
                 {formatDay(e.date)}, {e.type}, {e.photos.length} photos
+                {e.videos.length > 0 && `, ${e.videos.length} clips`}
+                {e.recap.length > 0 && `, ${e.recap.length} recap slides`}
                 {!e.published && ", hidden"}
               </p>
             </div>
@@ -200,36 +250,95 @@ export function EventsManager() {
 function EventForm({ initial, onDone }: { initial: EventRow; onDone: () => void }) {
   const [e, setE] = useState<EventRow>(initial);
   const [busy, setBusy] = useState(false);
+  const [previewing, setPreviewing] = useState(false);
+  const previewButton = useRef<HTMLButtonElement>(null);
   const isNew = !initial.id;
   const set = <K extends keyof EventRow>(k: K, v: EventRow[K]) => setE((x) => ({ ...x, [k]: v }));
   const toggle = (k: "departments" | "desks", v: string) =>
     set(k, e[k].includes(v) ? e[k].filter((x) => x !== v) : [...e[k], v]);
+  const folder = () => e.id || `${slugify(e.title || "event")}-${e.date}`;
+  const moveSlide = (i: number, by: -1 | 1) =>
+    setE((x) => {
+      const recap = [...x.recap];
+      if (!recap[i + by]) return x;
+      [recap[i], recap[i + by]] = [recap[i + by], recap[i]];
+      return { ...x, recap };
+    });
 
-  async function addPhotos(files: FileList | null) {
-    if (!files?.length) return;
-    setBusy(true);
-    const id = e.id || `${slugify(e.title || "event")}-${e.date}`;
-    const added: EventPhoto[] = [];
+  /** Shrinks and uploads pictures in name order; returns the addresses of those that went up. */
+  async function uploadPictures(files: FileList, max: number, quality?: number) {
+    const added: string[] = [];
     const unreadable: string[] = [];
-    for (const file of Array.from(files)) {
+    for (const file of Array.from(files).sort(byName)) {
       try {
-        const blob = await shrink(file);
-        const src = await upload("event-media", `${id}/${Date.now()}-${slugify(file.name)}.jpg`, blob, "image/jpeg");
-        added.push({ src, alt: "" });
+        const blob = await shrink(file, max, quality);
+        added.push(await upload("event-media", `${folder()}/${Date.now()}-${slugify(file.name)}.jpg`, blob, "image/jpeg"));
       } catch (err) {
         if (err instanceof UnreadablePhoto) unreadable.push(file.name);
         else toast.error(`${file.name}: ${(err as Error).message}`);
       }
-    }
-    if (added.length) {
-      set("photos", [...e.photos, ...added]);
-      toast.success(`${added.length} photo${added.length === 1 ? "" : "s"} uploaded. Add a short description to each.`);
     }
     if (unreadable.length) {
       toast.error(
         `This browser can't read ${unreadable.join(", ")} (iPhone photos are often HEIC). Open them in Preview and export as JPEG, or upload from Safari.`,
         { duration: 10000 },
       );
+    }
+    return added;
+  }
+
+  async function addPhotos(files: FileList | null) {
+    if (!files?.length) return;
+    setBusy(true);
+    const added = await uploadPictures(files, 1600);
+    if (added.length) {
+      setE((x) => ({ ...x, photos: [...x.photos, ...added.map((src) => ({ src, alt: "" }))] }));
+      toast.success(`${added.length} photo${added.length === 1 ? "" : "s"} uploaded. Add a short description to each.`);
+    }
+    setBusy(false);
+  }
+
+  async function addSlides(files: FileList | null) {
+    if (!files?.length) return;
+    setBusy(true);
+    // Recap slides carry text, so they keep more detail than photos.
+    const added = await uploadPictures(files, 2000, 0.9);
+    if (added.length) {
+      setE((x) => ({ ...x, recap: [...x.recap, ...added] }));
+      toast.success(`${added.length} slide${added.length === 1 ? "" : "s"} uploaded, in file name order.`);
+    }
+    setBusy(false);
+  }
+
+  async function addClips(files: FileList | null) {
+    if (!files?.length) return;
+    setBusy(true);
+    const added: string[] = [];
+    for (const file of Array.from(files).sort(byName)) {
+      if (file.size > MAX_CLIP_MB * 1024 * 1024) {
+        toast.error(`${file.name} is over ${MAX_CLIP_MB} MB. Trim it or export it smaller, then add it again.`);
+        continue;
+      }
+      try {
+        const poster = await posterFrom(file);
+        const ext = file.name.match(/\.(mp4|webm|mov)$/i)?.[1].toLowerCase() ?? "mp4";
+        const path = `${folder()}/${Date.now()}-${slugify(file.name.replace(/\.[^.]+$/, ""))}.${ext}`;
+        // iPhone .mov clips are served as MP4, which every browser opens.
+        const src = await upload("event-media", path, file, ext === "webm" ? "video/webm" : "video/mp4");
+        if (poster) await upload("event-media", clipPoster(path), poster, "image/jpeg");
+        else toast(`No still could be made for ${file.name}, so the site shows its first frame instead.`);
+        added.push(src);
+      } catch (err) {
+        toast.error(
+          err instanceof UnplayableClip
+            ? `This browser can't play ${file.name}. Export it as an MP4 (H.264) and add it again.`
+            : `${file.name}: ${(err as Error).message}`,
+        );
+      }
+    }
+    if (added.length) {
+      setE((x) => ({ ...x, videos: [...x.videos, ...added] }));
+      toast.success(`${added.length} clip${added.length === 1 ? "" : "s"} uploaded.`);
     }
     setBusy(false);
   }
@@ -355,13 +464,106 @@ function EventForm({ initial, onDone }: { initial: EventRow; onDone: () => void 
         </label>
       </fieldset>
 
+      <fieldset className="space-y-3">
+        <legend className={label}>Clips (short MP4 videos, up to {MAX_CLIP_MB} MB each)</legend>
+        {e.videos.length > 0 && (
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 lg:grid-cols-6">
+            {e.videos.map((v, i) => (
+              <div key={v} className="space-y-2 rounded-md border border-border p-2">
+                <video
+                  src={`${v}#t=0.1`}
+                  poster={clipPoster(v)}
+                  controls
+                  muted
+                  playsInline
+                  preload="metadata"
+                  className="aspect-[9/16] w-full rounded bg-black object-cover"
+                />
+                <button type="button" className={button} onClick={() => set("videos", e.videos.filter((_, j) => j !== i))}>
+                  <Trash2 className="h-4 w-4" /> Remove
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
+        <label className={cn(button, "cursor-pointer")}>
+          {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}
+          Add clips
+          <input
+            type="file"
+            accept="video/mp4,video/webm,video/quicktime,.mp4,.webm,.mov"
+            multiple
+            className="sr-only"
+            disabled={busy}
+            onChange={(x) => addClips(x.target.files)}
+          />
+        </label>
+      </fieldset>
+
+      <fieldset className="space-y-3">
+        <legend className={label}>Recap slides (the images of the Brand team's LinkedIn post, in order)</legend>
+        {e.recap.length > 0 && (
+          <div className="flex gap-3 overflow-x-auto pb-1">
+            {e.recap.map((src, i) => (
+              <div key={src} className="w-36 shrink-0 space-y-2 rounded-md border border-border p-2">
+                <img src={src} alt="" className="aspect-[4/5] w-full rounded object-cover" />
+                <div className="flex gap-1">
+                  <button type="button" className={cn(button, "px-2")} disabled={i === 0} onClick={() => moveSlide(i, -1)} aria-label={`Move slide ${i + 1} earlier`}>
+                    <ChevronLeft className="h-4 w-4" />
+                  </button>
+                  <button type="button" className={cn(button, "px-2")} disabled={i === e.recap.length - 1} onClick={() => moveSlide(i, 1)} aria-label={`Move slide ${i + 1} later`}>
+                    <ChevronRight className="h-4 w-4" />
+                  </button>
+                  <button type="button" className={cn(button, "px-2")} onClick={() => set("recap", e.recap.filter((_, j) => j !== i))} aria-label={`Remove slide ${i + 1}`}>
+                    <Trash2 className="h-4 w-4" />
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+        <label className={cn(button, "cursor-pointer")}>
+          {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}
+          Add slides
+          <input type="file" accept="image/*" multiple className="sr-only" disabled={busy} onChange={(x) => addSlides(x.target.files)} />
+        </label>
+      </fieldset>
+
       <label className="flex items-center gap-2 text-sm">
         <input type="checkbox" checked={e.published} onChange={(x) => set("published", x.target.checked)} />
         Show on the site
       </label>
-      <button className={primary} disabled={busy}>
-        {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : isNew ? "Add event" : "Save event"}
-      </button>
+      <div className="flex flex-wrap gap-2">
+        <button className={primary} disabled={busy}>
+          {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : isNew ? "Add event" : "Save event"}
+        </button>
+        <button ref={previewButton} type="button" className={cn(button, "h-10")} disabled={!e.title.trim()} onClick={() => setPreviewing(true)}>
+          <Eye className="h-4 w-4" /> Preview
+        </button>
+      </div>
+
+      <Dialog open={previewing} onOpenChange={setPreviewing}>
+        <DialogContent
+          className="flex max-h-[92vh] w-[min(96vw,1400px)] max-w-none flex-col gap-0 overflow-hidden p-0"
+          onCloseAutoFocus={(x) => {
+            x.preventDefault();
+            previewButton.current?.focus();
+          }}
+        >
+          <DialogTitle className="border-b border-border bg-card px-6 py-3 pr-14 font-sans text-sm font-normal tracking-normal text-muted-foreground">
+            Preview of the event page, as it will look once saved{e.published ? "" : " and shown on the site"}. Links are
+            switched off here.
+          </DialogTitle>
+          <div
+            className="overflow-y-auto bg-background"
+            onClickCapture={(x) => {
+              if ((x.target as HTMLElement).closest("a")) x.preventDefault();
+            }}
+          >
+            <EventArticle event={{ ...e, link: e.link ?? undefined }} />
+          </div>
+        </DialogContent>
+      </Dialog>
     </form>
   );
 }

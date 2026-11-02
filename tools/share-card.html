@@ -1,0 +1,22 @@
+<!doctype html><html><head><meta charset="utf-8">
+<!-- The link-preview image (public/images/share/emfc.jpg, 1200 x 630). To make it again, for example with a new group photo:
+  "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" --headless=new --hide-scrollbars --window-size=1200,630 --virtual-time-budget=8000 --allow-file-access-from-files --screenshot=card.png tools/share-card.html
+  then: sips -s format jpeg -s formatOptions 78 card.png --out public/images/share/emfc.jpg (keep it under 300 KB for WhatsApp). -->
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500&family=Cormorant+Garamond:wght@600&display=block" rel="stylesheet">
+<style>
+html,body{margin:0;width:1200px;height:630px;overflow:hidden;background:#000b3d}
+.card{position:relative;width:1200px;height:630px;background:#000b3d url("../public/images/team-group.jpg") center 28%/auto 118% no-repeat;font-family:Geist,sans-serif;color:#fff}
+.card::before{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,11,61,.80) 0%,rgba(0,11,61,.86) 60%,rgba(0,11,61,.93) 100%)}
+.inner{position:relative;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.mark{display:flex;align-items:center;gap:30px}
+.mark img{height:138px;width:auto}
+.word{font-family:"Cormorant Garamond",serif;font-weight:600;font-size:140px;line-height:1;letter-spacing:.08em;margin-right:-.08em}
+.sub{margin-top:34px;font-size:21px;font-weight:500;letter-spacing:.34em;text-transform:uppercase;color:#E3E6EF;margin-right:-.34em}
+.rule{margin-top:30px;width:72px;height:1px;background:#9ca8d4}
+.foot{margin-top:26px;font-size:16px;letter-spacing:.24em;text-transform:uppercase;color:#9ca8d4;margin-right:-.24em}
+</style></head><body><div class="card"><div class="inner">
+<div class="mark"><img src="../public/images/logo/bull-mark.png" alt=""><span class="word">EMFC</span></div>
+<div class="sub">ESADE Master's Finance Club</div>
+<div class="rule"></div>
+<div class="foot">ESADE Business School, Barcelona</div>
+</div></div></body></html>

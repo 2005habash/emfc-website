@@ -1,6 +1,6 @@
 -- Events, reports and sponsorship enquiries for the launch site (November 2026).
 -- Events and reports are managed from the admin page; the site falls back to the lists bundled in
--- src/data when these tables are missing or empty. Same access pattern as the existing tables:
+-- src/data only when these tables can't be read. Same access pattern as the existing tables:
 -- anyone can read what is published, only admins (private.has_role) can write.
 
 create table if not exists public.events (

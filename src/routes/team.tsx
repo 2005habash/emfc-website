@@ -6,7 +6,7 @@ import { Reveal } from "@/components/Reveal";
 import { MemberGrid } from "@/components/site/sections";
 import { Em, Eyebrow, Numeral, PageHero, PersonCard } from "@/components/site/ui";
 import { departments, type Department } from "@/lib/departments";
-import { CO_PRESIDENT_QUOTE, IMAGES, ROMAN } from "@/lib/site";
+import { absoluteUrl, CO_PRESIDENT_QUOTE, IMAGES, ROMAN } from "@/lib/site";
 import { ADVISORY, associatesOf, leadershipOf, PRESIDENTS } from "@/lib/team";
 import { STATS } from "@/data/stats";
 import { cn } from "@/lib/utils";
@@ -25,7 +25,7 @@ export const Route = createFileRoute("/team")({
         property: "og:description",
         content: `${STATS.members} members across six departments of the ESADE Master's Finance Club.`,
       },
-      { property: "og:image", content: IMAGES.teamGroup },
+      { property: "og:image", content: absoluteUrl(IMAGES.teamGroup) },
     ],
   }),
   component: Team,

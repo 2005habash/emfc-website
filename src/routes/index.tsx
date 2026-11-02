@@ -33,8 +33,6 @@ export const Route = createFileRoute("/")({
       },
       { property: "og:title", content: "EMFC, ESADE Master's Finance Club" },
       { property: "og:description", content: "The finance club at ESADE." },
-      { property: "og:image", content: IMAGES.placaEspanya },
-      { property: "twitter:image", content: IMAGES.placaEspanya },
     ],
   }),
   loader: () => loadEvents(),
@@ -186,7 +184,7 @@ function FirmsBand() {
                       src={logoUrl(f.domain, 64)}
                       alt=""
                       loading="lazy"
-                      className="h-8 w-8 rounded-[6px] object-contain grayscale transition duration-300 group-hover:grayscale-0 md:h-9 md:w-9"
+                      className="h-8 w-8 rounded-[6px] object-contain md:h-9 md:w-9 dark:bg-white"
                     />
                     {f.name}
                   </li>
