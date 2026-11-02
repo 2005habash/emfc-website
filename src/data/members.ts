@@ -99,10 +99,9 @@ export const MEMBERS: Member[] = [
   {
     "name": "Erik Oostendorp",
     "slug": "erik-oostendorp",
-    "title": "Associate, M&A",
+    "title": "Associate, Investment Banking",
     "department": "investment-banking",
     "position": "associate",
-    "desk": "m-and-a",
     "programme": "Global Master in Finance",
     "linkedin": "https://www.linkedin.com/in/erik-oostendorp",
     "firms": [
@@ -115,10 +114,9 @@ export const MEMBERS: Member[] = [
   {
     "name": "Jack Hermansson",
     "slug": "jack-hermansson",
-    "title": "Associate, M&A",
+    "title": "Associate, Investment Banking",
     "department": "investment-banking",
     "position": "associate",
-    "desk": "m-and-a",
     "programme": "Master in Finance",
     "linkedin": "https://www.linkedin.com/in/jack-hermansson",
     "firms": [
@@ -130,10 +128,9 @@ export const MEMBERS: Member[] = [
   {
     "name": "Kian Chirani",
     "slug": "kian-chirani",
-    "title": "Associate, M&A",
+    "title": "Associate, Investment Banking",
     "department": "investment-banking",
     "position": "associate",
-    "desk": "m-and-a",
     "programme": "Master in Finance, double degree",
     "linkedin": "https://www.linkedin.com/in/kianchirani",
     "firms": [
@@ -446,7 +443,7 @@ export const MEMBERS: Member[] = [
   {
     "name": "Lili Anna Paczolay-Nagy",
     "slug": "lili-anna-paczolay-nagy",
-    "title": "Associate, Private Markets",
+    "title": "Associate, Private Equity",
     "department": "private-markets",
     "position": "associate",
     "programme": "Global Master in Finance",
@@ -455,12 +452,13 @@ export const MEMBERS: Member[] = [
       "UniCredit Bank Austria",
       "UniCredit"
     ],
-    "photo": "/images/team/lili-anna-paczolay-nagy.jpg"
+    "photo": "/images/team/lili-anna-paczolay-nagy.jpg",
+    "desk": "private-equity"
   },
   {
     "name": "Shaivam Sundeep Ravani",
     "slug": "shaivam-sundeep-ravani",
-    "title": "Associate, Private Markets",
+    "title": "Associate, Fintech",
     "department": "private-markets",
     "position": "associate",
     "programme": "Master in Finance",
@@ -470,7 +468,8 @@ export const MEMBERS: Member[] = [
       "Xtrawrkx Management",
       "Mulya Finance"
     ],
-    "photo": "/images/team/shaivam-sundeep-ravani.jpg"
+    "photo": "/images/team/shaivam-sundeep-ravani.jpg",
+    "desk": "fintech"
   },
   {
     "name": "Cosimo Dini",

@@ -1,0 +1,12 @@
+{
+ "about": "Changes to titles and desks after the member form, applied by tools/import-members.mjs. desk null means the person works across the department's desks.",
+ "changes": [
+  { "slug": "erik-oostendorp", "title": "Associate, Investment Banking", "desk": null, "note": "Investment Banking associates work on both desks (Zaid, 3 November 2026)." },
+  { "slug": "jack-hermansson", "title": "Associate, Investment Banking", "desk": null, "note": "As above." },
+  { "slug": "kian-chirani", "title": "Associate, Investment Banking", "desk": null, "note": "As above." },
+  { "slug": "alice-lafreniere", "title": "Associate, Investment Banking", "desk": null, "note": "As above." },
+  { "slug": "henri-de-canecaude", "title": "Associate, Investment Banking", "desk": null, "note": "As above." },
+  { "slug": "shaivam-sundeep-ravani", "title": "Associate, Fintech", "desk": "Fintech", "note": "On the Fintech desk (Zaid, 3 November 2026)." },
+  { "slug": "lili-anna-paczolay-nagy", "title": "Associate, Private Equity", "desk": "Private Equity", "note": "On the Private Equity desk (Zaid, 3 November 2026)." }
+ ]
+}

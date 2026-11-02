@@ -1,4 +1,5 @@
 import { MEMBERS, type Member } from "@/data/members";
+import { getDepartment } from "@/lib/departments";
 
 export type { Member };
 
@@ -24,11 +25,16 @@ export const leadershipOf = (department: string) =>
 export const associatesOf = (department: string, desk?: string) =>
   membersOf(department).filter((m) => m.position === "associate" && (desk === undefined || m.desk === desk));
 
-/** Everyone working on a desk: its Vice-President or lead first, then its associates. */
-export const deskTeam = (department: string, desk: string) =>
-  membersOf(department)
-    .filter((m) => m.desk === desk)
+/**
+ * Everyone working on a desk: its Vice-President or lead first, then its associates. In a department
+ * whose associates work across all desks (Investment Banking), that is every associate without a desk.
+ */
+export const deskTeam = (department: string, desk: string) => {
+  const across = getDepartment(department)?.associatesAcrossDesks;
+  return membersOf(department)
+    .filter((m) => m.desk === desk || (across && m.position === "associate" && !m.desk))
     .sort((a, b) => Number(a.position === "associate") - Number(b.position === "associate"));
+};
 
 /**
  * Everyone with a photo, for the moving strip on the homepage. Departments take turns, so the strip

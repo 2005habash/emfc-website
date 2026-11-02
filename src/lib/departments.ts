@@ -43,6 +43,8 @@ export type Department = {
   desks: Desk[];
   /** Fixed Income: desks shown in two groups. */
   groups?: { name: string; lead: string; desks: string[] }[];
+  /** Associates work across every desk (Investment Banking), so each desk page lists all of them. */
+  associatesAcrossDesks?: boolean;
 };
 
 const firms = (names: string[], proposed: string[] = []): Firm[] => [
@@ -107,6 +109,7 @@ export const departments: Department[] = [
   {
     slug: "investment-banking",
     name: "Investment Banking",
+    associatesAcrossDesks: true,
     short:
       "M&A and Debt Advisory. Monthly deal case studies, coffee chats with bankers, and recruiting prep for investment banking.",
     long: "A coverage desk built like an analyst pool. A monthly M&A deal case study, coffee chats with bankers every two weeks, CV workshops and structured interview prep for investment banking recruiting.",
