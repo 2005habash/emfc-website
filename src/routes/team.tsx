@@ -76,9 +76,17 @@ const story = [
   },
 ];
 
-/** Associates by desk, Fixed Income by its two groups, then anyone without a desk. */
+/**
+ * Associates by desk, then anyone without a desk. Fixed Income, with six small desks, shows its two
+ * groups instead; each person's title still names their desk.
+ */
 function associateGroups(d: Department) {
   const all = associatesOf(d.slug);
+  if (d.groups) {
+    return d.groups
+      .map((g) => ({ label: g.name, members: all.filter((m) => m.group === g.name) }))
+      .filter((g) => g.members.length > 0);
+  }
   const groups = d.desks
     .map((k) => ({
       label: k.group ? `${k.group}: ${k.name}` : k.name,

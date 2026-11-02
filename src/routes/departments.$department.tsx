@@ -106,11 +106,16 @@ function DepartmentPage() {
   const events = eventsFor(data.events, d.slug);
   const deskNames = Object.fromEntries(d.desks.map((k) => [k.slug, k.name]));
   const associates = associatesOf(d.slug);
-  // Associates by desk, then anyone in the department without a desk.
-  const byDesk = [
-    ...d.desks.map((k) => ({ name: k.name, members: associatesOf(d.slug, k.slug) })),
-    { name: d.desks.length ? d.name : undefined, members: associates.filter((m) => !m.desk) },
-  ].filter((g) => g.members.length > 0);
+  // Associates by desk, then anyone in the department without a desk. Fixed Income shows its two
+  // groups instead of six small desks; each person's title names their desk.
+  const byDesk = (
+    d.groups
+      ? d.groups.map((g) => ({ name: g.name, members: associates.filter((m) => m.group === g.name) }))
+      : [
+          ...d.desks.map((k) => ({ name: k.name, members: associatesOf(d.slug, k.slug) })),
+          { name: d.desks.length ? d.name : undefined, members: associates.filter((m) => !m.desk) },
+        ]
+  ).filter((g) => g.members.length > 0);
 
   return (
     <SiteLayout>
