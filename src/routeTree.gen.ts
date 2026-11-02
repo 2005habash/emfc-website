@@ -17,6 +17,7 @@ import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as ResourcesRouteImport } from './routes/resources'
 import { Route as SponsorshipRouteImport } from './routes/sponsorship'
 import { Route as TeamRouteImport } from './routes/team'
+import { Route as ZaidRouteImport } from './routes/zaid'
 import { Route as DepartmentsIndexRouteImport } from './routes/departments.index'
 import { Route as DepartmentsDepartmentRouteImport } from './routes/departments.$department'
 import { Route as EventsEventIdRouteImport } from './routes/events_.$eventId'
@@ -62,6 +63,11 @@ const TeamRoute = TeamRouteImport.update({
   path: '/team',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ZaidRoute = ZaidRouteImport.update({
+  id: '/zaid',
+  path: '/zaid',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const DepartmentsIndexRoute = DepartmentsIndexRouteImport.update({
   id: '/departments/',
   path: '/departments/',
@@ -93,6 +99,7 @@ export interface FileRoutesByFullPath {
   '/resources': typeof ResourcesRoute
   '/sponsorship': typeof SponsorshipRoute
   '/team': typeof TeamRoute
+  '/zaid': typeof ZaidRoute
   '/departments/$department': typeof DepartmentsDepartmentRoute
   '/events/$eventId': typeof EventsEventIdRoute
   '/departments/': typeof DepartmentsIndexRoute
@@ -107,6 +114,7 @@ export interface FileRoutesByTo {
   '/resources': typeof ResourcesRoute
   '/sponsorship': typeof SponsorshipRoute
   '/team': typeof TeamRoute
+  '/zaid': typeof ZaidRoute
   '/departments/$department': typeof DepartmentsDepartmentRoute
   '/events/$eventId': typeof EventsEventIdRoute
   '/departments': typeof DepartmentsIndexRoute
@@ -122,6 +130,7 @@ export interface FileRoutesById {
   '/resources': typeof ResourcesRoute
   '/sponsorship': typeof SponsorshipRoute
   '/team': typeof TeamRoute
+  '/zaid': typeof ZaidRoute
   '/departments/$department': typeof DepartmentsDepartmentRoute
   '/events_/$eventId': typeof EventsEventIdRoute
   '/departments/': typeof DepartmentsIndexRoute
@@ -138,6 +147,7 @@ export interface FileRouteTypes {
     | '/resources'
     | '/sponsorship'
     | '/team'
+    | '/zaid'
     | '/departments/$department'
     | '/events/$eventId'
     | '/departments/'
@@ -152,6 +162,7 @@ export interface FileRouteTypes {
     | '/resources'
     | '/sponsorship'
     | '/team'
+    | '/zaid'
     | '/departments/$department'
     | '/events/$eventId'
     | '/departments'
@@ -166,6 +177,7 @@ export interface FileRouteTypes {
     | '/resources'
     | '/sponsorship'
     | '/team'
+    | '/zaid'
     | '/departments/$department'
     | '/events_/$eventId'
     | '/departments/'
@@ -181,6 +193,7 @@ export interface RootRouteChildren {
   ResourcesRoute: typeof ResourcesRoute
   SponsorshipRoute: typeof SponsorshipRoute
   TeamRoute: typeof TeamRoute
+  ZaidRoute: typeof ZaidRoute
   DepartmentsDepartmentRoute: typeof DepartmentsDepartmentRoute
   EventsEventIdRoute: typeof EventsEventIdRoute
   DepartmentsIndexRoute: typeof DepartmentsIndexRoute
@@ -245,6 +258,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof TeamRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/zaid': {
+      id: '/zaid'
+      path: '/zaid'
+      fullPath: '/zaid'
+      preLoaderRoute: typeof ZaidRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/departments/': {
       id: '/departments/'
       path: '/departments'
@@ -285,6 +305,7 @@ const rootRouteChildren: RootRouteChildren = {
   ResourcesRoute: ResourcesRoute,
   SponsorshipRoute: SponsorshipRoute,
   TeamRoute: TeamRoute,
+  ZaidRoute: ZaidRoute,
   DepartmentsDepartmentRoute: DepartmentsDepartmentRoute,
   EventsEventIdRoute: EventsEventIdRoute,
   DepartmentsIndexRoute: DepartmentsIndexRoute,
