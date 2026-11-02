@@ -1,7 +1,7 @@
 // Cloudflare Workers settings. The build (Nitro) merges these into .output/server/wrangler.json;
 // the worker's name must match the project name in the Cloudflare dashboard.
 {
-  "name": "emfc-website",
+  "name": "emfc",
   "compatibility_flags": ["nodejs_compat"],
   // Public by design (the browser gets the same values). Secrets such as RESEND_API_KEY are set in
   // the Cloudflare dashboard instead, and keep_vars stops a deploy from removing them.
