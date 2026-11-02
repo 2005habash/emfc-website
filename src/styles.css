@@ -1,0 +1,337 @@
+@import "tailwindcss" source(none);
+@source "../src";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --color-background: hsl(var(--background));
+  --color-foreground: hsl(var(--foreground));
+  --color-card: hsl(var(--card));
+  --color-card-foreground: hsl(var(--card-foreground));
+  --color-popover: hsl(var(--popover));
+  --color-popover-foreground: hsl(var(--popover-foreground));
+  --color-primary: hsl(var(--primary));
+  --color-primary-foreground: hsl(var(--primary-foreground));
+  --color-secondary: hsl(var(--secondary));
+  --color-secondary-foreground: hsl(var(--secondary-foreground));
+  --color-muted: hsl(var(--muted));
+  --color-muted-foreground: hsl(var(--muted-foreground));
+  --color-accent: hsl(var(--accent));
+  --color-accent-foreground: hsl(var(--accent-foreground));
+  --color-destructive: hsl(var(--destructive));
+  --color-destructive-foreground: hsl(var(--destructive-foreground));
+  --color-border: hsl(var(--border));
+  --color-input: hsl(var(--input));
+  --color-ring: hsl(var(--ring));
+  --color-ring-offset-background: hsl(var(--background));
+
+  /* EMFC design tokens. Each maps to a raw variable that flips in dark mode. */
+  --color-paper: var(--c-paper);
+  --color-stone: var(--c-stone);
+  --color-panel: var(--c-panel);
+  --color-ink: var(--c-ink);
+  --color-mute: var(--c-mute);
+  --color-line: var(--c-line);
+  --color-night: var(--c-night);
+  --color-deep: var(--c-deep);
+  --color-brass: var(--c-brass);
+  --color-brass-light: var(--c-brass-light);
+  --color-warn: var(--c-warn);
+  --color-field: var(--c-field);
+  --color-tile: #ece7de;
+  --color-tile-alt: #e4ded3;
+  --color-mist: #c9cedd;
+  --color-haze: #a9b0c6;
+
+  /* Legacy aliases kept so the admin dashboard keeps its styling. */
+  --color-navy: hsl(var(--primary));
+  --color-ink-legacy: hsl(var(--primary));
+  --color-steel: hsl(var(--muted-foreground));
+  --color-gold: hsl(var(--accent));
+  --color-gold-foreground: hsl(var(--accent-foreground));
+  --color-cream: hsl(var(--secondary));
+
+  --font-sans: "Geist", system-ui, sans-serif;
+  --font-serif: "Cormorant Garamond", Georgia, serif;
+
+  --animate-kenburns: kenburns 30s ease-in-out infinite alternate;
+  --animate-rise: rise 1s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+  --animate-marquee: marquee 70s linear infinite;
+  --animate-logo-in: logo-in 0.9s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+
+:root {
+  --radius: 0.25rem;
+
+  --c-paper: #faf8f4;
+  --c-stone: #f1ede5;
+  --c-panel: #faf8f4;
+  --c-ink: #141b34;
+  --c-mute: #555c72;
+  --c-line: #ddd6c9;
+  --c-night: #030c3b;
+  --c-deep: #02082a;
+  --c-brass: #a8844b;
+  --c-brass-light: #d9bc85;
+  --c-warn: #7a5e30;
+  --c-field: #ffffff;
+
+  /* shadcn tokens, as HSL channels */
+  --background: 40 38% 97%;
+  --foreground: 227 44% 14%;
+  --primary: 230 90% 12%;
+  --primary-foreground: 0 0% 100%;
+  --secondary: 40 30% 92%;
+  --secondary-foreground: 227 44% 14%;
+  --accent: 37 38% 48%;
+  --accent-foreground: 0 0% 100%;
+  --muted: 40 30% 92%;
+  --muted-foreground: 226 15% 39%;
+  --card: 40 38% 97%;
+  --card-foreground: 227 44% 14%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 227 44% 14%;
+  --border: 39 23% 83%;
+  --input: 39 23% 83%;
+  --ring: 230 90% 12%;
+  --destructive: 0 72% 42%;
+  --destructive-foreground: 0 0% 100%;
+
+  /* Legacy raw vars used by inline styles */
+  --navy: #030c3b;
+  --ink: #141b34;
+  --steel: #555c72;
+  --gold: #a8844b;
+  --gold-foreground: #ffffff;
+  --cream: #f1ede5;
+}
+
+.dark {
+  --c-paper: #070b1f;
+  --c-stone: #0b1130;
+  --c-panel: #111a40;
+  --c-ink: #f2eee6;
+  --c-mute: #a3abcb;
+  --c-line: #222c58;
+  --c-night: #0d1538;
+  --c-deep: #050817;
+  --c-warn: #d9bc85;
+  --c-field: #0b1130;
+
+  --background: 230 63% 7%;
+  --foreground: 40 32% 93%;
+  --primary: 40 32% 93%;
+  --primary-foreground: 230 63% 7%;
+  --secondary: 231 63% 12%;
+  --secondary-foreground: 40 32% 93%;
+  --accent: 39 52% 69%;
+  --accent-foreground: 230 63% 7%;
+  --muted: 231 63% 12%;
+  --muted-foreground: 228 28% 72%;
+  --card: 229 58% 16%;
+  --card-foreground: 40 32% 93%;
+  --popover: 229 58% 16%;
+  --popover-foreground: 40 32% 93%;
+  --border: 229 44% 24%;
+  --input: 229 44% 24%;
+  --ring: 40 32% 93%;
+
+  --navy: #f2eee6;
+  --ink: #f2eee6;
+  --steel: #a3abcb;
+  --cream: #0b1130;
+}
+
+@layer base {
+  * {
+    border-color: var(--color-border);
+  }
+  html {
+    scroll-behavior: smooth;
+  }
+  body {
+    background-color: var(--color-paper);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+  }
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-family: var(--font-serif);
+    letter-spacing: -0.01em;
+    font-weight: 500;
+  }
+  ::selection {
+    background: var(--c-brass);
+    color: #ffffff;
+  }
+}
+
+@utility container-emis {
+  @apply mx-auto w-full max-w-6xl px-6;
+}
+@utility container-wide {
+  @apply mx-auto w-full max-w-7xl px-6;
+}
+/* Full-bleed page gutter used by the public site. */
+@utility gutter {
+  @apply mx-auto w-full max-w-[1440px] px-5 md:px-10 lg:px-14;
+}
+@utility eyebrow {
+  text-transform: uppercase;
+  letter-spacing: 0.24em;
+  font-size: 0.6875rem;
+  font-weight: 500;
+  color: var(--color-mute);
+}
+@utility caps {
+  text-transform: uppercase;
+  font-weight: 500;
+}
+@utility display-caps {
+  font-family: var(--font-serif);
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  font-weight: 500;
+  line-height: 1.05;
+}
+
+@layer components {
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    height: 3.375rem;
+    padding: 0 1.75rem;
+    border-radius: 999px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    white-space: nowrap;
+    transition:
+      filter 0.2s,
+      background-color 0.2s,
+      color 0.2s;
+  }
+  .btn-sm {
+    height: 3rem;
+    padding: 0 1.375rem;
+    font-size: 0.6875rem;
+  }
+  .btn-white {
+    background: #ffffff;
+    color: #030c3b;
+  }
+  .btn-white:hover {
+    filter: brightness(0.94);
+  }
+  .btn-ink {
+    background: var(--c-ink);
+    color: var(--c-paper);
+  }
+  .btn-ink:hover {
+    filter: brightness(1.15);
+  }
+  .btn-outline-white {
+    border: 1px solid rgb(255 255 255 / 0.7);
+    color: #ffffff;
+  }
+  .btn-outline-white:hover {
+    background: rgb(255 255 255 / 0.12);
+  }
+  .btn-outline-ink {
+    border: 1px solid var(--c-ink);
+    color: var(--c-ink);
+  }
+  .btn-outline-ink:hover {
+    background: var(--c-ink);
+    color: var(--c-paper);
+  }
+}
+
+@keyframes kenburns {
+  from {
+    transform: scale(1);
+  }
+  to {
+    transform: scale(1.09);
+  }
+}
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(28px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+@keyframes logo-in {
+  from {
+    opacity: 0;
+    transform: translateX(-14px) scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Kept for the admin dashboard. */
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@utility animate-fade-up {
+  animation: fade-up 0.9s ease-out both;
+}
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@utility animate-fade-in {
+  animation: fade-in 1.2s ease-out both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  [data-reveal],
+  [data-parallax] {
+    transform: none !important;
+  }
+}
