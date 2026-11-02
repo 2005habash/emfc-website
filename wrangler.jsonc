@@ -1,0 +1,6 @@
+// Cloudflare Workers settings. The build (Nitro) merges these into .output/server/wrangler.json;
+// the worker's name must match the project name in the Cloudflare dashboard.
+{
+  "name": "emfc-website",
+  "compatibility_flags": ["nodejs_compat"]
+}

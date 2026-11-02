@@ -1,5 +1,5 @@
 > [!IMPORTANT]
-> The site is hosted on Vercel, which deploys every push to the `main` branch of
+> The site is hosted on Cloudflare Workers, which deploys every push to the `main` branch of
 > `Esade-Master-Finance-Club/emfc-website` straight to https://emfc.es. Keep `main` working:
 > build and check locally (`npm run build`, `npm run lint:copy`) before pushing, and use a branch
 > and a pull request for anything larger. Never force-push or rewrite history that is already
