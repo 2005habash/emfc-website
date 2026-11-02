@@ -4,7 +4,7 @@ The EMFC (ESADE Master's Finance Club) website, rebuilt for launch. State as of 
 
 ## 1. Where it stands
 
-- **The site is leaving Lovable** (decided 2 November, evening). It moves to the club's own accounts: code in the GitHub organisation `Esade-Masters-Finance-Club`, hosting on Vercel, and a new Supabase project (`rqgjcdttfccemcyxulub`) that starts fresh. Nothing from Lovable Cloud (applications, CVs, newsletter sign-ups) is carried over. Until the domain switch, https://emfc.es still serves the old Lovable site.
+- **The site is leaving Lovable** (decided 2 November, evening). It moves to the club's own accounts: code on GitHub at `2005habash/emfc-website` (public; Vercel's free plan only deploys personal repositories, so it moves to a club account at the handover with Settings, Transfer), hosting on Vercel, and a new Supabase project (`rqgjcdttfccemcyxulub`) that starts fresh. Nothing from Lovable Cloud (applications, CVs, newsletter sign-ups) is carried over. Until the domain switch, https://emfc.es still serves the old Lovable site.
 - **The launch build** is on the git branch `revamp` (`main` locally holds the 27 October starting point).
 - **Built and checked:** 66 members with matching portraits, 6 department pages and 15 desk pages, 10 events with photos and clips, a library of 12 reports, the club statistics, the sponsorship form that sends from the site, the newsletter with consent, a privacy page, and an admin page. The production build passes; no page overflows at phone width.
 - **Not yet working live**, because it needs accounts (section 8): the new database tables, sponsorship emails, admin logins, publishing.
@@ -78,7 +78,7 @@ The full list, with what each item blocks, is in `REVAMP-PLAN.md` section 13.
 
 ## 8. Going live
 
-1. **Code:** the private repository `Esade-Masters-Finance-Club/emfc-website`, with the launch build as `main`. Follow `AGENTS.md`: Vercel deploys every push to `main`.
+1. **Code:** the private repository `2005habash/emfc-website`, with the launch build as `main`. Follow `AGENTS.md`: Vercel deploys every push to `main`.
 2. **Database:** in the Supabase project's SQL Editor, run `supabase/migrations/20261102170000_initial_schema.sql` (admin roles, applications, CV storage, newsletter), then `20261102180000_events_reports_enquiries.sql` (events, reports, enquiries, upload buckets, and the launch events and reports). The old Lovable migrations are archived in `supabase/lovable-migrations/`.
 3. **Hosting:** a Vercel project connected to the GitHub repository, with the build settings Vercel suggests. The public Supabase values are in the repository (`.env.production`), so Vercel only needs the email keys. Check the site on its `vercel.app` address before touching the domain.
 4. **Email:** a Resend account; verify emfc.es there by adding its DNS records at one.com (where the domain's DNS lives), then set `RESEND_API_KEY`, `SPONSORSHIP_RECIPIENTS` (comma-separated) and `SPONSORSHIP_FROM` (for example `EMFC website <website@emfc.es>`) in the Vercel project. Without them, enquiries are saved but not emailed.
