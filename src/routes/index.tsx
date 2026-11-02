@@ -171,7 +171,7 @@ function FirmsBand() {
           have worked
         </div>
         <div className="group relative flex-1 overflow-hidden motion-reduce:overflow-x-auto [mask-image:linear-gradient(90deg,transparent,#000_6%,#000_94%,transparent)]">
-          <div className="flex w-max animate-marquee [animation-duration:90s] group-hover:[animation-play-state:paused]">
+          <div className="flex w-max animate-marquee [animation-duration:90s]">
             {[0, 1].map((copy) => (
               <ul
                 key={copy}

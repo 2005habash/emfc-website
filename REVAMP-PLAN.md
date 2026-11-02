@@ -207,7 +207,7 @@ One rule for the whole site: anything clickable has a visible sign at rest (a bu
 ### 7.5 One moving logo band (28 Oct)
 The homepage has two bands that do the same job: the moving department ticker and the static "Where our members come from" strip. Keep one, a slow band of member-firm logos.
 - **Content:** the 12 firms from 6.5, plus more from the "more options" list if it looks thin.
-- **Behaviour:** in colour (Zaid, 2 Nov, instead of monochrome), pauses on hover, static for reduced motion.
+- **Behaviour:** in colour (Zaid, 2 Nov, instead of monochrome), keeps moving on hover (Zaid, 3 Nov), static for reduced motion.
 - **Logos:** one-colour SVGs from each firm's press page. Until a logo is sourced, its name appears in the serif typeface instead.
 
 ## 8. Phase 3: page by page
