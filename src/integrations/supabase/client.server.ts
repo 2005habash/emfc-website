@@ -38,7 +38,7 @@ function createSupabaseAdminClient() {
       ...(!SUPABASE_URL ? ['SUPABASE_URL'] : []),
       ...(!SUPABASE_SERVICE_ROLE_KEY ? ['SUPABASE_SERVICE_ROLE_KEY'] : []),
     ];
-    const message = `Missing Supabase environment variable(s): ${missing.join(', ')}. Set them in .env (locally) or in the Cloudflare project's settings.`;
+    const message = `Missing Supabase environment variable(s): ${missing.join(', ')}. Set them in .env (locally) or in Vercel's project settings.`;
     console.error(`[Supabase] ${message}`);
     throw new Error(message);
   }

@@ -4,7 +4,7 @@ The EMFC (ESADE Master's Finance Club) website, rebuilt for launch. State as of 
 
 ## 1. Where it stands
 
-- **The site is leaving Lovable** (decided 2 November, evening). It moves to the club's own accounts: code in the GitHub organisation `Esade-Master-Finance-Club`, hosting on Cloudflare Workers (free; Vercel's free plan can't deploy an organisation's private repository), and a new Supabase project (`rqgjcdttfccemcyxulub`) that starts fresh. Nothing from Lovable Cloud (applications, CVs, newsletter sign-ups) is carried over. Until the domain switch, https://emfc.es still serves the old Lovable site.
+- **The site is leaving Lovable** (decided 2 November, evening). It moves to the club's own accounts: code in the GitHub organisation `Esade-Masters-Finance-Club`, hosting on Vercel, and a new Supabase project (`rqgjcdttfccemcyxulub`) that starts fresh. Nothing from Lovable Cloud (applications, CVs, newsletter sign-ups) is carried over. Until the domain switch, https://emfc.es still serves the old Lovable site.
 - **The launch build** is on the git branch `revamp` (`main` locally holds the 27 October starting point).
 - **Built and checked:** 66 members with matching portraits, 6 department pages and 15 desk pages, 10 events with photos and clips, a library of 12 reports, the club statistics, the sponsorship form that sends from the site, the newsletter with consent, a privacy page, and an admin page. The production build passes; no page overflows at phone width.
 - **Not yet working live**, because it needs accounts (section 8): the new database tables, sponsorship emails, admin logins, publishing.
@@ -17,7 +17,7 @@ npm install        # first time only
 npm run dev        # http://localhost:8080
 ```
 
-`.claude/launch.json` runs it on port 5173 for Claude's browser preview. Use npm. Keys go in `.env` (never committed; Cloudflare holds the same names): `VITE_SUPABASE_URL`, `VITE_SUPABASE_PUBLISHABLE_KEY`, `VITE_SUPABASE_PROJECT_ID`, `SUPABASE_URL`, `SUPABASE_PUBLISHABLE_KEY`, and for email `RESEND_API_KEY`, `SPONSORSHIP_RECIPIENTS`, `SPONSORSHIP_FROM`.
+`.claude/launch.json` runs it on port 5173 for Claude's browser preview. Use npm. Keys go in `.env` (never committed; Vercel holds the same names): `VITE_SUPABASE_URL`, `VITE_SUPABASE_PUBLISHABLE_KEY`, `VITE_SUPABASE_PROJECT_ID`, `SUPABASE_URL`, `SUPABASE_PUBLISHABLE_KEY`, and for email `RESEND_API_KEY`, `SPONSORSHIP_RECIPIENTS`, `SPONSORSHIP_FROM`.
 
 ## 3. Design rules (keep them)
 
@@ -78,18 +78,18 @@ The full list, with what each item blocks, is in `REVAMP-PLAN.md` section 13.
 
 ## 8. Going live
 
-1. **Code:** the private repository `Esade-Master-Finance-Club/emfc-website`, with the launch build as `main`. Follow `AGENTS.md`: Cloudflare deploys every push to `main`.
+1. **Code:** the private repository `Esade-Masters-Finance-Club/emfc-website`, with the launch build as `main`. Follow `AGENTS.md`: Vercel deploys every push to `main`.
 2. **Database:** in the Supabase project's SQL Editor, run `supabase/migrations/20261102170000_initial_schema.sql` (admin roles, applications, CV storage, newsletter), then `20261102180000_events_reports_enquiries.sql` (events, reports, enquiries, upload buckets, and the launch events and reports). The old Lovable migrations are archived in `supabase/lovable-migrations/`.
-3. **Hosting:** a Cloudflare Workers project named `emfc`, connected to the GitHub repository (build command `npm run build`, deploy command `npx wrangler deploy`), The public Supabase values are in the repository (`.env.production` for the browser code, `wrangler.jsonc` for the server), so the dashboard only needs the email secrets. Settings live in `vite.config.ts` and `wrangler.jsonc`. Check the site on its `workers.dev` address before touching the domain.
-4. **Email:** a Resend account; verify emfc.es there by adding its DNS records at one.com (where the domain's DNS lives), then set `RESEND_API_KEY` (as a secret), `SPONSORSHIP_RECIPIENTS` (comma-separated) and `SPONSORSHIP_FROM` (for example `EMFC website <website@emfc.es>`) in the Cloudflare project. Without them, enquiries are saved but not emailed.
+3. **Hosting:** a Vercel project connected to the GitHub repository, with the build settings Vercel suggests. The public Supabase values are in the repository (`.env.production`), so Vercel only needs the email keys. Check the site on its `vercel.app` address before touching the domain.
+4. **Email:** a Resend account; verify emfc.es there by adding its DNS records at one.com (where the domain's DNS lives), then set `RESEND_API_KEY`, `SPONSORSHIP_RECIPIENTS` (comma-separated) and `SPONSORSHIP_FROM` (for example `EMFC website <website@emfc.es>`) in the Vercel project. Without them, enquiries are saved but not emailed.
 5. **Admin logins** for the two Co-Presidents, the Head of Brand and the site owner:
    - Each of them opens `/club-office`, chooses "New admin? Create your account" and confirms the email. The account opens nothing yet.
    - The site owner gives it the `admin` role in the SQL Editor (the query is at the top of the initial schema file). The page shows "No admin access yet" until then, with the account's email.
    - Forgotten passwords: "Forgot your password?" emails a link back to `/club-office`.
-   - In Supabase, Authentication, URL Configuration: set the Site URL to `https://emfc.es` and allow the `workers.dev` address while testing. If an email link lands on another page of the site, the site forwards it to `/club-office`. Supabase's built-in email sends only a few messages an hour; for more, connect Resend as its SMTP sender.
-6. **Domain:** add emfc.es as a custom domain in Cloudflare. That needs the domain's DNS on Cloudflare (change the nameservers at one.com to Cloudflare's, after copying any existing records). The old Lovable site serves until then. Afterwards, close the Lovable project.
+   - In Supabase, Authentication, URL Configuration: set the Site URL to `https://emfc.es` and allow the `vercel.app` address while testing. If an email link lands on another page of the site, the site forwards it to `/club-office`. Supabase's built-in email sends only a few messages an hour; for more, connect Resend as its SMTP sender.
+6. **Domain:** add emfc.es and www.emfc.es in the Vercel project, then at one.com (where the DNS lives) set the records Vercel shows: an A record for emfc.es and a CNAME for www. Afterwards, close the Lovable project.
 7. **Check:** the sponsorship form reaches every recipient, one event and one report added on the admin page, every page in light and dark mode at phone width.
-8. **Accounts:** GitHub, Cloudflare, Supabase, Resend and the domain registrar under one club-owned login before handing over.
+8. **Accounts:** GitHub, Vercel, Supabase, Resend and the domain registrar under one club-owned login before handing over.
 
 ## 9. Known quirks
 

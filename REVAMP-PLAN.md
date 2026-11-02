@@ -395,7 +395,7 @@ On 28 October Vasco raised that next year's owner must be able to understand and
 | 7 | Members' emails | Not shown; LinkedIn only | 4, 6.1, 8.3 |
 | 8 | Fund page | "Coming soon" plus the Investment Policy Statement | 8.6 |
 | 9 | Admin scope and logins | Events, reports and sponsorship enquiries; logins for the two Co-Presidents, the Head of Brand and the site owner | 9 |
-| 10 | Hosting and accounts | Stay on Lovable with GitHub; every account under one club-owned login before the handover. **Changed the same evening:** the site leaves Lovable for the club's GitHub, Cloudflare Workers and its own Supabase project, starting fresh (see `HANDOFF.md` section 8) | 11, 12 |
+| 10 | Hosting and accounts | Stay on Lovable with GitHub; every account under one club-owned login before the handover. **Changed the same evening:** the site leaves Lovable for the club's GitHub, Vercel and its own Supabase project, starting fresh (see `HANDOFF.md` section 8) | 11, 12 |
 | 11 | Homepage length | Drop the fund teaser; cut the benefits from five to three | 8.1 |
 | 12 | Team page: the white section and the photo | "Second I think": the second section from the top, the Co-Presidents band, becomes white; Vasco confirms. The group photo from the current site, which Vasco also confirms | 8.3, 10 |
 | 13 | Newsletter sign-up | Keep it; add a consent line and a short privacy page | 8.8 |

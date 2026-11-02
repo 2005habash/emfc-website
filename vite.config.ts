@@ -6,9 +6,9 @@ import { nitro } from "nitro/vite";
 import { defineConfig } from "vite";
 import tsConfigPaths from "vite-tsconfig-paths";
 
-// Builds the site for Cloudflare Workers: Nitro packages the server and writes the deploy settings
-// (.output/server/wrangler.json), which `npx wrangler deploy` picks up. Set NITRO_PRESET to build for
-// something else (tools/export-static.sh uses node-server).
+// Builds the site for Vercel. Nitro packages the server: on Vercel it builds Vercel's output by
+// itself; elsewhere a plain Node server. Set NITRO_PRESET to choose (tools/export-static.sh uses
+// node-server).
 export default defineConfig(({ command }) => ({
   server: { host: "::", port: 8080 },
   resolve: {
@@ -24,11 +24,7 @@ export default defineConfig(({ command }) => ({
       // Files under a server/ folder, and "server-only" imports, never reach the browser.
       importProtection: { behavior: "error", client: { files: ["**/server/**"], specifiers: ["server-only"] } },
     }),
-    command === "build" &&
-      nitro({
-        preset: process.env.NITRO_PRESET ?? "cloudflare_module",
-        cloudflare: { deployConfig: true, nodeCompat: true },
-      }),
+    command === "build" && nitro({ preset: process.env.NITRO_PRESET }),
     viteReact(),
   ],
 }));
