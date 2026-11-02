@@ -1,0 +1,19 @@
+{
+  "event": "Speaker session: Investment Banking at William Blair, 7 October 2026",
+  "event_id": "william-blair-2026-10-07",
+  "about": "The photo Vasco took at the session, which Marketing used in its LinkedIn recap. The .heic is the untouched iPhone original (3024 x 4032, taken 7 October 2026 at 18:16); the .jpg next to it is a full-size copy for tools that can't open HEIC. Nobody is named, because names are never matched to faces.",
+  "photos": [
+    {
+      "file": "william-blair-2026-10-07-01.heic",
+      "received_as": "IMG_1719.HEIC (sent by Vasco)",
+      "size": "3024 x 4032, portrait",
+      "shows": "Members around a meeting-room table at ESADE Sant Cugat, the speaker on the screen."
+    },
+    {
+      "file": "william-blair-2026-10-07-01.jpg",
+      "received_as": "copy of the .heic",
+      "size": "3024 x 4032, portrait",
+      "shows": "Same photo, JPG."
+    }
+  ]
+}

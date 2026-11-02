@@ -1,7 +1,8 @@
 import { Link, useRouterState } from "@tanstack/react-router";
-import { Instagram, Linkedin, Menu, Moon, Sun, X } from "lucide-react";
-import { useEffect, useState } from "react";
+import { ChevronDown, Instagram, Linkedin, Menu, Moon, Sun, X } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
 import { cn } from "@/lib/utils";
+import { departments, type Department } from "@/lib/departments";
 import { IMAGES, NAV_LINKS, SOCIAL } from "@/lib/site";
 
 function ThemeToggle() {
@@ -36,13 +37,106 @@ function ThemeToggle() {
   );
 }
 
+/** A department's desks, with Fixed Income's under their two groups. */
+function deskGroups(d: Department) {
+  if (!d.groups) return [{ name: undefined, desks: d.desks }];
+  return d.groups.map((g) => ({
+    name: g.name,
+    desks: g.desks.map((slug) => d.desks.find((k) => k.slug === slug)!),
+  }));
+}
+
+/** The wide Departments menu: one column per department, its desks under it. */
+function DepartmentsMenu({ id, onNavigate }: { id: string; onNavigate: () => void }) {
+  return (
+    <div
+      id={id}
+      className="absolute inset-x-0 top-full border-b border-white/20 bg-[#000B3D] shadow-[0_24px_48px_rgb(0_0_0/0.25)]"
+    >
+      <div className="gutter grid grid-cols-6 gap-6 py-9 xl:gap-8">
+        {departments.map((d) => (
+          <div key={d.slug} className="flex flex-col gap-4">
+            <Link
+              to="/departments/$department"
+              params={{ department: d.slug }}
+              onClick={onNavigate}
+              className="font-serif text-[22px]/[1.1] text-white underline-offset-4 hover:underline xl:text-2xl/[1.1]"
+            >
+              {d.name}
+            </Link>
+            {d.desks.length > 0 ? (
+              <div className="flex flex-col gap-3">
+                {deskGroups(d).map((g) => (
+                  <ul key={g.name ?? d.slug} className="flex flex-col gap-2">
+                    {g.name && (
+                      <li className="font-serif text-[15px] italic text-bull-light">{g.name}</li>
+                    )}
+                    {g.desks.map((k) => (
+                      <li key={k.slug}>
+                        <Link
+                          to="/departments/$department/$desk"
+                          params={{ department: d.slug, desk: k.slug }}
+                          onClick={onNavigate}
+                          className="caps text-[10.5px]/[1.5] tracking-[0.14em] text-[#C9CEDD] underline-offset-4 hover:text-white hover:underline"
+                        >
+                          {k.name}
+                        </Link>
+                      </li>
+                    ))}
+                  </ul>
+                ))}
+              </div>
+            ) : (
+              <p className="text-[13px]/[1.55] text-[#A9B0C6]">{d.function}</p>
+            )}
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 /**
  * Site menu bar. With `overlay` it sits transparently on top of the hero photo
  * (used on the homepage); otherwise it is a solid navy bar that sticks to the top.
  */
 export function Nav({ overlay = false }: { overlay?: boolean }) {
   const [open, setOpen] = useState(false);
+  const [menu, setMenu] = useState(false);
+  const [mobileDepartments, setMobileDepartments] = useState(false);
   const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const timer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+  const menuRef = useRef<HTMLDivElement>(null);
+
+  // Hover opens after a short pause and closes a moment after leaving, so the menu doesn't flicker.
+  const hover = (next: boolean) => {
+    clearTimeout(timer.current);
+    timer.current = setTimeout(() => setMenu(next), next ? 90 : 160);
+  };
+
+  useEffect(() => {
+    setMenu(false);
+    setOpen(false);
+  }, [pathname]);
+
+  useEffect(() => {
+    if (!menu) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        setMenu(false);
+        menuRef.current?.querySelector<HTMLButtonElement>("button")?.focus();
+      }
+    };
+    const onClick = (e: MouseEvent) => {
+      if (!menuRef.current?.contains(e.target as Node)) setMenu(false);
+    };
+    document.addEventListener("keydown", onKey);
+    document.addEventListener("mousedown", onClick);
+    return () => {
+      document.removeEventListener("keydown", onKey);
+      document.removeEventListener("mousedown", onClick);
+    };
+  }, [menu]);
 
   const handleNav = (to: string) => (e: React.MouseEvent) => {
     if (pathname === to) {
@@ -50,14 +144,19 @@ export function Nav({ overlay = false }: { overlay?: boolean }) {
       window.scrollTo({ top: 0, behavior: "smooth" });
     }
     setOpen(false);
+    setMenu(false);
   };
+
+  const linkClass = "flex h-11 items-center px-2.5 underline-offset-8 xl:px-3.5";
+  const active = { className: "text-white underline decoration-bull-light" };
+  const inactive = { className: "text-[#E3E6EF] hover:underline" };
 
   return (
     <header
       className={cn(
         "z-50 text-white",
-        overlay ? "absolute inset-x-0 top-0" : "sticky top-0 bg-[#030C3B]",
-        open && "bg-[#030C3B]",
+        overlay ? "absolute inset-x-0 top-0" : "sticky top-0 bg-[#000B3D]",
+        (open || menu) && "bg-[#000B3D]",
       )}
     >
       <div className="gutter flex h-[72px] items-center justify-between border-b border-white/20 lg:h-[88px]">
@@ -83,19 +182,60 @@ export function Nav({ overlay = false }: { overlay?: boolean }) {
           aria-label="Primary"
           className="caps hidden items-center gap-1 text-[11px] tracking-[0.18em] lg:flex xl:gap-1.5 xl:text-xs"
         >
-          {NAV_LINKS.map((l) => (
-            <Link
-              key={l.to}
-              to={l.to}
-              onClick={handleNav(l.to)}
-              activeOptions={{ exact: l.to === "/" }}
-              activeProps={{ className: "text-white underline decoration-brass-light" }}
-              inactiveProps={{ className: "text-[#E3E6EF] hover:underline" }}
-              className="flex h-11 items-center px-2.5 underline-offset-8 xl:px-3.5"
-            >
-              {l.label}
-            </Link>
-          ))}
+          {NAV_LINKS.map((l) =>
+            "menu" in l ? (
+              <div
+                key={l.to}
+                ref={menuRef}
+                className="flex items-center"
+                onMouseEnter={() => hover(true)}
+                onMouseLeave={() => hover(false)}
+                onFocus={(e) => {
+                  // Keyboard focus opens the menu; a mouse click on the chevron just toggles it.
+                  if ((e.target as HTMLElement).matches(":focus-visible")) setMenu(true);
+                }}
+                onBlur={(e) => {
+                  if (!e.currentTarget.contains(e.relatedTarget as Node)) setMenu(false);
+                }}
+              >
+                <Link
+                  to={l.to}
+                  onClick={handleNav(l.to)}
+                  activeProps={active}
+                  inactiveProps={inactive}
+                  className={cn(linkClass, "pr-1 xl:pr-1")}
+                >
+                  {l.label}
+                </Link>
+                <button
+                  type="button"
+                  aria-expanded={menu}
+                  aria-controls="departments-menu"
+                  aria-label={menu ? "Close the departments menu" : "Open the departments menu"}
+                  onClick={() => setMenu((m) => !m)}
+                  className="flex h-11 w-7 items-center justify-center text-[#E3E6EF] hover:text-white"
+                >
+                  <ChevronDown
+                    className={cn("h-3.5 w-3.5 transition-transform", menu && "rotate-180")}
+                    strokeWidth={1.75}
+                  />
+                </button>
+                {menu && <DepartmentsMenu id="departments-menu" onNavigate={() => setMenu(false)} />}
+              </div>
+            ) : (
+              <Link
+                key={l.to}
+                to={l.to}
+                onClick={handleNav(l.to)}
+                activeOptions={{ exact: l.to === "/" }}
+                activeProps={active}
+                inactiveProps={inactive}
+                className={linkClass}
+              >
+                {l.label}
+              </Link>
+            ),
+          )}
         </nav>
 
         <div className="flex items-center gap-0.5">
@@ -137,20 +277,79 @@ export function Nav({ overlay = false }: { overlay?: boolean }) {
       {open && (
         <nav
           aria-label="Mobile"
-          className="gutter flex flex-col border-b border-white/20 bg-[#030C3B] pb-6 pt-2 lg:hidden"
+          className="gutter flex flex-col border-b border-white/20 bg-[#000B3D] pb-6 pt-2 lg:hidden"
         >
-          {NAV_LINKS.map((l) => (
-            <Link
-              key={l.to}
-              to={l.to}
-              onClick={handleNav(l.to)}
-              activeOptions={{ exact: l.to === "/" }}
-              activeProps={{ className: "text-brass-light" }}
-              className="border-b border-white/10 py-4 font-serif text-3xl"
-            >
-              {l.label}
-            </Link>
-          ))}
+          {NAV_LINKS.map((l) =>
+            "menu" in l ? (
+              <div key={l.to} className="border-b border-white/10">
+                <div className="flex items-center justify-between">
+                  <Link
+                    to={l.to}
+                    onClick={handleNav(l.to)}
+                    activeProps={{ className: "text-bull-light" }}
+                    className="py-4 font-serif text-3xl"
+                  >
+                    {l.label}
+                  </Link>
+                  <button
+                    type="button"
+                    aria-expanded={mobileDepartments}
+                    aria-controls="mobile-departments"
+                    aria-label={mobileDepartments ? "Hide the departments" : "Show the departments"}
+                    onClick={() => setMobileDepartments((v) => !v)}
+                    className="flex h-11 w-11 items-center justify-center rounded-full border border-white/30"
+                  >
+                    <ChevronDown
+                      className={cn("h-4 w-4 transition-transform", mobileDepartments && "rotate-180")}
+                      strokeWidth={1.6}
+                    />
+                  </button>
+                </div>
+                {mobileDepartments && (
+                  <ul id="mobile-departments" className="flex flex-col gap-5 pb-6 pl-1">
+                    {departments.map((d) => (
+                      <li key={d.slug} className="flex flex-col gap-2.5">
+                        <Link
+                          to="/departments/$department"
+                          params={{ department: d.slug }}
+                          onClick={() => setOpen(false)}
+                          className="font-serif text-2xl"
+                        >
+                          {d.name}
+                        </Link>
+                        {d.desks.length > 0 && (
+                          <div className="flex flex-wrap gap-x-4 gap-y-2">
+                            {d.desks.map((k) => (
+                              <Link
+                                key={k.slug}
+                                to="/departments/$department/$desk"
+                                params={{ department: d.slug, desk: k.slug }}
+                                onClick={() => setOpen(false)}
+                                className="caps text-[10.5px] tracking-[0.14em] text-[#C9CEDD]"
+                              >
+                                {k.name}
+                              </Link>
+                            ))}
+                          </div>
+                        )}
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+            ) : (
+              <Link
+                key={l.to}
+                to={l.to}
+                onClick={handleNav(l.to)}
+                activeOptions={{ exact: l.to === "/" }}
+                activeProps={{ className: "text-bull-light" }}
+                className="border-b border-white/10 py-4 font-serif text-3xl"
+              >
+                {l.label}
+              </Link>
+            ),
+          )}
           <div className="mt-5 flex gap-2">
             <a
               href={SOCIAL.instagram}

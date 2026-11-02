@@ -1,27 +1,34 @@
-export type Person = { name: string; role: string; linkedin?: string };
+// Departments and their desks. Texts are the departments' own, word for word, from the content package
+// of 2 November 2026 (content/2026-11-02/departments). People come from src/data/members.ts.
+// `drafted: true` marks a text written from the department's material, waiting for its Head or
+// Vice-President to confirm (see REVAMP-PLAN.md, section 13). The flag is never shown on the site.
 
-export const LINKEDIN: Record<string, string> = {
-  "Diogo Oliveira": "https://www.linkedin.com/in/diogo-oliveira-83bb39230",
-  "Vasco Barahona de Lemos": "https://www.linkedin.com/in/vascobarahona",
-  "Jan Heibel": "https://www.linkedin.com/in/jan-heibel-294a15248",
-  "Yonatan Bendler": "https://www.linkedin.com/in/yonatan-bendler-055a44320",
-  "Cosimo Dini": "https://www.linkedin.com/in/cosimo-dini",
-  "Luka Thomson": "https://www.linkedin.com/in/luka-thomson-255411243",
-  "Fabian Seher": "https://www.linkedin.com/in/fabian-seher-8b102a26a",
-  "Luís Laboreiro": "https://www.linkedin.com/in/luis-laboreiro",
-  "Anastasia Murgida": "https://www.linkedin.com/in/anastasia-murgida-6b2727293",
-  "Luca Flusche": "https://www.linkedin.com/in/luca-flusche/",
-  "Nick Kriz": "https://www.linkedin.com/in/nick-kriz/",
-  "David Villar": "https://www.linkedin.com/in/david-villar-455a78242/",
-  "Constantin Molineus": "https://www.linkedin.com/in/cmolineus",
-  "João Salgado": "https://www.linkedin.com/in/jo%C3%A3o-salgado-943665266",
-  "Zaid Habash": "https://www.linkedin.com/in/zaid-habash",
-  "Paul Christian Abel": "https://www.linkedin.com/in/paul-christian-abel-2a1a03203",
-  "Moritz Fritsch": "https://www.linkedin.com/in/moritzfritsch",
-  "Philip Ignatzi": "https://www.linkedin.com/in/philip-ignatzi-111922186",
+export type Firm = {
+  name: string;
+  /** Desk slugs the firm is tagged with on the department page. */
+  desks?: string[];
+  /** Added to fill the grid of 12; the desk can swap it. Not shown on the site. */
+  proposed?: boolean;
 };
 
-export type DetailSection = { title: string; body: string };
+export type WorkItem = { title: string; body: string; frequency?: string };
+
+export type Desk = {
+  slug: string;
+  name: string;
+  /** Fixed Income only: the group the desk belongs to. */
+  group?: string;
+  /** Shown next to the Head on the desk page. */
+  lead?: string;
+  /** One line on the department page. */
+  line: string;
+  description: string;
+  does: string[];
+  targetFirms: Firm[];
+  /** Planned activities without a date yet. */
+  planned?: string[];
+  drafted?: boolean;
+};
 
 export type Department = {
   slug: string;
@@ -29,125 +36,307 @@ export type Department = {
   short: string;
   long: string;
   function: string;
-  head: string;
-  cio?: string;
-  verticals: string[];
-  deskLabel: string;
   associate: string;
-  support?: boolean;
-  produces: DetailSection[];
-  targetFirms?: string[];
-  people: Person[];
+  head: string;
+  produces: WorkItem[];
+  targetFirms: Firm[];
+  desks: Desk[];
+  /** Fixed Income: desks shown in two groups. */
+  groups?: { name: string; lead: string; desks: string[] }[];
 };
+
+const firms = (names: string[], proposed: string[] = []): Firm[] => [
+  ...names.map((name) => ({ name })),
+  ...proposed.map((name) => ({ name, proposed: true })),
+];
+
+const IB_FIRMS = firms([
+  "Goldman Sachs",
+  "Morgan Stanley",
+  "J.P. Morgan",
+  "Bank of America",
+  "Citi",
+  "Evercore",
+  "Lazard",
+  "Rothschild & Co",
+  "Houlihan Lokey",
+  "Jefferies",
+  "UBS",
+  "Crédit Agricole",
+]);
+
+const AM_FIRMS = firms(
+  ["BlackRock", "Fidelity", "Capital Group", "Vanguard", "State Street", "Schroders", "Amundi", "PIMCO"],
+  ["J.P. Morgan Asset Management", "Goldman Sachs Asset Management", "Wellington Management", "T. Rowe Price"],
+);
+
+const FI_FIRMS = firms(
+  [
+    "PIMCO",
+    "RBC BlueBay Asset Management",
+    "TwentyFour Asset Management",
+    "Loomis Sayles",
+    "PGIM Fixed Income",
+    "Ares Management",
+    "Arcmont Asset Management",
+    "Hayfin Capital Management",
+    "Golub Capital",
+    "Pemberton Asset Management",
+  ],
+  ["Apollo", "Oaktree Capital Management"],
+);
+
+/** A Fixed Income desk: the department's own work, applied to one market. */
+const fiDesk = (slug: string, name: string, group: string, line: string, lead?: string): Desk => ({
+  slug,
+  name,
+  group,
+  lead,
+  line,
+  description: `${line} Members cover this market in the monthly Fixed Income Market Monitor, work through debt capital markets case studies, and present their findings in desk meetings.`,
+  does: [
+    `Their section of the monthly Fixed Income Market Monitor`,
+    "Debt capital markets case studies across public and private debt markets",
+    "Findings presented in desk meetings",
+  ],
+  targetFirms: FI_FIRMS,
+  drafted: true,
+});
 
 export const departments: Department[] = [
   {
     slug: "investment-banking",
     name: "Investment Banking",
     short:
-      "M&A and Debt advisory. Live deal coverage, technical drills, and direct contact with bankers from partner firms.",
-    long: "A coverage desk built like an analyst pool. Monthly live deals, technical workshops on LBO, DCF and accretion/dilution, and structured interview prep with bankers who recruit at ESADE.",
+      "M&A and Debt Advisory. Monthly deal case studies, coffee chats with bankers, and recruiting prep for investment banking.",
+    long: "A coverage desk built like an analyst pool. A monthly M&A deal case study, coffee chats with bankers every two weeks, CV workshops and structured interview prep for investment banking recruiting.",
     function:
-      "M&A and Debt advisory coverage. Live deal write-ups, technical drills, IB recruiting prep, and networking with bankers from partner firms.",
-    head: "Yonatan Bendler",
-    verticals: ["M&A", "Debt"],
-    deskLabel: "Team preference",
+      "M&A and Debt Advisory coverage. Monthly deal case studies, coffee chats with investment banking professionals, CV workshops and interview prep.",
     associate:
-      "Write live deal notes, build models with the VPs, and join mock interview rounds. Meet bankers through speaker events and small-group sessions.",
+      "Write live deal notes, build models with the Vice-Presidents, and join mock interview rounds. Meet bankers through coffee chats and small-group sessions.",
+    head: "Yonatan Bendler",
     produces: [
       {
-        title: "Monthly Deal Analysis",
-        body: "Each month the M&A or Debt team brings a live deal to the table: rationale, valuation, structure, financing and key risks. Members leave with frameworks they can reuse in interviews.",
+        title: "M&A Deal Case Study",
+        frequency: "Monthly",
+        body: "In-depth analysis of live and recent M&A deals, covering deal rationale, valuation, financing and regulatory issues.",
       },
       {
-        title: "Sector & Market Education",
-        body: "How bankers actually think. Deal process, league tables, M&A and leveraged-finance trends, and the market awareness to hold a credible conversation with any banker.",
+        title: "Coffee Chats",
+        frequency: "Every two weeks",
+        body: "Informal sessions with investment banking professionals across teams, sectors and locations, London and New York so far.",
       },
       {
-        title: "Interview Prep & Cases",
-        body: "CV screening, mock interviews, and technical drills across LBO, DCF and accretion/dilution, built specifically for IB processes.",
+        title: "CV Workshops",
+        frequency: "Once per term, upon demand",
+        body: "Helping members tailor their CVs for investment banking applications.",
       },
       {
-        title: "Speaker Events & Podcast",
-        body: "Sessions with M&A and leveraged-finance professionals, plus introductions to ESADE alumni inside target firms.",
-      },
-      {
-        title: "Study Tours & Future Formats",
-        body: "Working toward London, Madrid and Barcelona trips, alongside deal competitions, buddy systems and alumni dinners.",
+        title: "Interview Prep, Company Visits & Networking",
+        frequency: "As scheduled",
+        body: "Technical and behavioural practice for recruiting season, and events connecting members with banks and other financial firms.",
       },
     ],
-    targetFirms: [
-      "Goldman Sachs",
-      "Morgan Stanley",
-      "J.P. Morgan",
-      "Bank of America",
-      "Citi",
-      "Evercore",
-      "Lazard",
-      "Rothschild & Co",
-      "Houlihan Lokey",
-      "Jefferies",
-      "UBS",
-      "Crédit Agricole",
-    ],
-    people: [
-      { name: "Yonatan Bendler", role: "Head of Investment Banking" },
-      { name: "Constantin Molineus", role: "VP, M&A" },
-      { name: "João Salgado", role: "VP, Debt" },
+    targetFirms: IB_FIRMS,
+    desks: [
+      {
+        slug: "m-and-a",
+        name: "M&A",
+        lead: "Constantin Molineus",
+        line: "Hands-on exposure to mergers and acquisitions advisory, and preparation for careers in investment banking.",
+        description:
+          "The M&A Desk of the ESADE Master's Finance Club gives members hands-on exposure to mergers and acquisitions advisory and helps them prepare for careers in investment banking.",
+        does: [
+          "Case studies: in-depth analysis of live and recent M&A deals, covering deal rationale, valuation, financing and regulatory issues.",
+          "Coffee chats: informal sessions with investment banking professionals across teams, sectors and locations.",
+          "Company visits and networking events: connecting members with banks and other financial firms.",
+          "CV workshops: helping members tailor their CVs for investment banking applications.",
+          "Interview preparation: technical and behavioural practice for recruiting season.",
+          "Market updates: regular discussion of notable deals and trends in M&A and capital markets.",
+        ],
+        targetFirms: IB_FIRMS,
+      },
+      {
+        slug: "debt-advisory",
+        name: "Debt Advisory",
+        lead: "João Salgado",
+        line: "How companies and private equity funds raise debt, from leveraged buyouts to refinancings and restructurings.",
+        description:
+          "Every deal needs financing. We cover how companies and private equity funds raise debt, from leveraged buyouts and acquisition financing to refinancings and restructurings. Members follow live deals, build their credit and capital structure skills, and prepare for Leveraged Finance, DCM and debt advisory roles at bulge brackets and boutiques.",
+        does: [
+          "Live deals followed from leveraged buyouts and acquisition financing to refinancings and restructurings.",
+          "Credit and capital structure skills.",
+          "Preparation for Leveraged Finance, DCM and debt advisory roles at bulge brackets and boutiques.",
+        ],
+        targetFirms: IB_FIRMS,
+      },
     ],
   },
   {
-    slug: "pe-vc-fintech-real-assets",
+    slug: "private-markets",
     name: "Private Markets",
     short:
       "Private markets coverage with direct access to investors across PE, VC & Growth, Fintech and Real Assets.",
     long: "The private markets desk. Associates work on deal teardowns and investment memos, meet investors from partner firms, and sit in on speaker events and recruiting prep across PE, VC & Growth, Fintech and Real Assets.",
     function:
-      "Private markets coverage across PE, VC & Growth, Fintech and Real Assets. Fortnightly deal teardowns, sector sessions, recruiting prep and speaker events with investors from partner firms.",
-    head: "Jan Heibel",
-    verticals: ["Private Equity", "Venture Capital & Growth", "Fintech", "Real Assets"],
-    deskLabel: "Team preference",
+      "Private markets coverage across PE, VC & Growth, Fintech and Real Assets. Deal teardowns, sector sessions, recruiting prep and speaker events with investors from partner firms.",
     associate:
       "Look at private market deals, write investment memos, and present to the desk. Get face time with investors and alumni working in the space.",
+    head: "Jan Heibel",
     produces: [
       {
-        title: "Fortnightly Deal Teardowns",
-        body: "Live deal coverage across all four verticals: PE, VC & Growth, Fintech and Real Assets, with full investment memos.",
+        title: "Deal Teardowns",
+        body: "Regular deal coverage across PE, VC & Growth, Fintech and Real Assets, from short deal notes to full investment memos.",
       },
       {
         title: "Sector & Market Education",
-        body: "Asset class mechanics, investor thinking and current macro trends across private markets.",
+        body: "Asset class mechanics, investor thinking and current macro trends across private markets, plus technical training on accounting, valuation and LBO mechanics.",
       },
       {
         title: "Interview Prep & Case Simulations",
-        body: "CV screening, mock interviews and case practice tailored to PE, VC, Fintech and Real Assets recruiting.",
+        body: "CV screening, mock interviews, paper LBO workshops and case practice tailored to PE, VC, Fintech and Real Assets recruiting.",
       },
       {
-        title: "Speaker Events & Podcast",
-        body: "Monthly sessions with alumni and industry professionals, plus a podcast in build.",
+        title: "Speaker Events",
+        body: "Roundtables and coffee chats with alumni and industry professionals, with an Industry Profile on each speaker planned.",
       },
       {
         title: "Study Tours & Outreach",
         body: "Working toward Barcelona, Madrid and London trips, buddy systems, alumni dinners, company visits and IC competitions.",
       },
+      {
+        title: "Research & Reports",
+        body: "Deal notes and sector reports across the four verticals, such as the quarterly Real Assets Market Insight, with the annual Spanish Mid-Market PE Review and Industry Profiles on our speakers in preparation.",
+      },
     ],
     targetFirms: [
-      "Blackstone",
-      "KKR",
-      "CVC",
-      "Warburg Pincus",
-      "Ardian",
-      "Index Ventures",
-      "Atomico",
-      "Sequoia",
-      "General Atlantic",
+      { name: "Blackstone", desks: ["private-equity"] },
+      { name: "KKR", desks: ["private-equity"] },
+      { name: "CVC", desks: ["private-equity"] },
+      { name: "Warburg Pincus", desks: ["private-equity"] },
+      { name: "Ardian", desks: ["private-equity", "real-assets"] },
+      { name: "Index Ventures", desks: ["vc-and-growth"] },
+      { name: "Atomico", desks: ["vc-and-growth"] },
+      { name: "Sequoia Capital", desks: ["vc-and-growth"] },
+      { name: "General Atlantic", desks: ["vc-and-growth"] },
+      { name: "EQT", desks: ["private-equity", "real-assets"] },
+      { name: "Brookfield", desks: ["real-assets"] },
+      { name: "Hg", desks: ["private-equity"] },
     ],
-    people: [
-      { name: "Jan Heibel", role: "Head of Private Markets" },
-      { name: "Fabian Seher", role: "VP, Private Equity" },
-      { name: "Zaid Habash", role: "VP, VC & Growth" },
-      { name: "Anastasia Murgida", role: "VP, Fintech" },
-      { name: "Luca Flusche", role: "VP, Real Assets" },
+    desks: [
+      {
+        slug: "private-equity",
+        name: "Private Equity",
+        lead: "Fabian Luis Seher",
+        line: "How buyout funds find, value and finance deals, with a monthly Deal of the Month, paper LBO workshops, mock interviews and the annual Spanish Mid-Market PE Review.",
+        description:
+          "How buyout funds find, value and finance deals, with a monthly Deal of the Month, paper LBO workshops, mock interviews and the annual Spanish Mid-Market PE Review.",
+        does: [
+          "Deal of the Month: one buyout or mid-market deal a month, from short deal notes to a full investment memo.",
+          "Technical training: accounting and valuation fundamentals for PE interviews, three-statement links, EV to equity bridge and LBO mechanics.",
+          "Paper LBO workshops: building a paper LBO under time pressure, as tested in PE interviews.",
+          "CV screening and mock interviews for PE and IB recruiting.",
+          "Roundtables and coffee chats with PE professionals and alumni, with Industry Profiles documenting them planned.",
+          "The Spanish Mid-Market PE Review, an annual report.",
+          "A PE Case Competition: teams analyse a buyout case and pitch to a jury of PE professionals.",
+        ],
+        targetFirms: firms(
+          ["Blackstone", "KKR", "CVC", "Warburg Pincus", "Ardian", "EQT", "Hg", "Silver Lake"],
+          ["Carlyle", "Advent International", "Permira", "Cinven"],
+        ),
+        planned: [
+          "Paper LBO Workshop: a hands-on session building a paper LBO under time pressure, as tested in PE interviews.",
+          "PE Case Competition: teams analyse a buyout case and pitch an investment recommendation to a jury of PE professionals.",
+        ],
+        drafted: true,
+      },
+      {
+        slug: "vc-and-growth",
+        name: "VC & Growth",
+        lead: "Zaid Habash",
+        line: "How venture and growth investors find, back and build companies, with a monthly paper on the venture market or a single deal planned.",
+        description:
+          "How venture and growth investors find, back and build companies. The desk is preparing a regular paper, either on the venture market as a whole or on one fund or deal.",
+        does: [
+          "A paper on the venture market or on a single fund or deal, planned monthly.",
+          "The Venture Capital table at the alumni roundtables, with Miguel Bowden of InnoEnergy.",
+          "Recruiting prep for venture capital and growth roles, with the rest of Private Markets.",
+        ],
+        targetFirms: firms(
+          ["Sequoia Capital", "Index Ventures", "Atomico", "General Atlantic"],
+          [
+            "Accel",
+            "General Catalyst",
+            "Lightspeed Venture Partners",
+            "Balderton Capital",
+            "Creandum",
+            "EQT Ventures",
+            "Northzone",
+            "Partech",
+          ],
+        ),
+        drafted: true,
+      },
+      {
+        slug: "fintech",
+        name: "Fintech",
+        lead: "Anastasia Murgida",
+        line: "Payments, digital banking and the technology changing financial services, from early-stage startups to the fintech teams of banks and investors.",
+        description:
+          "Payments, digital banking and the technology changing financial services, from early-stage startups to the fintech teams of banks and investors.",
+        does: [
+          "Speaker sessions on fintech and payments, such as the equity research session with a former UBS FinTech & Payments analyst.",
+          "The Fintech table at the alumni roundtables, with Martin Nicholls of Frekuent.",
+        ],
+        targetFirms: firms(
+          [],
+          [
+            "Stripe",
+            "Adyen",
+            "Revolut",
+            "Klarna",
+            "Wise",
+            "Checkout.com",
+            "N26",
+            "Monzo",
+            "Trade Republic",
+            "Nubank",
+            "Plaid",
+            "Coinbase",
+          ],
+        ),
+        drafted: true,
+      },
+      {
+        slug: "real-assets",
+        name: "Real Assets",
+        lead: "Luca Flusche",
+        line: "Deep dives into real estate, infrastructure and the energy transition.",
+        description:
+          "We are the Real Assets team of the ESADE Master's Finance Club, a group of finance students who love real estate, infrastructure and the energy transition. We dig into real deals and market data, share what we find, and help each other get ready for a career in private markets.",
+        does: [
+          "Market Insights: a quarterly report on where capital is flowing across real estate, infrastructure and energy.",
+          "Deal breakdowns: live transactions taken apart, structure, pricing, financing and why the buyer bought.",
+          "Sector deep dives: focused research on themes such as data centres, logistics, living sectors and the grid.",
+          "Modelling workshops: hands-on sessions building real estate and infrastructure models, from appraisals to waterfalls.",
+          "Industry sessions: talks and coffee chats with practitioners and ESADE alumni working in real assets.",
+          "Recruiting prep: technical drills, case studies and mock interviews for real estate and infrastructure roles.",
+        ],
+        targetFirms: firms(
+          ["EQT", "CBRE Investment Management", "Ardian", "Brookfield"],
+          [
+            "Macquarie Asset Management",
+            "Antin Infrastructure Partners",
+            "Meridiam",
+            "Copenhagen Infrastructure Partners",
+            "Patrizia",
+            "Hines",
+            "Nuveen Real Estate",
+            "AXA IM Alts",
+          ],
+        ),
+        planned: ["A team deal teardown and industry insights."],
+      },
     ],
   },
   {
@@ -157,82 +346,98 @@ export const departments: Department[] = [
       "Run a real paper trading portfolio, build a track record, and meet portfolio managers from Barcelona and beyond.",
     long: "The buy-side desk. Members run a paper portfolio with full attribution, publish research, and host PMs and analysts. Bloomberg training included.",
     function:
-      "Runs a paper trading portfolio across Macro & Strategy, Equity Research, Portfolio Management and ETFs & Multi-Asset. Bloomberg training, equity research output, and recurring sessions with practising PMs.",
-    head: "Cosimo Dini",
-    cio: "Luís Laboreiro",
-    verticals: [
-      "Macro & Strategy",
-      "Equity Research",
-      "Portfolio Management",
-      "ETFs & Multi-Asset",
-    ],
-    deskLabel: "Team preference",
+      "Runs a paper trading portfolio across Macro & Strategy, Equity Research and Portfolio Management. Bloomberg training, equity research output, and recurring sessions with practising PMs.",
     associate:
       "Cover a sector or strategy, publish research, and pitch ideas into the portfolio. Help organise events with industry guests.",
+    head: "Cosimo Dini",
     produces: [
       {
-        title: "Market & Macro Research",
-        body: "Central banks, economic data, geopolitics and asset allocation views, produced by the Macro & Strategy desk.",
+        title: "Portfolio Management",
+        body: "Security selection, sector and regional allocation, risk management and execution of the investment committee's themes across the book.",
       },
       {
-        title: "Investment Thesis Development",
-        body: "Equity research, valuation and risk assessment work, leading to publishable single-name and thematic pieces.",
+        title: "Equity Research",
+        body: "Research, valuation and risk assessment work, for potential suitable names for the portfolio.",
       },
       {
         title: "Investment Committee",
-        body: "Thesis presentations, committee debate and final approval before positions enter the paper portfolio.",
+        body: "Sets the fund's investment themes and approves every thesis before it enters the portfolio.",
       },
       {
-        title: "Portfolio Monitoring & Review",
-        body: "Performance attribution, rebalancing and post-mortems across the live book.",
+        title: "Market & Macro Research",
+        body: "Central banks, economic data, geopolitics and asset allocation views, produced by the Macro & Strategy desk.",
       },
       {
         title: "Training & Industry Access",
         body: "Bloomberg training sessions, trading and investment challenges, London and Luxembourg business trips, plus speaker events with AM, WM and ER professionals.",
       },
     ],
-    targetFirms: [
-      "Schroders",
-      "BlackRock",
-      "Fidelity",
-      "Capital Group",
-      "Citadel",
-      "Point72",
-      "Brevan Howard",
-      "Marshall Wace",
-    ],
-    people: [
-      { name: "Cosimo Dini", role: "Head of Asset Management" },
-      { name: "Luís Laboreiro", role: "Chief Investment Officer" },
+    targetFirms: AM_FIRMS,
+    desks: [
+      {
+        slug: "macro-and-strategy",
+        name: "Macro & Strategy",
+        line: "Central banks, economic data, geopolitics and asset allocation views, published each month in Monthly Market Views.",
+        description:
+          "Central banks, economic data, geopolitics and asset allocation views. The desk publishes Monthly Market Views and its views feed the investment committee's themes.",
+        does: [
+          "Monthly Market Views, the desk's monthly report on markets and the economy.",
+          "Coverage of central banks, economic data and geopolitics.",
+          "Asset allocation views for the investment committee.",
+        ],
+        targetFirms: AM_FIRMS,
+        drafted: true,
+      },
+      {
+        slug: "equity-research",
+        name: "Equity Research",
+        line: "Research, valuation and risk assessment of potential names for the portfolio.",
+        description:
+          "Research, valuation and risk assessment work on potential names for the portfolio, taken to the investment committee before any position enters the book.",
+        does: [
+          "Single-name research and valuation.",
+          "Risk assessment of potential portfolio names.",
+          "Theses presented to the investment committee before a position enters the portfolio.",
+        ],
+        targetFirms: AM_FIRMS,
+        drafted: true,
+      },
+      {
+        slug: "portfolio-management",
+        name: "Portfolio Management",
+        lead: "Luís Laboreiro",
+        line: "Security selection, sector and regional allocation, risk management and execution of the investment committee's themes across the book.",
+        description:
+          "Security selection, sector and regional allocation, risk management and execution of the investment committee's themes across the book of the EMFC Global Equity Fund, an active global equity paper portfolio benchmarked against the MSCI World.",
+        does: [
+          "Runs the EMFC Global Equity Fund, an active global equity paper portfolio benchmarked against the MSCI World.",
+          "Security selection, sector and regional allocation.",
+          "Risk management and execution of the investment committee's themes.",
+        ],
+        targetFirms: AM_FIRMS,
+        drafted: true,
+      },
     ],
   },
   {
     slug: "fixed-income",
     name: "Fixed Income",
     short:
-      "Debt Capital Markets, private credit, and buy-side debt. Prep for recruitment and direct access to fixed income professionals.",
-    long: "A research-led credit desk covering corporate debt across the rating spectrum. Members publish S&P-style issuer rating case studies, prep for private credit and credit research roles, and meet credit investors through speaker sessions.",
+      "Debt capital markets, private credit, and buy-side debt. Prep for recruitment and direct access to fixed income professionals.",
+    long: "A research-led desk covering public and private debt markets. Members produce a monthly Fixed Income Market Monitor, analysing market developments, trends and investment opportunities across asset classes. They also work through debt capital markets case studies and engage with industry professionals through speaker sessions.",
     function:
-      "Corporate credit research by market (IG, HY, Distressed & Special Situations, Emerging Markets, Financials). S&P-style issuer ratings, private credit recruiting prep, and networking with credit investors.",
-    head: "Luka Thomson",
-    verticals: [
-      "Investment Grade",
-      "High Yield",
-      "Distressed & Special Situations",
-      "Emerging Markets",
-      "Financials",
-    ],
-    deskLabel: "Team preference",
+      "Research-led coverage of public and private debt markets: a monthly Fixed Income Market Monitor, debt capital markets case studies and speaker sessions with industry professionals.",
     associate:
-      "Cover an issuer universe, publish rating case studies, and present credit views in monthly desk meetings.",
+      "Contribute to the monthly Fixed Income Market Monitor, analyse developments in their assigned markets, work through debt capital markets case studies, and present their findings in desk meetings.",
+    head: "Luka Thomson",
     produces: [
       {
         title: "Monthly Research",
         body: "Each month, associates publish spread moves and rating actions in their assigned market to the desk.",
       },
       {
-        title: "Issuer Rating Case Studies",
-        body: "Full credit reviews using an S&P-style scorecard, walking through business, financial and structural risk.",
+        title: "Debt Capital Markets Case Studies",
+        body: "Work through real-world transactions across public and private debt markets, examining financing structures, pricing, investor demand and the factors influencing funding decisions.",
       },
       {
         title: "Associate-Led Lessons",
@@ -243,31 +448,70 @@ export const departments: Department[] = [
         body: "CV reviews, mock interviews and case practice for private credit and fixed income roles.",
       },
     ],
-    targetFirms: [
-      "PIMCO",
-      "Apollo",
-      "Ares",
-      "Oaktree",
-      "HPS",
-      "Blackstone Credit",
-      "BlueBay",
-      "Muzinich",
+    targetFirms: FI_FIRMS,
+    groups: [
+      {
+        name: "Public credit",
+        lead: "Luka Thomson",
+        desks: [
+          "rates-and-government-bonds",
+          "investment-grade-credit",
+          "high-yield-credit",
+          "mortgage-backed-securities",
+        ],
+      },
+      { name: "Private credit", lead: "Tim Constantin Ziegler", desks: ["private-credit", "direct-lending"] },
     ],
-    people: [{ name: "Luka Thomson", role: "Head of Fixed Income" }],
+    desks: [
+      fiDesk(
+        "rates-and-government-bonds",
+        "Rates & Government Bonds",
+        "Public credit",
+        "Government bond markets, central bank policy and the shape of the yield curve.",
+      ),
+      fiDesk(
+        "investment-grade-credit",
+        "Investment Grade Credit",
+        "Public credit",
+        "Investment grade corporate bonds: spreads, new issuance and the credit quality of large issuers.",
+      ),
+      fiDesk(
+        "high-yield-credit",
+        "High Yield Credit",
+        "Public credit",
+        "High yield bonds and leveraged credit: spreads, defaults and the riskier end of corporate debt.",
+      ),
+      fiDesk(
+        "mortgage-backed-securities",
+        "Mortgage-Backed Securities",
+        "Public credit",
+        "Mortgage-backed securities and the housing and securitisation markets behind them.",
+      ),
+      fiDesk(
+        "private-credit",
+        "Private Credit",
+        "Private credit",
+        "Private credit funds and the lending they do outside the public bond markets.",
+        "Tim Constantin Ziegler",
+      ),
+      fiDesk(
+        "direct-lending",
+        "Direct Lending",
+        "Private credit",
+        "Direct lending to mid-market companies, often alongside private equity buyouts.",
+        "Tim Constantin Ziegler",
+      ),
+    ],
   },
   {
     slug: "corporate-relations",
     name: "Corporate Relations",
-    short:
-      "Build EMFC's relationships with firms. Sponsorships, partnerships and the people behind both.",
-    long: "A support function open to all master's students. Own outreach to partner firms, structure sponsorship conversations, and run logistics for corporate events and study trips.",
+    short: "Build EMFC's relationships with firms. Sponsorships, partnerships and the people behind both.",
+    long: "Open to all master's students. Own outreach to partner firms, structure sponsorship conversations, and run logistics for corporate events and company visits with every department.",
     function: "Partnerships, sponsorship and long-term relationships with partner firms.",
-    head: "Nick Kriz",
-    verticals: [],
-    deskLabel: "Area of interest",
     associate:
-      "Reach out to partner firms, manage sponsorship conversations, and coordinate logistics for corporate events and study trips.",
-    support: true,
+      "Reach out to partner firms, manage sponsorship conversations, and coordinate logistics for corporate events and company visits.",
+    head: "Nick Kriz",
     produces: [
       {
         title: "Partner Firm Outreach",
@@ -279,23 +523,21 @@ export const departments: Department[] = [
       },
       {
         title: "Event Logistics",
-        body: "Run logistics for corporate visits, panels and study trips alongside the Department Heads.",
+        body: "Run logistics for corporate visits, panels and networking events alongside the Department Heads.",
       },
     ],
-    people: [{ name: "Nick Kriz", role: "Head of Corporate Relations" }],
+    targetFirms: [],
+    desks: [],
   },
   {
-    slug: "marketing",
-    name: "Marketing",
+    slug: "brand",
+    name: "Brand",
     short: "Brand, communications, social media and event execution.",
-    long: "A support function open to all master's students. Own EMFC's voice, social channels, member communications and on-the-ground event execution.",
+    long: "Open to all master's students. Own EMFC's voice, social channels, member communications and on-the-ground event execution.",
     function: "Brand, communications, social media and event execution.",
-    head: "David Villar",
-    verticals: [],
-    deskLabel: "Area of interest",
     associate:
       "Run social channels and newsletters, design member-facing materials, and execute on-site at events and conferences.",
-    support: true,
+    head: "David Villar",
     produces: [
       {
         title: "Brand & Identity",
@@ -310,8 +552,22 @@ export const departments: Department[] = [
         body: "On-site execution at speaker events, panels and conferences, working alongside Corporate Relations and the Department Heads.",
       },
     ],
-    people: [{ name: "David Villar", role: "Head of Brand" }],
+    targetFirms: [],
+    desks: [],
   },
 ];
 
-export const getDepartment = (slug: string) => departments.find((d) => d.slug === slug);
+/** Old department slugs, for links made before the October 2026 rename. */
+export const DEPARTMENT_ALIASES: Record<string, string> = {
+  "pe-vc-fintech-real-assets": "private-markets",
+  marketing: "brand",
+};
+
+export const getDepartment = (slug: string) =>
+  departments.find((d) => d.slug === (DEPARTMENT_ALIASES[slug] ?? slug));
+
+export const getDesk = (department: string, desk: string) =>
+  getDepartment(department)?.desks.find((k) => k.slug === desk);
+
+/** Every desk with its department, in site order. */
+export const ALL_DESKS = departments.flatMap((d) => d.desks.map((desk) => ({ department: d, desk })));

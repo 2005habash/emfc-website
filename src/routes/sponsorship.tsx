@@ -1,10 +1,12 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { ArrowRight } from "lucide-react";
-import { useState } from "react";
+import { ArrowRight, Check, Linkedin, Loader2 } from "lucide-react";
+import { useRef, useState } from "react";
 import { SiteLayout } from "@/components/layout/SiteLayout";
 import { Reveal } from "@/components/Reveal";
 import { Em, Eyebrow, Numeral, PageHero } from "@/components/site/ui";
-import { IMAGES, ROMAN, SPONSORSHIP_EMAIL } from "@/lib/site";
+import { STATS, TARGET_AREAS, TARGET_CITIES } from "@/data/stats";
+import { FORMATS, sendSponsorshipEnquiry } from "@/lib/enquiries";
+import { IMAGES, ROMAN, SOCIAL } from "@/lib/site";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/sponsorship")({
@@ -14,7 +16,7 @@ export const Route = createFileRoute("/sponsorship")({
       {
         name: "description",
         content:
-          "Partner with EMFC to reach a curated pipeline of ESADE MSc Finance talent through workshops, events and brand visibility.",
+          "Partner with EMFC to reach 66 ESADE master's students through workshops, events and brand visibility.",
       },
       { property: "og:title", content: "Sponsor EMFC" },
       {
@@ -28,16 +30,18 @@ export const Route = createFileRoute("/sponsorship")({
 });
 
 const facts = [
-  { value: "MSc", label: "Finance students at ESADE" },
-  { value: "90%+", label: "International cohort" },
-  { value: "04", label: "Investment desks: IB, PM, AM, FI" },
-  { value: "2026", label: "Founding year · Barcelona" },
+  { value: String(STATS.members), label: `Members across ${STATS.programmes} ESADE master's programmes` },
+  { value: String(STATS.nationalities), label: "Nationalities" },
+  { value: `${STATS.internationalPct}%`, label: "From outside Spain" },
+  { value: `${STATS.experiencePct}%`, label: "With professional experience" },
+  { value: `${STATS.internships}+`, label: "Internships completed" },
+  { value: `${STATS.graduating2027Pct}%`, label: "Graduate in 2027" },
 ];
 
 const benefits = [
   {
     title: "Talent Pipeline",
-    body: "Direct access to a hand-picked cohort of ESADE MSc Finance students targeting Investment Banking, Private Equity, Asset Management and Fixed Income.",
+    body: "Direct access to 66 ESADE master's students targeting Private Equity, Investment Banking, Asset Management, Venture Capital and Fixed Income, most of them recruiting for 2027.",
   },
   {
     title: "Brand Visibility",
@@ -49,8 +53,6 @@ const benefits = [
   },
 ];
 
-const formats = ["Talent events", "Workshops", "Sponsored content", "Full-year partnership"];
-
 const fieldClass =
   "h-[52px] rounded border border-mute bg-field px-4 text-base text-ink outline-offset-2 placeholder:text-mute focus-visible:outline-2 focus-visible:outline-ink";
 const labelClass = "caps text-[10px] tracking-[0.2em] text-mute md:text-[10.5px]";
@@ -60,27 +62,26 @@ function SponsorshipPage() {
     name: "",
     firm: "",
     email: "",
-    format: formats[0],
+    format: FORMATS[0] as (typeof FORMATS)[number],
     message: "",
+    website: "",
   });
+  const [status, setStatus] = useState<"idle" | "sending" | "sent" | "error">("idle");
+  const openedAt = useRef(Date.now());
   const set =
     (k: keyof typeof form) =>
     (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) =>
       setForm((f) => ({ ...f, [k]: e.target.value }));
 
-  // There is no enquiry backend yet, so the form opens a pre-filled email in the sender's mail app.
-  function submit(e: React.FormEvent) {
+  async function submit(e: React.FormEvent) {
     e.preventDefault();
-    const subject = `EMFC Sponsorship Enquiry${form.firm ? `: ${form.firm}` : ""}`;
-    const body = [
-      `Name: ${form.name}`,
-      `Firm: ${form.firm}`,
-      `Email: ${form.email}`,
-      `Interested in: ${form.format}`,
-      "",
-      form.message,
-    ].join("\n");
-    window.location.href = `mailto:${SPONSORSHIP_EMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+    setStatus("sending");
+    try {
+      const res = await sendSponsorshipEnquiry({ data: { ...form, elapsed: Date.now() - openedAt.current } });
+      setStatus(res.ok ? "sent" : "error");
+    } catch {
+      setStatus("error");
+    }
   }
 
   return (
@@ -96,22 +97,25 @@ function SponsorshipPage() {
           </>
         }
       >
-        The ESADE Master's Finance Club is a member-driven community of MSc Finance students
-        preparing for careers across banking, private capital and markets. Sponsors join us for the
-        people, the reach, and a direct line into the next intake of ESADE finance talent.
+        The ESADE Master's Finance Club is a member-driven community of master's students preparing
+        for careers across banking, private capital and markets. Sponsors join us for the people, the
+        reach, and a direct line into the next intake of ESADE finance talent.
       </PageHero>
 
       {/* Audience facts */}
       <section aria-label="The EMFC audience" className="border-b border-line">
-        <dl className="gutter grid grid-cols-2 lg:grid-cols-4">
+        <dl className="gutter grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6">
           {facts.map((f, i) => (
             <div
               key={f.label}
               className={cn(
                 "flex flex-col gap-2.5 py-7 lg:py-9 lg:pb-10",
-                i % 2 === 1 && "border-l border-line pl-5",
-                i < 2 && "border-b border-line lg:border-b-0",
-                i > 0 && "lg:border-l lg:border-line lg:pl-8",
+                i % 2 === 1 && "border-l border-line pl-5 md:border-l-0 md:pl-0",
+                i % 3 !== 0 && "md:border-l md:border-line md:pl-6",
+                i < 4 && "border-b border-line md:border-b-0",
+                i < 3 && "md:border-b md:border-line lg:border-b-0",
+                i > 0 && "lg:border-l lg:border-line lg:pl-6",
+                i === 3 && "lg:pl-6",
               )}
             >
               <dd className="font-serif text-[40px]/none font-medium md:text-[52px]/none">
@@ -144,6 +148,42 @@ function SponsorshipPage() {
         </Reveal>
       </section>
 
+      {/* What members aim for */}
+      <section className="gutter grid items-start gap-10 pb-16 lg:grid-cols-12 lg:gap-8 lg:pb-24">
+        <Reveal className="flex flex-col gap-5 lg:col-span-4">
+          <Eyebrow>From the member form</Eyebrow>
+          <h2 className="font-serif text-[44px]/none tracking-[-0.01em] md:text-[64px]/none">
+            Where members <Em>aim</Em>
+          </h2>
+          <p className="text-[15px]/[1.7] text-mute md:text-base/[1.7]">
+            The areas and cities members target, each picking up to three. Totals only.
+          </p>
+        </Reveal>
+        <Reveal className="grid gap-10 sm:grid-cols-2 lg:col-span-7 lg:col-start-6">
+          {[
+            { title: "Target areas", rows: TARGET_AREAS },
+            { title: "Target cities", rows: TARGET_CITIES },
+          ].map((t) => (
+            <div key={t.title} className="flex flex-col gap-4">
+              <h3 className="caps border-b border-ink pb-3 text-[10.5px] tracking-[0.2em]">{t.title}</h3>
+              <ul className="flex flex-col gap-3.5">
+                {t.rows.map((r) => (
+                  <li key={r.name} className="flex flex-col gap-1.5">
+                    <span className="flex items-baseline justify-between gap-4">
+                      <span className="font-serif text-[21px]/[1.1]">{r.name}</span>
+                      <span className="caps text-[10.5px] tracking-[0.14em] text-mute">{r.pct}%</span>
+                    </span>
+                    <span aria-hidden className="h-[3px] w-full bg-line">
+                      <span className="block h-full bg-bull" style={{ width: `${r.pct}%` }} />
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
+        </Reveal>
+      </section>
+
       {/* Ways to partner */}
       <section className="bg-stone">
         <div className="gutter grid items-start gap-10 py-16 lg:grid-cols-12 lg:gap-8 lg:py-24">
@@ -157,7 +197,7 @@ function SponsorshipPage() {
             </p>
           </Reveal>
           <Reveal className="flex flex-col border-b border-ink lg:col-span-7 lg:col-start-6">
-            {formats.map((f, i) => (
+            {FORMATS.map((f, i) => (
               <a
                 key={f}
                 href="#contact"
@@ -190,105 +230,147 @@ function SponsorshipPage() {
               Let's talk <Em light>sponsorship</Em>
             </h2>
             <p className="text-[15px]/[1.75] text-mist md:text-base/[1.75]">
-              Tell us about your firm and what you'd like to run with EMFC — talent events,
-              workshops, sponsored content or a full-year partnership. We'll come back within a few
+              Tell us about your firm and what you'd like to run with EMFC: talent events, workshops,
+              sponsored content or a full-year partnership. Your message goes straight to the
+              Co-Presidents and the Head of Corporate Relations, and we'll come back within a few
               working days.
             </p>
-            <div className="mt-2 flex flex-col gap-2 border-t border-white/20 pt-6">
+            <div className="mt-2 flex flex-col gap-3 border-t border-white/20 pt-6">
               <span className="caps text-[10px] tracking-[0.22em] text-haze md:text-[10.5px]">
-                Or write directly to
+                Or find us on LinkedIn
               </span>
-              <a
-                href={`mailto:${SPONSORSHIP_EMAIL}?subject=EMFC%20Sponsorship%20Enquiry`}
-                className="font-serif text-[22px]/[1.15] break-all underline decoration-1 underline-offset-[6px] md:text-3xl/[1.15]"
-              >
-                {SPONSORSHIP_EMAIL}
+              <a href={SOCIAL.linkedin} target="_blank" rel="noreferrer" className="btn btn-sm btn-outline-white self-start">
+                <Linkedin className="h-3.5 w-3.5" strokeWidth={1.75} />
+                EMFC on LinkedIn
               </a>
             </div>
           </Reveal>
           <Reveal className="lg:col-span-6 lg:col-start-7">
-            <form
-              onSubmit={submit}
-              className="grid gap-5 bg-paper p-6 text-ink sm:grid-cols-2 md:p-10"
-            >
-              <div className="flex flex-col gap-2">
-                <label htmlFor="sp-name" className={labelClass}>
-                  Your name
-                </label>
-                <input
-                  id="sp-name"
-                  required
-                  autoComplete="name"
-                  value={form.name}
-                  onChange={set("name")}
-                  className={fieldClass}
-                />
-              </div>
-              <div className="flex flex-col gap-2">
-                <label htmlFor="sp-firm" className={labelClass}>
-                  Firm
-                </label>
-                <input
-                  id="sp-firm"
-                  required
-                  autoComplete="organization"
-                  value={form.firm}
-                  onChange={set("firm")}
-                  className={fieldClass}
-                />
-              </div>
-              <div className="flex flex-col gap-2">
-                <label htmlFor="sp-email" className={labelClass}>
-                  Work email
-                </label>
-                <input
-                  id="sp-email"
-                  type="email"
-                  required
-                  autoComplete="email"
-                  placeholder="name@firm.com"
-                  value={form.email}
-                  onChange={set("email")}
-                  className={fieldClass}
-                />
-              </div>
-              <div className="flex flex-col gap-2">
-                <label htmlFor="sp-format" className={labelClass}>
-                  Interested in
-                </label>
-                <select
-                  id="sp-format"
-                  value={form.format}
-                  onChange={set("format")}
-                  className={cn(fieldClass, "px-3")}
-                >
-                  {formats.map((f) => (
-                    <option key={f}>{f}</option>
-                  ))}
-                </select>
-              </div>
-              <div className="flex flex-col gap-2 sm:col-span-2">
-                <label htmlFor="sp-msg" className={labelClass}>
-                  What would you like to run with EMFC?
-                </label>
-                <textarea
-                  id="sp-msg"
-                  rows={5}
-                  value={form.message}
-                  onChange={set("message")}
-                  className={cn(fieldClass, "h-auto resize-y py-3.5 leading-normal")}
-                />
-              </div>
-              <div className="flex flex-col gap-4 sm:col-span-2 sm:flex-row sm:items-center sm:justify-between sm:gap-6">
-                <span className="text-[13.5px]/[1.5] text-mute">
-                  Opens a pre-filled email in your mail app.
+            {status === "sent" ? (
+              <div role="status" className="flex flex-col gap-5 bg-paper p-8 text-ink md:p-10">
+                <span className="flex h-12 w-12 items-center justify-center rounded-full bg-ink text-paper">
+                  <Check className="h-5 w-5" strokeWidth={2} />
                 </span>
-                <button type="submit" className="btn btn-ink shrink-0">
-                  Send enquiry
-                  <ArrowRight className="h-4 w-4" strokeWidth={1.75} />
-                </button>
+                <p className="font-serif text-[34px]/[1.1] md:text-[40px]/[1.1]">Thank you, {form.name.split(" ")[0]}.</p>
+                <p className="text-[15px]/[1.7] text-mute md:text-base/[1.7]">
+                  Your enquiry has reached the team. We'll reply to {form.email} within a few working days.
+                </p>
               </div>
-            </form>
+            ) : (
+              <form onSubmit={submit} className="grid gap-5 bg-paper p-6 text-ink sm:grid-cols-2 md:p-10">
+                <div className="flex flex-col gap-2">
+                  <label htmlFor="sp-name" className={labelClass}>
+                    Your name
+                  </label>
+                  <input
+                    id="sp-name"
+                    required
+                    minLength={2}
+                    maxLength={120}
+                    autoComplete="name"
+                    value={form.name}
+                    onChange={set("name")}
+                    className={fieldClass}
+                  />
+                </div>
+                <div className="flex flex-col gap-2">
+                  <label htmlFor="sp-firm" className={labelClass}>
+                    Firm
+                  </label>
+                  <input
+                    id="sp-firm"
+                    required
+                    minLength={2}
+                    maxLength={160}
+                    autoComplete="organization"
+                    value={form.firm}
+                    onChange={set("firm")}
+                    className={fieldClass}
+                  />
+                </div>
+                <div className="flex flex-col gap-2">
+                  <label htmlFor="sp-email" className={labelClass}>
+                    Work email
+                  </label>
+                  <input
+                    id="sp-email"
+                    type="email"
+                    required
+                    maxLength={200}
+                    autoComplete="email"
+                    placeholder="name@firm.com"
+                    value={form.email}
+                    onChange={set("email")}
+                    className={fieldClass}
+                  />
+                </div>
+                <div className="flex flex-col gap-2">
+                  <label htmlFor="sp-format" className={labelClass}>
+                    Interested in
+                  </label>
+                  <select
+                    id="sp-format"
+                    value={form.format}
+                    onChange={set("format")}
+                    className={cn(fieldClass, "px-3")}
+                  >
+                    {FORMATS.map((f) => (
+                      <option key={f}>{f}</option>
+                    ))}
+                  </select>
+                </div>
+                <div className="flex flex-col gap-2 sm:col-span-2">
+                  <label htmlFor="sp-msg" className={labelClass}>
+                    What would you like to run with EMFC?
+                  </label>
+                  <textarea
+                    id="sp-msg"
+                    rows={5}
+                    required
+                    minLength={10}
+                    maxLength={4000}
+                    value={form.message}
+                    onChange={set("message")}
+                    className={cn(fieldClass, "h-auto resize-y py-3.5 leading-normal")}
+                  />
+                </div>
+                {/* Left empty by people; bots fill it in. */}
+                <div aria-hidden className="absolute -left-[9999px] h-px w-px overflow-hidden">
+                  <label htmlFor="sp-website">Website</label>
+                  <input
+                    id="sp-website"
+                    tabIndex={-1}
+                    autoComplete="off"
+                    value={form.website}
+                    onChange={set("website")}
+                  />
+                </div>
+                <div className="flex flex-col gap-4 sm:col-span-2 sm:flex-row sm:items-center sm:justify-between sm:gap-6">
+                  {status === "error" ? (
+                    <span role="alert" className="text-[13.5px]/[1.5] text-[#B4435A]">
+                      Your enquiry could not be sent. Please try again in a moment, or message us on LinkedIn.
+                    </span>
+                  ) : (
+                    <span className="text-[13.5px]/[1.5] text-mute">
+                      We only use your details to answer this enquiry.
+                    </span>
+                  )}
+                  <button type="submit" disabled={status === "sending"} className="btn btn-ink shrink-0 disabled:opacity-70">
+                    {status === "sending" ? (
+                      <>
+                        <Loader2 className="h-4 w-4 animate-spin" strokeWidth={1.75} />
+                        Sending
+                      </>
+                    ) : (
+                      <>
+                        Send enquiry
+                        <ArrowRight className="h-4 w-4" strokeWidth={1.75} />
+                      </>
+                    )}
+                  </button>
+                </div>
+              </form>
+            )}
           </Reveal>
         </div>
       </section>

@@ -1,17 +1,13 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { ArrowLeft, ArrowRight, CalendarPlus, Linkedin, MapPin } from "lucide-react";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { ArrowLeft, ArrowRight, ArrowUpRight, CalendarPlus, Images, Linkedin, MapPin } from "lucide-react";
 import { useState } from "react";
 import { SiteLayout } from "@/components/layout/SiteLayout";
 import { Em, Eyebrow, PageHero } from "@/components/site/ui";
-import {
-  EVENT_TYPE_COLORS,
-  EVENTS,
-  IMAGES,
-  SOCIAL,
-  type EventItem,
-  type EventType,
-} from "@/lib/site";
+import { EVENT_TYPE_COLORS, EVENTS, type EventItem, type EventType } from "@/data/events";
+import { IMAGES, SOCIAL } from "@/lib/site";
 import { cn } from "@/lib/utils";
+import { icsHref } from "@/lib/ics";
+import { TypeDot } from "@/components/site/sections";
 
 export const Route = createFileRoute("/events")({
   head: () => ({
@@ -25,7 +21,7 @@ export const Route = createFileRoute("/events")({
       {
         property: "og:description",
         content:
-          "Speaker sessions, workshops, study trips and socials from the ESADE Master's Finance Club.",
+          "Speaker sessions, workshops, networking events and socials from the ESADE Master's Finance Club.",
       },
     ],
   }),
@@ -34,41 +30,6 @@ export const Route = createFileRoute("/events")({
 
 const dateOf = (e: EventItem) => new Date(e.date + "T12:00:00");
 const fmt = (d: Date, o: Intl.DateTimeFormatOptions) => d.toLocaleDateString("en-GB", o);
-
-/** Builds a downloadable calendar file so an event can be added to any calendar app. */
-function icsHref(e: EventItem) {
-  const day = e.date.replaceAll("-", "");
-  const next = new Date(dateOf(e).getTime() + 86400000)
-    .toISOString()
-    .slice(0, 10)
-    .replaceAll("-", "");
-  const esc = (s: string) => s.replace(/([,;\\])/g, "\\$1").replace(/\n/g, "\\n");
-  const ics = [
-    "BEGIN:VCALENDAR",
-    "VERSION:2.0",
-    "PRODID:-//EMFC//Events//EN",
-    "BEGIN:VEVENT",
-    `UID:${e.id}@emfc.es`,
-    `DTSTAMP:${day}T000000Z`,
-    `DTSTART;VALUE=DATE:${day}`,
-    `DTEND;VALUE=DATE:${next}`,
-    `SUMMARY:${esc("EMFC: " + e.title)}`,
-    `LOCATION:${esc(e.location)}`,
-    `DESCRIPTION:${esc(e.description)}`,
-    "END:VEVENT",
-    "END:VCALENDAR",
-  ].join("\r\n");
-  return `data:text/calendar;charset=utf-8,${encodeURIComponent(ics)}`;
-}
-
-function TypeDot({ type }: { type: EventType }) {
-  return (
-    <span
-      className="h-[7px] w-[7px] shrink-0 rounded-full"
-      style={{ background: EVENT_TYPE_COLORS[type] }}
-    />
-  );
-}
 
 function EventsPage() {
   const [view, setView] = useState<"overview" | "calendar">("overview");
@@ -164,11 +125,52 @@ function EventFeature({ e, past = false }: { e: EventItem; past?: boolean }) {
       </div>
       <div className="flex flex-col gap-4 lg:col-span-8">
         <h3 className="font-serif text-5xl/[0.96] tracking-[-0.01em] md:text-[64px]/[0.96]">
-          {e.title}
+          <Link
+            to="/events/$eventId"
+            params={{ eventId: e.id }}
+            className="underline-offset-[6px] hover:underline"
+          >
+            {e.title}
+          </Link>
         </h3>
         <p className="max-w-[640px] text-[15px]/[1.7] text-mute md:text-[17px]/[1.7]">
           {e.description}
         </p>
+        {e.photos && e.photos.length > 0 && (
+          <Link
+            to="/events/$eventId"
+            params={{ eventId: e.id }}
+            className="group mt-1 flex max-w-[640px] gap-2 overflow-hidden"
+            aria-label={`See the photos from ${e.title}`}
+          >
+            {e.photos.slice(0, 4).map((ph, i) => (
+              <img
+                key={ph.src}
+                src={ph.src}
+                alt=""
+                loading="lazy"
+                className={cn(
+                  "h-24 w-full min-w-0 flex-1 object-cover transition duration-500 group-hover:brightness-90 md:h-32",
+                  i > 1 && "max-sm:hidden",
+                )}
+              />
+            ))}
+          </Link>
+        )}
+        <div className="mt-1 flex flex-wrap gap-2.5">
+          <Link
+            to="/events/$eventId"
+            params={{ eventId: e.id }}
+            className="btn btn-outline-ink h-[46px] px-5 text-[11px]"
+          >
+            {e.photos?.length ? (
+              <Images className="h-3.5 w-3.5" strokeWidth={1.75} />
+            ) : (
+              <ArrowUpRight className="h-3.5 w-3.5" strokeWidth={1.75} />
+            )}
+            {e.photos?.length ? `Photos and details` : "Details"}
+          </Link>
+        </div>
         {!past && (
           <div className="mt-1 flex flex-wrap gap-2.5">
             <a
@@ -321,7 +323,7 @@ function CalendarView() {
                 type="button"
                 onClick={() => setSelected(ev[0])}
                 aria-label={`${ev[0].title}, ${fmt(dateOf(ev[0]), { day: "numeric", month: "long" })}`}
-                className="flex h-[64px] flex-col justify-between bg-[#030C3B] p-1.5 text-left text-white md:h-[104px] md:px-3 md:py-2.5"
+                className="flex h-[64px] flex-col justify-between bg-[#000B3D] p-1.5 text-left text-white md:h-[104px] md:px-3 md:py-2.5"
               >
                 <span className="font-serif text-lg/none md:text-[22px]/none">{day}</span>
                 <span className="hidden text-xs/[1.3] font-medium md:block">{ev[0].title}</span>
@@ -351,7 +353,7 @@ function CalendarView() {
                 <span className="font-serif text-3xl/[1.05] font-medium">{selected.title}</span>
                 <span className="caps flex items-center gap-2 text-[10px] tracking-[0.18em] text-mute">
                   <TypeDot type={selected.type} />
-                  {selected.type} · {selected.location}
+                  {selected.type}, {selected.location}
                 </span>
               </div>
             </div>
@@ -364,6 +366,14 @@ function CalendarView() {
                 year: "numeric",
               })}
             </span>
+            <Link
+              to="/events/$eventId"
+              params={{ eventId: selected.id }}
+              className="btn btn-sm btn-ink self-start"
+            >
+              Event details
+              <ArrowRight className="h-3.5 w-3.5" strokeWidth={1.75} />
+            </Link>
           </>
         ) : (
           <p className="font-serif text-2xl/[1.2] italic">No upcoming events scheduled.</p>

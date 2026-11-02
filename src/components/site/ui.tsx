@@ -1,13 +1,13 @@
 import { useReducedMotion } from "framer-motion";
 import { useEffect, useState, type ReactNode } from "react";
 import { cn } from "@/lib/utils";
-import type { Person } from "@/lib/departments";
-import { linkedinOf, photoOf } from "@/lib/team";
-import { IMAGES } from "@/lib/site";
+import { Linkedin } from "lucide-react";
+import { Dialog, DialogContent, DialogDescription, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { initialsOf, type Member } from "@/lib/team";
 
 type Tone = "ink" | "light" | "hero";
 
-/** Small spaced-caps label with a brass rule, used above headings. */
+/** Small spaced-caps label with a short blue rule, used above headings. */
 export function Eyebrow({
   children,
   tone = "ink",
@@ -19,13 +19,13 @@ export function Eyebrow({
   center?: boolean;
   className?: string;
 }) {
-  const rule = cn("h-px w-7 shrink-0 md:w-10", tone === "ink" ? "bg-brass" : "bg-brass-light");
+  const rule = cn("h-px w-7 shrink-0 md:w-10", tone === "ink" ? "bg-bull" : "bg-bull-light");
   return (
     <div
       className={cn(
         "caps flex items-center gap-3.5 text-[10px] tracking-[0.24em] md:text-[11px]",
         tone === "ink" && "text-mute",
-        tone === "light" && "text-brass-light",
+        tone === "light" && "text-bull-light",
         tone === "hero" && "text-[#E3E6EF]",
         center && "justify-center",
         className,
@@ -41,7 +41,7 @@ export function Eyebrow({
 /** Italic accent word inside a serif heading. */
 export function Em({ children, light = false }: { children: ReactNode; light?: boolean }) {
   return (
-    <em className={cn("font-normal italic", light ? "text-brass-light" : "text-brass")}>
+    <em className={cn("font-normal italic", light ? "text-bull-light" : "text-bull")}>
       {children}
     </em>
   );
@@ -50,7 +50,7 @@ export function Em({ children, light = false }: { children: ReactNode; light?: b
 /** Roman numeral marker. */
 export function Numeral({ children, className }: { children: ReactNode; className?: string }) {
   return (
-    <span className={cn("font-serif text-[28px]/none italic text-brass", className)}>
+    <span className={cn("font-serif text-[28px]/none italic text-bull", className)}>
       {children}
     </span>
   );
@@ -73,7 +73,7 @@ export function PageHero({
   position?: string;
 }) {
   return (
-    <section className="relative overflow-hidden bg-[#030C3B] text-white">
+    <section className="relative overflow-hidden bg-[#000B3D] text-white">
       <img
         src={image}
         alt={alt}
@@ -99,87 +99,134 @@ export function PageHero({
 }
 
 /**
- * Team portrait. The photos have white or grey backgrounds, so they are blended
- * onto one warm tile colour and shown in black and white until hovered.
+ * Team portrait. The photos are cut out onto white, so they are blended onto one warm tile colour
+ * and shown in black and white until hovered. Members without a photo yet get their initials.
  */
 export function Portrait({
-  name,
+  member,
   alt,
   alternate = false,
   className,
 }: {
-  name: string;
+  member: Pick<Member, "name" | "photo">;
   alt?: string;
   alternate?: boolean;
   className?: string;
 }) {
-  const src = photoOf(name);
   return (
-    <span className={cn("block overflow-hidden", alternate ? "bg-tile-alt" : "bg-tile", className)}>
-      {src && (
+    <span
+      className={cn(
+        "relative block overflow-hidden",
+        alternate ? "bg-tile-alt" : "bg-tile",
+        className,
+      )}
+    >
+      {member.photo ? (
         <img
-          src={src}
-          alt={alt ?? `Portrait of ${name}`}
+          src={member.photo}
+          alt={alt ?? `Portrait of ${member.name}`}
           loading="lazy"
-          className="h-full w-full origin-top scale-[1.18] object-cover object-top mix-blend-multiply grayscale contrast-[1.05] transition duration-500 group-hover:grayscale-0"
+          className="h-full w-full object-cover object-top mix-blend-multiply grayscale contrast-[1.05] transition duration-500 group-hover:grayscale-0"
         />
+      ) : (
+        <span
+          aria-hidden
+          className="absolute inset-0 grid place-items-center font-serif text-[clamp(26px,4vw,52px)] italic text-[#555C72]"
+        >
+          {initialsOf(member.name)}
+        </span>
       )}
     </span>
   );
 }
 
-const isOpenRole = (p: Person) => /open/i.test(p.name) && /recruiting/i.test(p.name);
+const sizes = {
+  lg: { name: "text-3xl/[1.05]", title: "text-[10px]", gap: "gap-3.5" },
+  md: { name: "text-2xl/[1.1]", title: "text-[10px]", gap: "gap-3.5" },
+  sm: { name: "text-lg/[1.15] md:text-xl/[1.15]", title: "text-[9px] md:text-[9.5px]", gap: "gap-2.5" },
+};
 
+/**
+ * A member's portrait, name and title. Clicking opens their profile: programme, firms and LinkedIn
+ * (only what members agreed to show).
+ */
 export function PersonCard({
-  person,
+  member,
   index = 0,
-  large = false,
+  size = "md",
 }: {
-  person: Person;
+  member: Member;
   index?: number;
-  large?: boolean;
+  size?: keyof typeof sizes;
 }) {
-  if (isOpenRole(person)) {
-    return (
-      <div className="flex flex-col gap-3.5">
-        <span className="block aspect-[5/6] overflow-hidden bg-[#000A3C]">
-          <img
-            src={IMAGES.bullTile}
-            alt=""
-            loading="lazy"
-            className="h-full w-full object-contain"
-          />
-        </span>
+  const s = sizes[size];
+  return (
+    <Dialog>
+      <DialogTrigger
+        className={cn(
+          "group flex cursor-pointer flex-col text-left outline-none focus-visible:ring-2 focus-visible:ring-bull focus-visible:ring-offset-4 focus-visible:ring-offset-paper",
+          s.gap,
+        )}
+        aria-label={`${member.name}, ${member.title}. Open profile`}
+      >
+        <Portrait member={member} alternate={index % 2 === 1} className="aspect-[5/6] w-full" />
         <span className="flex flex-col gap-1.5">
-          <span className="font-serif text-2xl/[1.1] font-medium">Role open</span>
-          <span className="caps text-[10px] tracking-[0.16em] text-warn">{person.role}</span>
+          <span
+            className={cn(
+              "font-serif font-medium decoration-1 underline-offset-4 group-hover:underline",
+              s.name,
+            )}
+          >
+            {member.name}
+          </span>
+          <span className={cn("caps tracking-[0.16em] text-mute", s.title)}>{member.title}</span>
         </span>
-      </div>
-    );
-  }
-  const href = linkedinOf(person);
-  const body = (
-    <>
-      <Portrait name={person.name} alternate={index % 2 === 1} className="aspect-[5/6]" />
-      <span className="flex flex-col gap-1.5">
-        <span
-          className={cn(
-            "font-serif font-medium decoration-1 underline-offset-4 group-hover:underline",
-            large ? "text-3xl/[1.05]" : "text-2xl/[1.1]",
-          )}
-        >
-          {person.name}
-        </span>
-        <span className="caps text-[10px] tracking-[0.16em] text-mute">{person.role}</span>
-      </span>
-    </>
+      </DialogTrigger>
+      <ProfileDialog member={member} />
+    </Dialog>
   );
-  return href ? (
-    <a href={href} target="_blank" rel="noreferrer" className="group flex flex-col gap-3.5">
-      {body}
-    </a>
-  ) : (
-    <div className="group flex flex-col gap-3.5">{body}</div>
+}
+
+function ProfileDialog({ member }: { member: Member }) {
+  return (
+    <DialogContent className="max-w-[640px] gap-0 rounded-none border-line bg-paper p-0 text-ink sm:rounded-none">
+      <div className="grid sm:grid-cols-[220px_1fr]">
+        <Portrait member={member} className="aspect-square w-full sm:aspect-auto sm:h-full" />
+        <div className="flex flex-col gap-5 p-6 sm:p-8">
+          <div className="flex flex-col gap-2">
+            <DialogTitle className="font-serif text-[34px]/[1.05] font-medium">{member.name}</DialogTitle>
+            <DialogDescription className="caps text-[10.5px] tracking-[0.18em] text-mute">
+              {member.title}
+            </DialogDescription>
+          </div>
+          <dl className="flex flex-col gap-3.5 border-t border-line pt-5 text-[15px]/[1.5]">
+            {member.programme && (
+              <div className="flex flex-col gap-1">
+                <dt className="caps text-[10px] tracking-[0.18em] text-mute">Programme</dt>
+                <dd>{member.programme}</dd>
+              </div>
+            )}
+            {member.firms.length > 0 && (
+              <div className="flex flex-col gap-1">
+                <dt className="caps text-[10px] tracking-[0.18em] text-mute">Experience</dt>
+                <dd>{member.firms.join(", ")}</dd>
+              </div>
+            )}
+          </dl>
+          {member.linkedin && (
+            <a
+              href={member.linkedin}
+              target="_blank"
+              rel="noreferrer"
+              className="btn btn-sm btn-outline-ink mt-auto self-start"
+            >
+              <Linkedin className="h-3.5 w-3.5" strokeWidth={1.75} />
+              LinkedIn
+            </a>
+          )}
+        </div>
+      </div>
+    </DialogContent>
   );
 }
 

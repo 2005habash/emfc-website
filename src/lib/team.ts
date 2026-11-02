@@ -1,58 +1,52 @@
-import { LINKEDIN, type Person } from "./departments";
+import { MEMBERS, type Member } from "@/data/members";
 
-export const PHOTOS: Record<string, string> = {
-  "Diogo Oliveira": "/images/team/diogo.webp",
-  "Vasco Barahona de Lemos": "/images/team/vasco.webp",
-  "Yonatan Bendler": "/images/team/yonatan.webp",
-  "Constantin Molineus": "/images/team/constantin.webp",
-  "João Salgado": "/images/team/joao.webp",
-  "Jan Heibel": "/images/team/jan.jpg",
-  "Fabian Seher": "/images/team/fabian.webp",
-  "Zaid Habash": "/images/team/zaid.jpg",
-  "Anastasia Murgida": "/images/team/anastasia.jpg",
-  "Luca Flusche": "/images/team/luca.webp",
-  "Cosimo Dini": "/images/team/cosimo.webp",
-  "Luís Laboreiro": "/images/team/luis.webp",
-  "Luka Thomson": "/images/team/luka.webp",
-  "Nick Kriz": "/images/team/nick.jpg",
-  "David Villar": "/images/team/david.jpg",
-  "Paul Christian Abel": "/images/team/paul.webp",
-  "Moritz Fritsch": "/images/team/moritz.webp",
-  "Philip Ignatzi": "/images/team/philip.webp",
-};
+export type { Member };
 
-export const photoOf = (name: string): string | undefined => PHOTOS[name];
-export const linkedinOf = (p: Person): string | undefined => p.linkedin ?? LINKEDIN[p.name];
+const LEADERSHIP_ORDER = ["head", "cio", "vice-president"] as const;
 
-export const PRESIDENTS: Person[] = [
-  { name: "Diogo Oliveira", role: "Co-President & Founder" },
-  { name: "Vasco Barahona de Lemos", role: "Co-President & Founder" },
-];
+export const memberByName = (name: string) => MEMBERS.find((m) => m.name === name);
 
-export const ADVISORY: Person[] = [
-  { name: "Paul Christian Abel", role: "Advisor & Founder" },
-  { name: "Moritz Fritsch", role: "Advisor & Founder" },
-  { name: "Philip Ignatzi", role: "Advisor & Founder" },
-];
+export const PRESIDENTS = MEMBERS.filter((m) => m.department === "co-presidents");
+export const ADVISORY = MEMBERS.filter((m) => m.department === "advisory-board");
 
-/** Everyone with a portrait, in the order used by the homepage mosaic. */
-export const MOSAIC: Person[] = [
-  { name: "Diogo Oliveira", role: "Co-President" },
-  { name: "Vasco Barahona de Lemos", role: "Co-President" },
-  { name: "Yonatan Bendler", role: "Head · Investment Banking" },
-  { name: "Constantin Molineus", role: "VP · M&A" },
-  { name: "Anastasia Murgida", role: "VP · Fintech" },
-  { name: "João Salgado", role: "VP · Debt" },
-  { name: "Jan Heibel", role: "Head · Private Markets" },
-  { name: "Fabian Seher", role: "VP · Private Equity" },
-  { name: "Zaid Habash", role: "VP · VC & Growth" },
-  { name: "Luca Flusche", role: "VP · Real Assets" },
-  { name: "Cosimo Dini", role: "Head · Asset Management" },
-  { name: "Luís Laboreiro", role: "Chief Investment Officer" },
-  { name: "Luka Thomson", role: "Head · Fixed Income" },
-  { name: "Nick Kriz", role: "Head · Corporate Relations" },
-  { name: "David Villar", role: "Head · Brand" },
-  { name: "Paul Christian Abel", role: "Advisor & Founder" },
-  { name: "Moritz Fritsch", role: "Advisor & Founder" },
-  { name: "Philip Ignatzi", role: "Advisor & Founder" },
-];
+export const membersOf = (department: string) => MEMBERS.filter((m) => m.department === department);
+
+/** Head, Chief Investment Officer and Vice-Presidents, in that order. */
+export const leadershipOf = (department: string) =>
+  membersOf(department)
+    .filter((m) => m.position !== "associate")
+    .sort(
+      (a, b) =>
+        LEADERSHIP_ORDER.indexOf(a.position as (typeof LEADERSHIP_ORDER)[number]) -
+        LEADERSHIP_ORDER.indexOf(b.position as (typeof LEADERSHIP_ORDER)[number]),
+    );
+
+export const associatesOf = (department: string, desk?: string) =>
+  membersOf(department).filter((m) => m.position === "associate" && (desk === undefined || m.desk === desk));
+
+/** Everyone working on a desk: its Vice-President or lead first, then its associates. */
+export const deskTeam = (department: string, desk: string) =>
+  membersOf(department)
+    .filter((m) => m.desk === desk)
+    .sort((a, b) => Number(a.position === "associate") - Number(b.position === "associate"));
+
+/**
+ * Everyone with a photo, for the moving strip on the homepage. Departments take turns, so the strip
+ * mixes the whole club instead of running one department after another.
+ */
+export const PEOPLE_STRIP: Member[] = (() => {
+  const queues = [...new Set(MEMBERS.map((m) => m.department))].map((d) =>
+    MEMBERS.filter((m) => m.department === d && m.photo),
+  );
+  const out: Member[] = [];
+  while (queues.some((q) => q.length)) for (const q of queues) if (q.length) out.push(q.shift()!);
+  return out;
+})();
+
+export const initialsOf = (name: string) =>
+  name
+    .split(/\s+/)
+    .filter((w) => /^\p{Lu}/u.test(w))
+    .map((w) => w[0])
+    .filter((_, i, all) => i === 0 || i === all.length - 1)
+    .join("");

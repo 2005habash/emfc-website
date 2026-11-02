@@ -11,12 +11,16 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AdminRouteImport } from './routes/admin'
-import { Route as DepartmentsRouteImport } from './routes/departments'
 import { Route as EventsRouteImport } from './routes/events'
 import { Route as FundRouteImport } from './routes/fund'
+import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as ResourcesRouteImport } from './routes/resources'
 import { Route as SponsorshipRouteImport } from './routes/sponsorship'
 import { Route as TeamRouteImport } from './routes/team'
+import { Route as DepartmentsIndexRouteImport } from './routes/departments.index'
+import { Route as DepartmentsDepartmentRouteImport } from './routes/departments.$department'
+import { Route as EventsEventIdRouteImport } from './routes/events_.$eventId'
+import { Route as DepartmentsDepartmentDeskRouteImport } from './routes/departments.$department_.$desk'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -28,11 +32,6 @@ const AdminRoute = AdminRouteImport.update({
   path: '/admin',
   getParentRoute: () => rootRouteImport,
 } as any)
-const DepartmentsRoute = DepartmentsRouteImport.update({
-  id: '/departments',
-  path: '/departments',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const EventsRoute = EventsRouteImport.update({
   id: '/events',
   path: '/events',
@@ -41,6 +40,11 @@ const EventsRoute = EventsRouteImport.update({
 const FundRoute = FundRouteImport.update({
   id: '/fund',
   path: '/fund',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PrivacyRoute = PrivacyRouteImport.update({
+  id: '/privacy',
+  path: '/privacy',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ResourcesRoute = ResourcesRouteImport.update({
@@ -58,80 +62,129 @@ const TeamRoute = TeamRouteImport.update({
   path: '/team',
   getParentRoute: () => rootRouteImport,
 } as any)
+const DepartmentsIndexRoute = DepartmentsIndexRouteImport.update({
+  id: '/departments/',
+  path: '/departments/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DepartmentsDepartmentRoute = DepartmentsDepartmentRouteImport.update({
+  id: '/departments/$department',
+  path: '/departments/$department',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EventsEventIdRoute = EventsEventIdRouteImport.update({
+  id: '/events_/$eventId',
+  path: '/events/$eventId',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DepartmentsDepartmentDeskRoute =
+  DepartmentsDepartmentDeskRouteImport.update({
+    id: '/departments/$department_/$desk',
+    path: '/departments/$department/$desk',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
-  '/departments': typeof DepartmentsRoute
   '/events': typeof EventsRoute
   '/fund': typeof FundRoute
+  '/privacy': typeof PrivacyRoute
   '/resources': typeof ResourcesRoute
   '/sponsorship': typeof SponsorshipRoute
   '/team': typeof TeamRoute
+  '/departments/$department': typeof DepartmentsDepartmentRoute
+  '/events/$eventId': typeof EventsEventIdRoute
+  '/departments/': typeof DepartmentsIndexRoute
+  '/departments/$department/$desk': typeof DepartmentsDepartmentDeskRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
-  '/departments': typeof DepartmentsRoute
   '/events': typeof EventsRoute
   '/fund': typeof FundRoute
+  '/privacy': typeof PrivacyRoute
   '/resources': typeof ResourcesRoute
   '/sponsorship': typeof SponsorshipRoute
   '/team': typeof TeamRoute
+  '/departments/$department': typeof DepartmentsDepartmentRoute
+  '/events/$eventId': typeof EventsEventIdRoute
+  '/departments': typeof DepartmentsIndexRoute
+  '/departments/$department/$desk': typeof DepartmentsDepartmentDeskRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
-  '/departments': typeof DepartmentsRoute
   '/events': typeof EventsRoute
   '/fund': typeof FundRoute
+  '/privacy': typeof PrivacyRoute
   '/resources': typeof ResourcesRoute
   '/sponsorship': typeof SponsorshipRoute
   '/team': typeof TeamRoute
+  '/departments/$department': typeof DepartmentsDepartmentRoute
+  '/events_/$eventId': typeof EventsEventIdRoute
+  '/departments/': typeof DepartmentsIndexRoute
+  '/departments/$department_/$desk': typeof DepartmentsDepartmentDeskRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
     | '/admin'
-    | '/departments'
     | '/events'
     | '/fund'
+    | '/privacy'
     | '/resources'
     | '/sponsorship'
     | '/team'
+    | '/departments/$department'
+    | '/events/$eventId'
+    | '/departments/'
+    | '/departments/$department/$desk'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/admin'
-    | '/departments'
     | '/events'
     | '/fund'
+    | '/privacy'
     | '/resources'
     | '/sponsorship'
     | '/team'
+    | '/departments/$department'
+    | '/events/$eventId'
+    | '/departments'
+    | '/departments/$department/$desk'
   id:
     | '__root__'
     | '/'
     | '/admin'
-    | '/departments'
     | '/events'
     | '/fund'
+    | '/privacy'
     | '/resources'
     | '/sponsorship'
     | '/team'
+    | '/departments/$department'
+    | '/events_/$eventId'
+    | '/departments/'
+    | '/departments/$department_/$desk'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AdminRoute: typeof AdminRoute
-  DepartmentsRoute: typeof DepartmentsRoute
   EventsRoute: typeof EventsRoute
   FundRoute: typeof FundRoute
+  PrivacyRoute: typeof PrivacyRoute
   ResourcesRoute: typeof ResourcesRoute
   SponsorshipRoute: typeof SponsorshipRoute
   TeamRoute: typeof TeamRoute
+  DepartmentsDepartmentRoute: typeof DepartmentsDepartmentRoute
+  EventsEventIdRoute: typeof EventsEventIdRoute
+  DepartmentsIndexRoute: typeof DepartmentsIndexRoute
+  DepartmentsDepartmentDeskRoute: typeof DepartmentsDepartmentDeskRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -150,13 +203,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/departments': {
-      id: '/departments'
-      path: '/departments'
-      fullPath: '/departments'
-      preLoaderRoute: typeof DepartmentsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/events': {
       id: '/events'
       path: '/events'
@@ -169,6 +215,13 @@ declare module '@tanstack/react-router' {
       path: '/fund'
       fullPath: '/fund'
       preLoaderRoute: typeof FundRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/privacy': {
+      id: '/privacy'
+      path: '/privacy'
+      fullPath: '/privacy'
+      preLoaderRoute: typeof PrivacyRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/resources': {
@@ -192,18 +245,50 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof TeamRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/departments/': {
+      id: '/departments/'
+      path: '/departments'
+      fullPath: '/departments/'
+      preLoaderRoute: typeof DepartmentsIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/departments/$department': {
+      id: '/departments/$department'
+      path: '/departments/$department'
+      fullPath: '/departments/$department'
+      preLoaderRoute: typeof DepartmentsDepartmentRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/events_/$eventId': {
+      id: '/events_/$eventId'
+      path: '/events/$eventId'
+      fullPath: '/events/$eventId'
+      preLoaderRoute: typeof EventsEventIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/departments/$department_/$desk': {
+      id: '/departments/$department_/$desk'
+      path: '/departments/$department/$desk'
+      fullPath: '/departments/$department/$desk'
+      preLoaderRoute: typeof DepartmentsDepartmentDeskRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AdminRoute: AdminRoute,
-  DepartmentsRoute: DepartmentsRoute,
   EventsRoute: EventsRoute,
   FundRoute: FundRoute,
+  PrivacyRoute: PrivacyRoute,
   ResourcesRoute: ResourcesRoute,
   SponsorshipRoute: SponsorshipRoute,
   TeamRoute: TeamRoute,
+  DepartmentsDepartmentRoute: DepartmentsDepartmentRoute,
+  EventsEventIdRoute: EventsEventIdRoute,
+  DepartmentsIndexRoute: DepartmentsIndexRoute,
+  DepartmentsDepartmentDeskRoute: DepartmentsDepartmentDeskRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

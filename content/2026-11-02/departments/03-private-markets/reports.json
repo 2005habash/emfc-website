@@ -1,0 +1,50 @@
+{
+  "department": "Private Markets",
+  "about": "Reports and documents for the site. 'file' is relative to this department folder. 'where' says which page the sender wants it on.",
+  "reports": [
+    {
+      "title": "Real assets in Q3 2026: where the money is going",
+      "series": "Market Insight (quarterly)",
+      "desk": "Real Assets",
+      "authors": [
+        "Jan Heibel",
+        "Luca Flusche"
+      ],
+      "data_as_of": "2026-09-25",
+      "pages": 4,
+      "status": "Published on LinkedIn",
+      "file": "files/EMFC_RealAssets_MarketInsight_Q3_2026_vf.pdf",
+      "link": "https://lnkd.in/p/ebkynQ-q",
+      "link_note": "The LinkedIn post, as linked in the footer of the Real Assets one-pager.",
+      "where": "Resources page (as a downloadable PDF or a link to the LinkedIn post, Luca Flusche), and the Real Assets desk page.",
+      "note": "Jan Heibel also announced a 'Real Assets Q3 Market Overview' PDF: Vasco confirmed it is this same report."
+    },
+    {
+      "title": "EMFC Private Markets - Real Assets Division (one-pager)",
+      "series": "Desk one-pager",
+      "desk": "Real Assets",
+      "pages": 1,
+      "status": "Approved",
+      "file": "files/EMFC_PM_RealAssets_External_vf.pdf",
+      "contact": "(email removed)",
+      "where": "Linked from the Real Assets desk on the Private Markets page, so companies can see who the team is and how to reach them (Luca Flusche)."
+    },
+    {
+      "title": "Deal of the Month",
+      "series": "Monthly",
+      "desk": "Private Equity",
+      "status": "In preparation, PDF to follow (Fabian Seher)"
+    },
+    {
+      "title": "Spanish Mid-Market PE Review",
+      "series": "Annual, per Fabian's page feedback",
+      "desk": "Private Equity",
+      "status": "In preparation, PDF to follow (Fabian Seher)"
+    },
+    {
+      "title": "Investment Memo Drafting",
+      "desk": "Private Equity",
+      "status": "In preparation, PDF to follow (Fabian Seher)"
+    }
+  ]
+}

@@ -1,0 +1,30 @@
+{
+  "department": "Fixed Income",
+  "about": "Reports for the site. 'file' is relative to this department folder. The department didn't say where they go; 'where' is the suggested page.",
+  "reports": [
+    {
+      "title": "Fixed Income Market Monitor, October 2026",
+      "series": "Fixed Income Market Monitor",
+      "issue": "October 2026",
+      "authors": [
+        "Fixed Income department: section text by Joan Brugada, Nin Sacristan, Paul Emil Manner, Jules Coppens, Hugo Heise, Giulia Weber Colussi and Liam Thiele (the report prints them as Joan Brugada Mestre and Paul Manner); data pages compiled by Luka Thomson"
+      ],
+      "pages": 15,
+      "file": "files/EMFC_Fixed_Income_Market_Monitor_Oct2026.pdf",
+      "note": "Its 'About this publication' note says it was 'Prepared by students for internal discussion, not investment research or advice.'",
+      "where": "Resources page"
+    },
+    {
+      "title": "Fixed Income Market Monitor, week ending 4 September 2026",
+      "series": "Fixed Income Market Monitor",
+      "issue": "4 September 2026",
+      "authors": [
+        "Fixed Income department; data pages compiled by Luka Thomson"
+      ],
+      "pages": 9,
+      "file": "files/EMFC_Fixed_Income_Market_Monitor_Sep2026_Updated.pdf",
+      "note": "File name says 'Updated'. Its team page shows the September team (it includes Rayane and Keryann, who are not on the current list). Same 'internal discussion' note as October.",
+      "where": "Resources page"
+    }
+  ]
+}

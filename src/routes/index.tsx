@@ -1,22 +1,25 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ArrowLeft, ArrowRight, ArrowUpRight, Linkedin } from "lucide-react";
+import { ArrowRight, ArrowUpRight, Linkedin } from "lucide-react";
 import { motion, useReducedMotion } from "framer-motion";
 import { useEffect, useState } from "react";
 import { SiteLayout } from "@/components/layout/SiteLayout";
 import { Reveal } from "@/components/Reveal";
 import { NewsletterForm } from "@/components/site/NewsletterForm";
 import { CountUp, Em, Eyebrow, Numeral, PhotoCaption, Portrait } from "@/components/site/ui";
+import { EVENTS } from "@/data/events";
+import { STATS } from "@/data/stats";
 import { departments } from "@/lib/departments";
 import {
-  CO_PRESIDENT_QUOTES,
-  EVENTS,
+  CO_PRESIDENT_QUOTE,
+  FUND_PAGE_LIVE,
   IMAGES,
+  logoUrl,
   MEMBER_FIRMS,
   NEXT_INTAKE_OPENS,
   ROMAN,
   SOCIAL,
 } from "@/lib/site";
-import { linkedinOf, MOSAIC } from "@/lib/team";
+import { leadershipOf, PEOPLE_STRIP, PRESIDENTS, type Member } from "@/lib/team";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/")({
@@ -26,7 +29,7 @@ export const Route = createFileRoute("/")({
       {
         name: "description",
         content:
-          "The finance club at ESADE Business School in Barcelona. Built around careers, companies and community. Launching September 2026.",
+          `The finance club at ESADE Business School in Barcelona: ${STATS.members} members, ${STATS.nationalities} nationalities and six departments, built around careers, companies and community.`,
       },
       { property: "og:title", content: "EMFC, ESADE Master's Finance Club" },
       { property: "og:description", content: "The finance club at ESADE." },
@@ -44,7 +47,7 @@ const pillars = [
   },
   {
     title: "Six Departments",
-    body: "Coverage across IB, Private Markets, Asset Management, Fixed Income, Corporate Relations and Marketing.",
+    body: "Coverage across IB, Private Markets, Asset Management, Fixed Income, Corporate Relations and Brand.",
   },
   {
     title: "Industry Access",
@@ -52,7 +55,7 @@ const pillars = [
   },
   {
     title: "International",
-    body: "Over 90% international cohort, built around a global recruiting horizon.",
+    body: `${STATS.internationalPct}% of members come from outside Spain, from ${STATS.nationalities} nationalities, with a global recruiting horizon.`,
   },
 ];
 
@@ -63,55 +66,26 @@ const benefits = [
   },
   {
     title: "Top-tier recruitment opportunities",
-    body: "Recruitment events, CV drop-ins and info sessions from the leading financial firms across banking, markets and private capital.",
+    body: "Recruitment events and info sessions with leading financial firms, plus CV reviews, technical training and mock interviews for every desk.",
   },
   {
     title: "Real research and deal work",
-    body: "Each department publishes deal teardowns, equity research, and credit reports, fostering a track record of rigorous analysis and professional growth.",
+    body: "Each department publishes deal case studies, market views and credit research, building a track record of rigorous analysis.",
     library: true,
   },
-  {
-    title: "Application workshops",
-    body: "Technical training sessions, CV reviews and panel events for Investment Banking, Private Equity, VC & Growth, Fintech, Real Assets, Fixed Income and Asset Management.",
-  },
-  {
-    title: "Study trips",
-    body: "Trips to leading financial hubs with desk time on the buy-side and sell-side, organised with partner firms.",
-  },
-];
-
-const tickerItems = [
-  { name: "Investment Banking", mark: "▲", detail: "M&A · Debt" },
-  {
-    name: "Private Markets",
-    mark: "▲",
-    detail: "Private Equity · VC & Growth · Fintech · Real Assets",
-  },
-  {
-    name: "Asset Management",
-    mark: "▲",
-    detail: "Macro & Strategy · Equity Research · Portfolio Management · ETFs",
-  },
-  {
-    name: "Fixed Income",
-    mark: "▲",
-    detail: "Investment Grade · High Yield · Distressed · Emerging Markets · Financials",
-  },
-  { name: "The EMFC Fund", mark: "●", detail: "Coming soon" },
 ];
 
 function Home() {
   return (
     <SiteLayout overlayNav>
       <Hero />
-      <Ticker />
-      <FirmsStrip />
+      <FirmsBand />
       <Intro />
-      <Panorama />
+      <People />
       <Departments />
       <Membership />
-      <People />
-      <FundTeaser />
+      <Panorama />
+      {FUND_PAGE_LIVE && <FundTeaser />}
       <Join />
     </SiteLayout>
   );
@@ -119,13 +93,13 @@ function Home() {
 
 function Hero() {
   const facts = [
-    { value: <CountUp to={6} pad={2} />, label: "Departments" },
-    { value: <CountUp to={90} suffix="%+" />, label: "International cohort" },
-    { value: <CountUp to={MEMBER_FIRMS.length} />, label: "Firms in our network" },
-    { value: <CountUp to={2026} from={2000} />, label: "Founded in Barcelona" },
+    { value: <CountUp to={STATS.members} />, label: "Members" },
+    { value: <CountUp to={STATS.nationalities} />, label: "Nationalities" },
+    { value: <CountUp to={STATS.firms} />, label: "Firms where members have worked" },
+    { value: <CountUp to={STATS.departments} pad={2} />, label: "Departments" },
   ];
   return (
-    <section className="relative overflow-hidden bg-[#030C3B] text-white">
+    <section className="relative overflow-hidden bg-[#000B3D] text-white">
       <img
         src={IMAGES.placaEspanya}
         alt="Plaça d'Espanya in Barcelona at dusk"
@@ -135,12 +109,12 @@ function Hero() {
       />
       <div aria-hidden className="absolute inset-0 bg-[rgb(3_10_46/0.5)]" />
       <PhotoCaption className="absolute right-5 top-1/2 hidden -translate-y-1/2 rotate-180 [writing-mode:vertical-rl] lg:block">
-        Plaça d'Espanya · Barcelona
+        Plaça d'Espanya, Barcelona
       </PhotoCaption>
 
       <div className="gutter relative flex min-h-[780px] flex-col justify-end gap-6 pt-32 md:min-h-[860px] md:gap-7">
         <Eyebrow tone="hero" className="animate-rise">
-          Est. 2026 · ESADE Business School · Barcelona
+          Established 2026, ESADE Business School, Barcelona
         </Eyebrow>
         <h1 className="font-serif text-[64px]/[0.92] tracking-[-0.015em] md:text-[112px]/[0.9] xl:text-[152px]/[0.9]">
           <span className="block animate-rise [animation-delay:150ms]">ESADE Master's</span>
@@ -188,47 +162,37 @@ function Hero() {
   );
 }
 
-function Ticker() {
+/** "Where our members have worked": one slow moving band of firm names (28 October). */
+function FirmsBand() {
   return (
-    <div
-      aria-label="Departments and verticals"
-      className="overflow-hidden border-t border-white/15 bg-[#030C3B]"
-    >
-      <div className="flex w-max animate-marquee">
-        {[0, 1].map((group) => (
-          <div
-            key={group}
-            aria-hidden={group === 1}
-            className="caps flex gap-14 py-3.5 pr-14 text-[10px] tracking-[0.22em] whitespace-nowrap text-haze md:text-[10.5px]"
-          >
-            {tickerItems.map((it) => (
-              <span key={it.name}>
-                <span className="text-white">{it.name}</span>{" "}
-                <span className="text-brass-light">{it.mark}</span> {it.detail}
-              </span>
+    <section aria-label="Where our members have worked" className="border-b border-line">
+      <div className="flex flex-col gap-4 py-7 lg:flex-row lg:items-center lg:gap-0 lg:py-9">
+        <div className="caps gutter shrink-0 text-[10px]/[1.6] tracking-[0.2em] text-mute lg:mx-0 lg:w-auto lg:max-w-none lg:border-r lg:border-line lg:pr-10 lg:text-[10.5px]/[1.6]">
+          Where our members <br className="hidden lg:block" />
+          have worked
+        </div>
+        <div className="group relative flex-1 overflow-hidden motion-reduce:overflow-x-auto [mask-image:linear-gradient(90deg,transparent,#000_6%,#000_94%,transparent)]">
+          <div className="flex w-max animate-marquee [animation-duration:90s] group-hover:[animation-play-state:paused]">
+            {[0, 1].map((copy) => (
+              <ul
+                key={copy}
+                aria-hidden={copy === 1}
+                className="flex shrink-0 items-center gap-14 pr-14 font-serif text-[21px] font-semibold whitespace-nowrap md:text-[24px]"
+              >
+                {MEMBER_FIRMS.map((f) => (
+                  <li key={f.name} className="flex items-center gap-3.5">
+                    <img
+                      src={logoUrl(f.domain, 64)}
+                      alt=""
+                      loading="lazy"
+                      className="h-8 w-8 rounded-[6px] object-contain grayscale transition duration-300 group-hover:grayscale-0 md:h-9 md:w-9"
+                    />
+                    {f.name}
+                  </li>
+                ))}
+              </ul>
             ))}
           </div>
-        ))}
-      </div>
-    </div>
-  );
-}
-
-function FirmsStrip() {
-  return (
-    <section aria-label="Where our members come from" className="border-b border-line">
-      <div className="gutter flex flex-col gap-4 py-8 lg:flex-row lg:items-center lg:gap-10 lg:py-10">
-        <div className="caps shrink-0 text-[10px]/[1.6] tracking-[0.2em] text-mute lg:w-[170px] lg:text-[10.5px]/[1.6]">
-          Where our members <br className="hidden lg:block" />
-          come from
-        </div>
-        <span className="hidden h-11 w-px shrink-0 bg-line lg:block" />
-        <div className="grid flex-1 grid-cols-3 gap-y-2.5 font-serif text-[19px] font-semibold sm:grid-cols-4 lg:flex lg:justify-between lg:text-[18px] xl:text-[21px]">
-          {MEMBER_FIRMS.map((f) => (
-            <span key={f} className="whitespace-nowrap">
-              {f}
-            </span>
-          ))}
         </div>
       </div>
     </section>
@@ -275,7 +239,7 @@ function Panorama() {
   return (
     <section
       aria-label="Barcelona"
-      className="relative flex h-[320px] flex-col items-center justify-center gap-4 overflow-hidden bg-[#030C3B] px-5 text-center text-white md:h-[420px]"
+      className="relative flex h-[320px] flex-col items-center justify-center gap-4 overflow-hidden bg-[#000B3D] px-5 text-center text-white md:h-[420px]"
     >
       <img
         src={IMAGES.sagradaFamilia}
@@ -286,14 +250,14 @@ function Panorama() {
       <div aria-hidden className="absolute inset-0 bg-[rgb(3_10_46/0.4)]" />
       <Reveal>
         <p className="relative font-serif text-[44px]/none italic md:text-[80px]/none">
-          Over 90% international.
+          {STATS.nationalities} nationalities.
         </p>
         <p className="caps relative mt-4 text-[9.5px] tracking-[0.26em] text-[#E3E6EF] md:text-[11px]">
           Built around a global recruiting horizon
         </p>
       </Reveal>
       <PhotoCaption className="absolute bottom-4 left-5 md:bottom-6 md:left-14">
-        Sagrada Família & L'Eixample · Barcelona
+        Sagrada Família and L'Eixample, Barcelona
       </PhotoCaption>
     </section>
   );
@@ -301,8 +265,6 @@ function Panorama() {
 
 function Departments() {
   const reduce = useReducedMotion();
-  const investment = departments.filter((d) => !d.support);
-  const support = departments.filter((d) => d.support);
   const grow = (axis: "scaleX" | "scaleY", delay: number) => ({
     initial: reduce ? false : { [axis]: 0 },
     whileInView: { [axis]: 1 },
@@ -318,91 +280,54 @@ function Departments() {
             Our Departments
           </h2>
           <p className="text-[15px]/[1.7] text-mute md:text-[17px]/[1.7]">
-            How EMFC is structured across the Investment and Support teams.
+            Six departments and fifteen desks, led by two Co-Presidents.
           </p>
         </Reveal>
 
-        <Reveal className="mt-10 flex flex-col gap-2 bg-[#030C3B] px-6 py-5 text-center text-white md:mt-14 md:px-12">
-          <span className="caps text-[10px] tracking-[0.24em] text-brass-light md:text-[10.5px]">
+        <Reveal className="mt-10 flex flex-col gap-2 bg-[#000B3D] px-6 py-5 text-center text-white md:mt-14 md:px-12">
+          <span className="caps text-[10px] tracking-[0.24em] text-bull-light md:text-[10.5px]">
             Co-Presidents
           </span>
           <span className="font-serif text-[22px]/[1.25] font-medium md:text-[28px]/[1.2]">
-            Diogo Oliveira <span className="max-md:hidden">·</span>
-            <br className="md:hidden" /> Vasco Barahona de Lemos
+            {PRESIDENTS.map((p) => p.name).join(" and ")}
           </span>
         </Reveal>
 
-        <div aria-hidden className="relative hidden h-14 w-full lg:block">
+        <div aria-hidden className="relative hidden h-12 w-full lg:block">
+          <motion.div className="absolute left-1/2 top-0 h-6 w-px origin-top bg-bull" {...grow("scaleY", 0.2)} />
           <motion.div
-            className="absolute left-1/2 top-0 h-6 w-px origin-top bg-brass"
-            {...grow("scaleY", 0.2)}
-          />
-          <motion.div
-            className="absolute right-[calc(12.5%-3px)] left-[calc(37.5%-9px)] top-6 h-px bg-brass"
+            className="absolute left-[calc(100%/6)] right-[calc(100%/6)] top-6 h-px bg-bull"
             {...grow("scaleX", 0.6)}
-          />
-          <motion.div
-            className="absolute left-[calc(37.5%-9px)] top-6 h-8 w-px origin-top bg-brass"
-            {...grow("scaleY", 1.1)}
-          />
-          <motion.div
-            className="absolute right-[calc(12.5%-3px)] top-6 h-8 w-px origin-top bg-brass"
-            {...grow("scaleY", 1.1)}
           />
         </div>
 
-        <Reveal className="mt-10 grid w-full items-start gap-10 lg:mt-0 lg:grid-cols-[3fr_1fr] lg:gap-6">
-          <div className="flex flex-col gap-6">
-            <div className="caps border-b border-ink pb-3.5 text-center text-[10px] tracking-[0.24em] md:text-[11px]">
-              Investment Team · {investment.length} Desks
-            </div>
-            <div className="grid gap-4 sm:grid-cols-2 lg:gap-6">
-              {investment.map((d, i) => (
-                <Link
-                  key={d.slug}
-                  to="/departments"
-                  search={{ desk: d.slug }}
-                  className="flex flex-col gap-3 border border-line bg-panel p-6 transition duration-300 hover:-translate-y-1 hover:border-ink md:px-8 md:py-7"
-                >
-                  <div className="flex items-center justify-between">
-                    <Numeral>{ROMAN[i]}</Numeral>
-                    <ArrowUpRight className="h-4 w-4" strokeWidth={1.5} />
-                  </div>
-                  <h3 className="mt-1 font-serif text-[32px]/none md:text-[38px]/none">{d.name}</h3>
-                  <div className="caps text-[10px] tracking-[0.18em] text-mute md:text-[10.5px]">
-                    Head — {d.head}
-                    {d.cio && ` · CIO — ${d.cio}`}
-                  </div>
-                  <div className="caps mt-1 border-t border-line pt-3.5 text-[10px]/[1.7] tracking-[0.16em] md:text-[10.5px]/[1.7]">
-                    {d.verticals.join(" · ")}
-                  </div>
-                </Link>
-              ))}
-            </div>
-          </div>
-          <div className="flex flex-col gap-6">
-            <div className="caps border-b border-ink pb-3.5 text-center text-[10px] tracking-[0.24em] md:text-[11px]">
-              Support Team
-            </div>
-            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-1 lg:gap-6">
-              {support.map((d, i) => (
-                <Link
-                  key={d.slug}
-                  to="/departments"
-                  search={{ desk: d.slug }}
-                  className="flex flex-col gap-3 border border-line bg-panel p-6 transition duration-300 hover:-translate-y-1 hover:border-ink md:p-7"
-                >
-                  <Numeral>{ROMAN[investment.length + i]}</Numeral>
-                  <h3 className="mt-1 font-serif text-[28px]/[1.05] md:text-[32px]/[1.05]">
-                    {d.name}
-                  </h3>
-                  <div className="caps text-[10px] tracking-[0.18em] text-mute md:text-[10.5px]">
-                    Head — {d.head}
-                  </div>
-                </Link>
-              ))}
-            </div>
-          </div>
+        <Reveal className="mt-10 grid w-full gap-4 sm:grid-cols-2 lg:mt-0 lg:grid-cols-3 lg:gap-6">
+          {departments.map((d, i) => {
+            const leads = leadershipOf(d.slug).filter((m) => m.position === "head" || m.position === "cio");
+            return (
+              <Link
+                key={d.slug}
+                to="/departments/$department"
+                params={{ department: d.slug }}
+                className="group flex flex-col gap-3 border border-line bg-panel p-6 transition duration-300 hover:-translate-y-1 hover:border-ink md:px-8 md:py-7"
+              >
+                <div className="flex items-center justify-between">
+                  <Numeral>{ROMAN[i]}</Numeral>
+                  <ArrowUpRight
+                    className="h-4 w-4 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5"
+                    strokeWidth={1.5}
+                  />
+                </div>
+                <h3 className="mt-1 font-serif text-[32px]/none md:text-[38px]/none">{d.name}</h3>
+                <div className="caps text-[10px]/[1.7] tracking-[0.18em] text-mute md:text-[10.5px]/[1.7]">
+                  {leads.map((m) => `${m.position === "cio" ? "CIO" : "Head"}: ${m.name}`).join(", ")}
+                </div>
+                <div className="caps mt-1 border-t border-line pt-3.5 text-[10px]/[1.7] tracking-[0.16em] md:text-[10.5px]/[1.7]">
+                  {d.desks.length ? d.desks.map((k) => k.name).join(", ") : d.function}
+                </div>
+              </Link>
+            );
+          })}
         </Reveal>
       </div>
     </section>
@@ -431,7 +356,7 @@ function Membership() {
             />
           </div>
           <figcaption className="caps text-[10px] tracking-[0.22em] text-mute">
-            Port Olímpic · Barcelona
+            Port Olímpic, Barcelona
           </figcaption>
         </figure>
       </Reveal>
@@ -462,31 +387,56 @@ function Membership() {
   );
 }
 
-function MosaicCaption({ name, role }: { name: string; role: string }) {
+function StripTile({ m, i }: { m: Member; i: number }) {
   return (
-    <span className="absolute inset-x-0 bottom-0 flex translate-y-full flex-col gap-0.5 bg-[#030C3B] px-3 pt-2.5 pb-3 text-white transition-transform duration-300 group-hover:translate-y-0 group-focus-visible:translate-y-0">
-      <span className="font-serif text-lg/[1.1]">{name}</span>
-      <span className="caps text-[8.5px] tracking-[0.16em] text-[#D5D9E6]">{role}</span>
-    </span>
+    <Link
+      to="/team"
+      aria-label={`${m.name}, ${m.title}`}
+      className="group relative block h-[150px] w-[125px] shrink-0 overflow-hidden md:h-[220px] md:w-[183px]"
+    >
+      <Portrait member={m} alt="" alternate={i % 2 === 1} className="h-full" />
+      <span className="absolute inset-x-0 bottom-0 flex translate-y-full flex-col gap-0.5 bg-[#000B3D] px-3 pt-2.5 pb-3 text-white transition-transform duration-300 group-hover:translate-y-0 group-focus-visible:translate-y-0">
+        <span className="font-serif text-base/[1.1] md:text-lg/[1.1]">{m.name}</span>
+        <span className="caps text-[8px] tracking-[0.16em] text-[#D5D9E6] md:text-[8.5px]">{m.title}</span>
+      </span>
+    </Link>
+  );
+}
+
+/** A row of portraits moving slowly sideways; it pauses on hover and stays still for reduced motion. */
+function MovingRow({ people, reverse = false }: { people: Member[]; reverse?: boolean }) {
+  return (
+    <div className="group/row overflow-hidden motion-reduce:overflow-x-auto">
+      <div
+        className="flex w-max animate-marquee group-hover/row:[animation-play-state:paused]"
+        style={{ animationDuration: `${people.length * 4.5}s`, animationDirection: reverse ? "reverse" : "normal" }}
+      >
+        {[0, 1].map((copy) => (
+          <div key={copy} aria-hidden={copy === 1 || undefined} className="flex shrink-0">
+            {people.map((m, i) => (
+              <StripTile key={m.slug} m={m} i={i + copy} />
+            ))}
+          </div>
+        ))}
+      </div>
+    </div>
   );
 }
 
 function People() {
-  const [quote, setQuote] = useState(0);
-  const total = CO_PRESIDENT_QUOTES.length;
-  const pad = (n: number) => String(n).padStart(2, "0");
+  const half = Math.ceil(PEOPLE_STRIP.length / 2);
   return (
     <section id="people" className="bg-night text-white">
       <Reveal className="gutter grid items-start gap-10 pt-20 lg:grid-cols-12 lg:gap-8 lg:pt-26">
         <div className="flex flex-col gap-6 lg:col-span-5">
-          <Eyebrow tone="light">The founding cohort</Eyebrow>
+          <Eyebrow tone="light">{STATS.members} members</Eyebrow>
           <h2 className="font-serif text-[52px]/[0.98] tracking-[-0.01em] md:text-[76px]/[0.98]">
             The people <br className="max-md:hidden" />
             behind <Em light>EMFC.</Em>
           </h2>
           <p className="max-w-[420px] text-[15px]/[1.7] text-mist md:text-base/[1.7]">
-            Led by master's students with prior experience across banking, markets and private
-            capital.
+            Master's students from {STATS.nationalities} nationalities, {STATS.experiencePct}% of them
+            with professional experience across banking, markets and private capital.
           </p>
           <Link to="/team" className="btn btn-sm btn-outline-white self-start">
             Meet the team
@@ -494,108 +444,38 @@ function People() {
           </Link>
         </div>
         <figure className="flex flex-col gap-7 border border-white/20 p-6 md:px-11 md:py-10 lg:col-span-6 lg:col-start-7">
-          <div className="caps text-[10px] tracking-[0.24em] text-brass-light md:text-[10.5px]">
+          <div className="caps text-[10px] tracking-[0.24em] text-bull-light md:text-[10.5px]">
             From the Co-Presidents
           </div>
-          <blockquote
-            aria-live="polite"
-            className="font-serif text-2xl/[1.25] italic md:min-h-[236px] md:text-[30px]/[1.24]"
-          >
-            “{CO_PRESIDENT_QUOTES[quote]}”
+          <blockquote className="font-serif text-2xl/[1.25] italic md:text-[30px]/[1.24]">
+            “{CO_PRESIDENT_QUOTE}”
           </blockquote>
-          <figcaption className="flex flex-col gap-5 border-t border-white/20 pt-6 sm:flex-row sm:items-center sm:justify-between">
-            <div className="flex items-center gap-4">
-              <div className="flex shrink-0">
+          <figcaption className="flex items-center gap-4 border-t border-white/20 pt-6">
+            <div className="flex shrink-0">
+              {PRESIDENTS.map((p, i) => (
                 <Portrait
-                  name="Diogo Oliveira"
+                  key={p.slug}
+                  member={p}
                   alt=""
-                  className="h-14 w-14 rounded-full border-2 border-night"
+                  className={cn("h-14 w-14 rounded-full border-2 border-night", i > 0 && "-ml-3.5")}
                 />
-                <Portrait
-                  name="Vasco Barahona de Lemos"
-                  alt=""
-                  className="-ml-3.5 h-14 w-14 rounded-full border-2 border-night"
-                />
-              </div>
-              <div className="flex flex-col gap-1">
-                <span className="font-serif text-lg/[1.15] md:text-[21px]/[1.15]">
-                  Diogo Oliveira & Vasco Barahona de Lemos
-                </span>
-                <span className="caps text-[9.5px] tracking-[0.2em] text-mist md:text-[10px]">
-                  Co-Presidents & Founders
-                </span>
-              </div>
+              ))}
             </div>
-            <div className="flex shrink-0 items-center gap-2.5">
-              <span className="caps text-[10.5px] tracking-[0.2em] text-mist">
-                {pad(quote + 1)} / {pad(total)}
+            <div className="flex flex-col gap-1">
+              <span className="font-serif text-lg/[1.15] md:text-[21px]/[1.15]">
+                {PRESIDENTS.map((p) => p.name).join(" and ")}
               </span>
-              <button
-                type="button"
-                aria-label="Previous quote"
-                onClick={() => setQuote((q) => (q + total - 1) % total)}
-                className="flex h-11 w-11 items-center justify-center rounded-full border border-white/60 hover:bg-white/10"
-              >
-                <ArrowLeft className="h-[15px] w-[15px]" strokeWidth={1.75} />
-              </button>
-              <button
-                type="button"
-                aria-label="Next quote"
-                onClick={() => setQuote((q) => (q + 1) % total)}
-                className="flex h-11 w-11 items-center justify-center rounded-full border border-white/60 hover:bg-white/10"
-              >
-                <ArrowRight className="h-[15px] w-[15px]" strokeWidth={1.75} />
-              </button>
+              <span className="caps text-[9.5px] tracking-[0.2em] text-mist md:text-[10px]">
+                Co-Presidents and Founders
+              </span>
             </div>
           </figcaption>
         </figure>
       </Reveal>
 
-      {/* Desktop: full-width mosaic, names appear on hover. */}
-      <Reveal className="mt-18 hidden grid-cols-9 md:grid">
-        {MOSAIC.map((p, i) => {
-          const href = linkedinOf(p);
-          // Nine columns: an odd count, so alternating by index gives a checkerboard.
-          const alternate = i % 2 === 1;
-          const inner = (
-            <>
-              <Portrait name={p.name} alt="" alternate={alternate} className="h-full" />
-              <MosaicCaption name={p.name} role={p.role} />
-            </>
-          );
-          const cls = "group relative block h-[170px] overflow-hidden lg:h-[220px]";
-          return href ? (
-            <a
-              key={p.name}
-              href={href}
-              target="_blank"
-              rel="noreferrer"
-              aria-label={`${p.name}, ${p.role}`}
-              className={cls}
-            >
-              {inner}
-            </a>
-          ) : (
-            <Link key={p.name} to="/team" aria-label={`${p.name}, ${p.role}`} className={cls}>
-              {inner}
-            </Link>
-          );
-        })}
-      </Reveal>
-
-      {/* Mobile: swipeable strip with names always visible. */}
-      <div className="mt-10 overflow-x-auto px-5 pb-10 [scrollbar-width:none] md:hidden">
-        <div className="grid w-[1234px] grid-cols-9 gap-x-2 gap-y-5">
-          {MOSAIC.map((p, i) => (
-            <a key={p.name} href={linkedinOf(p) ?? "/team"} className="group flex flex-col gap-2">
-              <Portrait name={p.name} alternate={i % 2 === 1} className="h-[156px]" />
-              <span className="flex flex-col gap-0.5">
-                <span className="font-serif text-base/[1.1]">{p.name}</span>
-                <span className="caps text-[8px] tracking-[0.14em] text-mist">{p.role}</span>
-              </span>
-            </a>
-          ))}
-        </div>
+      <div className="mt-14 flex flex-col md:mt-18" aria-label="Members of EMFC">
+        <MovingRow people={PEOPLE_STRIP.slice(0, half)} />
+        <MovingRow people={PEOPLE_STRIP.slice(half)} reverse />
       </div>
     </section>
   );
@@ -607,8 +487,8 @@ function FundTeaser() {
     <section id="fund" className="border-t border-white/15 bg-night text-white md:border-t-0">
       <div className="gutter flex flex-col items-center py-18 text-center lg:py-26">
         <Reveal className="flex flex-col items-center">
-          <span className="caps inline-flex items-center gap-2.5 rounded-full border border-brass-light px-4 py-2 text-[10px] tracking-[0.22em] text-brass-light md:text-[10.5px]">
-            <span className="h-1.5 w-1.5 rounded-full bg-brass-light" />
+          <span className="caps inline-flex items-center gap-2.5 rounded-full border border-bull-light px-4 py-2 text-[10px] tracking-[0.22em] text-bull-light md:text-[10.5px]">
+            <span className="h-1.5 w-1.5 rounded-full bg-bull-light" />
             Coming soon
           </span>
           <h2 className="mt-7 font-serif text-[64px]/[0.95] tracking-[-0.015em] md:text-[112px]/[0.95]">
@@ -630,7 +510,7 @@ function FundTeaser() {
               key={s}
               className="relative flex items-start gap-5 md:flex-col md:items-center md:gap-3.5"
             >
-              <span className="mt-0.5 h-[13px] w-[13px] shrink-0 rounded-full border border-brass-light bg-night md:mt-0" />
+              <span className="mt-0.5 h-[13px] w-[13px] shrink-0 rounded-full border border-bull-light bg-night md:mt-0" />
               <span className="flex flex-col gap-1 md:gap-3.5">
                 <span className="caps text-[9.5px] tracking-[0.22em] text-haze md:text-[10.5px]">
                   Stage {ROMAN[i]}
@@ -690,7 +570,7 @@ function Join() {
 
   return (
     <section id="join" className="grid lg:grid-cols-2">
-      <div className="relative min-h-[240px] overflow-hidden bg-[#030C3B] lg:min-h-[760px]">
+      <div className="relative min-h-[240px] overflow-hidden bg-[#000B3D] lg:min-h-[760px]">
         <img
           src={IMAGES.parkGuell}
           alt="Park Güell mosaic bench overlooking Barcelona at sunrise"
@@ -698,13 +578,13 @@ function Join() {
           className="absolute inset-0 h-full w-full object-cover object-[50%_60%] lg:object-center"
         />
         <PhotoCaption className="absolute bottom-4 left-5 text-white md:bottom-6 md:left-14">
-          Park Güell · Barcelona
+          Park Güell, Barcelona
         </PhotoCaption>
       </div>
       <div className="flex flex-col gap-6 bg-stone px-5 py-14 md:px-10 lg:px-18 lg:py-26">
         {counting ? (
           <>
-            <Eyebrow>Next intake · Associate applications</Eyebrow>
+            <Eyebrow>Next intake: Associate applications</Eyebrow>
             <h2 className="font-serif text-[52px]/[0.98] tracking-[-0.01em] md:text-[76px]/[0.98]">
               Applications <Em>open in</Em>
             </h2>
@@ -767,11 +647,15 @@ function Join() {
             </div>
             <div className="flex min-w-0 flex-1 flex-col gap-1.5">
               <span className="caps text-[9px] tracking-[0.22em] text-mute md:text-[10px]">
-                {next ? "Next event" : "Latest event"} · {event.type} · {event.location}
+                {next ? "Next event" : "Latest event"}, {event.type}, {event.location}
               </span>
-              <span className="font-serif text-[28px]/[1.05] font-medium md:text-[32px]/[1.05]">
+              <Link
+                to="/events/$eventId"
+                params={{ eventId: event.id }}
+                className="font-serif text-[28px]/[1.05] font-medium underline-offset-4 hover:underline md:text-[32px]/[1.05]"
+              >
                 {event.title}
-              </span>
+              </Link>
             </div>
             <Link
               to="/events"

@@ -20,7 +20,7 @@ export function Footer() {
               careers, companies and the people you meet along the way.
             </p>
             <span className="caps text-[10.5px] tracking-[0.22em] text-haze">
-              ESADE Business School · Barcelona
+              ESADE Business School, Barcelona
             </span>
           </div>
 
@@ -29,7 +29,7 @@ export function Footer() {
             className="grid grid-cols-2 gap-8 text-[15px] lg:col-span-3 lg:col-start-6"
           >
             <div className="flex flex-col gap-2.5">
-              <span className="caps mb-1.5 text-[10.5px] tracking-[0.22em] text-brass-light">
+              <span className="caps mb-1.5 text-[10.5px] tracking-[0.22em] text-bull-light">
                 Club
               </span>
               <Link to="/" className="hover:text-white hover:underline">
@@ -46,7 +46,7 @@ export function Footer() {
               </Link>
             </div>
             <div className="flex flex-col gap-2.5">
-              <span className="caps mb-1.5 text-[10.5px] tracking-[0.22em] text-brass-light">
+              <span className="caps mb-1.5 text-[10.5px] tracking-[0.22em] text-bull-light">
                 Members
               </span>
               <Link to="/events" className="hover:text-white hover:underline">
@@ -96,7 +96,12 @@ export function Footer() {
           </div>
           <div className="caps flex flex-col gap-2 border-t border-[#1B2560] pt-5 text-[10px] tracking-[0.2em] text-haze md:flex-row md:justify-between">
             <span>© {new Date().getFullYear()} EMFC, ESADE Master's Finance Club</span>
-            <span>Launched September 2026</span>
+            <span className="flex gap-6">
+              <Link to="/privacy" className="hover:text-white hover:underline">
+                Privacy
+              </Link>
+              <span>Launched September 2026</span>
+            </span>
           </div>
         </div>
       </div>

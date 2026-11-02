@@ -8,7 +8,7 @@ import { toast } from "sonner";
 import { zip } from "fflate";
 
 export const Route = createFileRoute("/admin")({
-  head: () => ({ meta: [{ title: "Admin — EMFC" }, { name: "robots", content: "noindex" }] }),
+  head: () => ({ meta: [{ title: "Admin, EMFC" }, { name: "robots", content: "noindex" }] }),
   component: Admin,
 });
 
@@ -310,7 +310,7 @@ function Dashboard() {
         <div>
           <p className="eyebrow">Admin</p>
           <h1 className="mt-2 font-serif text-3xl text-navy">Applications</h1>
-          <p className="mt-1 text-sm text-muted-foreground">{filtered.length} showing · {apps.length} total</p>
+          <p className="mt-1 text-sm text-muted-foreground">{filtered.length} showing, {apps.length} total</p>
         </div>
         <div className="flex flex-wrap items-center gap-2">
           <button onClick={downloadAllCVs} disabled={zipping} className="inline-flex h-10 items-center gap-2 rounded-md border border-navy px-4 text-sm font-medium text-navy hover:bg-secondary disabled:opacity-60">
@@ -442,8 +442,8 @@ function Dashboard() {
                         <a onClick={(e) => e.stopPropagation()} href={`mailto:${a.email}`} className="text-steel hover:underline">{a.email}</a>
                       </td>
                       <td className="p-3 text-xs">{deptName(a.department)}</td>
-                      <td className="p-3 text-xs">{a.desk_preference ?? "—"}</td>
-                      <td className="p-3 text-xs">{a.program} · {a.graduation_year}</td>
+                      <td className="p-3 text-xs">{a.desk_preference ?? "–"}</td>
+                      <td className="p-3 text-xs">{a.program}, {a.graduation_year}</td>
                       <td className="p-3" onClick={(e) => e.stopPropagation()}>
                         {a.cv_path ? (
                           <div className="flex items-center gap-2">
@@ -454,7 +454,7 @@ function Dashboard() {
                               <ExternalLink className="h-3 w-3" />
                             </button>
                           </div>
-                        ) : <span className="text-xs text-muted-foreground">—</span>}
+                        ) : <span className="text-xs text-muted-foreground">–</span>}
                       </td>
                     </tr>
                     {isOpen && (
@@ -464,11 +464,11 @@ function Dashboard() {
                           <div className="grid gap-4 md:grid-cols-2">
                             <DetailField label="Full name" value={a.full_name} />
                             <DetailField label="Email" value={<a href={`mailto:${a.email}`} className="text-steel hover:underline">{a.email}</a>} />
-                            <DetailField label="Program" value={`${a.program} · Class of ${a.graduation_year}`} />
-                            <DetailField label="Nationality" value={a.nationality ?? "—"} />
+                            <DetailField label="Program" value={`${a.program}, Class of ${a.graduation_year}`} />
+                            <DetailField label="Nationality" value={a.nationality ?? "–"} />
                             <DetailField label="Department" value={deptName(a.department)} />
-                            <DetailField label="Position type" value={a.position_type ?? "—"} />
-                            <DetailField label="Team preference" value={a.desk_preference ?? "—"} />
+                            <DetailField label="Position type" value={a.position_type ?? "–"} />
+                            <DetailField label="Team preference" value={a.desk_preference ?? "–"} />
                             <DetailField
                               label="LinkedIn"
                               value={(() => {

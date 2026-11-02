@@ -39,8 +39,8 @@
   --color-line: var(--c-line);
   --color-night: var(--c-night);
   --color-deep: var(--c-deep);
-  --color-brass: var(--c-brass);
-  --color-brass-light: var(--c-brass-light);
+  --color-bull: var(--c-bull);
+  --color-bull-light: var(--c-bull-light);
   --color-warn: var(--c-warn);
   --color-field: var(--c-field);
   --color-tile: #ece7de;
@@ -74,11 +74,12 @@
   --c-ink: #141b34;
   --c-mute: #555c72;
   --c-line: #ddd6c9;
-  --c-night: #030c3b;
+  --c-night: #000b3d;
   --c-deep: #02082a;
-  --c-brass: #a8844b;
-  --c-brass-light: #d9bc85;
-  --c-warn: #7a5e30;
+  /* Accents come from the bull logo: mid blue on light backgrounds, light blue on navy. */
+  --c-bull: #5a67a2;
+  --c-bull-light: #9ca8d4;
+  --c-warn: #5a67a2;
   --c-field: #ffffff;
 
   /* shadcn tokens, as HSL channels */
@@ -88,7 +89,7 @@
   --primary-foreground: 0 0% 100%;
   --secondary: 40 30% 92%;
   --secondary-foreground: 227 44% 14%;
-  --accent: 37 38% 48%;
+  --accent: 229 29% 49%;
   --accent-foreground: 0 0% 100%;
   --muted: 40 30% 92%;
   --muted-foreground: 226 15% 39%;
@@ -103,10 +104,10 @@
   --destructive-foreground: 0 0% 100%;
 
   /* Legacy raw vars used by inline styles */
-  --navy: #030c3b;
+  --navy: #000b3d;
   --ink: #141b34;
   --steel: #555c72;
-  --gold: #a8844b;
+  --gold: #5a67a2;
   --gold-foreground: #ffffff;
   --cream: #f1ede5;
 }
@@ -120,7 +121,8 @@
   --c-line: #222c58;
   --c-night: #0d1538;
   --c-deep: #050817;
-  --c-warn: #d9bc85;
+  --c-bull: #9ca8d4;
+  --c-warn: #9ca8d4;
   --c-field: #0b1130;
 
   --background: 230 63% 7%;
@@ -129,7 +131,7 @@
   --primary-foreground: 230 63% 7%;
   --secondary: 231 63% 12%;
   --secondary-foreground: 40 32% 93%;
-  --accent: 39 52% 69%;
+  --accent: 227 39% 72%;
   --accent-foreground: 230 63% 7%;
   --muted: 231 63% 12%;
   --muted-foreground: 228 28% 72%;
@@ -169,7 +171,7 @@
     font-weight: 500;
   }
   ::selection {
-    background: var(--c-brass);
+    background: var(--c-bull);
     color: #ffffff;
   }
 }
@@ -229,7 +231,7 @@
   }
   .btn-white {
     background: #ffffff;
-    color: #030c3b;
+    color: #000b3d;
   }
   .btn-white:hover {
     filter: brightness(0.94);

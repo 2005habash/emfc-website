@@ -5,8 +5,6 @@ export const SOCIAL = {
   linkedin: "https://www.linkedin.com/company/esade-finance-club/",
 } as const;
 
-export const SPONSORSHIP_EMAIL = "removed@example.com";
-
 /**
  * When the next intake opens, as an ISO date-time in Barcelona time
  * (for example "2027-02-01T09:00:00+01:00"). Leave as null while no date is set:
@@ -14,33 +12,55 @@ export const SPONSORSHIP_EMAIL = "removed@example.com";
  */
 export const NEXT_INTAKE_OPENS: string | null = null;
 
+/**
+ * The full fund page (portfolio, holdings and charts) stays hidden until the portfolio is built.
+ * Set to true to show it instead of the "Coming soon" page.
+ */
+export const FUND_PAGE_LIVE = false;
+
 export const IMAGES = {
   placaEspanya: "/images/barcelona/placa-espanya.jpg",
   sagradaFamilia: "/images/barcelona/sagrada-familia.jpg",
   parkGuell: "/images/barcelona/park-guell.jpg",
   portOlimpic: "/images/barcelona/port-olimpic.jpg",
+  teamGroup: "/images/team-group.jpg",
   bullMark: "/images/logo/bull-mark.png",
   bullTile: "/images/logo/bull-tile.png",
 } as const;
 
+/**
+ * Logos come from logo.dev by domain, with the same publishable key the 2026 Lovable site used.
+ * The key is public by design (it is sent with every logo request).
+ */
+const LOGO_DEV_TOKEN = "pk_RUlFftUYS4eetzgWC4_DYA";
+export const logoUrl = (domain: string, size = 120) =>
+  `https://img.logo.dev/${domain}?token=${LOGO_DEV_TOKEN}&format=png&size=${size}&retina=true`;
+
+/** "Where our members have worked": firms from the member form (content/2026-11-02/statistics). */
 export const MEMBER_FIRMS = [
-  "J.P. Morgan",
-  "UBS",
-  "Ardian",
-  "Amundi",
-  "Santander",
-  "Nordea",
-  "Euronext",
-  "Meridiam",
-  "Deloitte",
-  "PwC",
-  "KPMG",
-  "CaixaBank",
+  { name: "J.P. Morgan", domain: "jpmorgan.com" },
+  { name: "UBS", domain: "ubs.com" },
+  { name: "BNP Paribas", domain: "bnpparibas.com" },
+  { name: "HSBC", domain: "hsbc.com" },
+  { name: "Santander", domain: "santander.com" },
+  { name: "Ardian", domain: "ardian.com" },
+  { name: "Lazard Asset Management", domain: "lazard.com" },
+  { name: "Allianz Global Investors", domain: "allianzgi.com" },
+  { name: "William Blair", domain: "williamblair.com" },
+  { name: "Euronext", domain: "euronext.com" },
+  { name: "EY", domain: "ey.com" },
+  { name: "KPMG", domain: "kpmg.com" },
+  { name: "Crédit Agricole", domain: "credit-agricole.com" },
+  { name: "Natixis CIB", domain: "natixis.com" },
+  { name: "ING Group", domain: "ing.com" },
+  { name: "Deloitte", domain: "deloitte.com" },
+  { name: "PwC", domain: "pwc.com" },
+  { name: "Alantra", domain: "alantra.com" },
 ] as const;
 
 export const NAV_LINKS = [
   { to: "/", label: "Home" },
-  { to: "/departments", label: "Departments" },
+  { to: "/departments", label: "Departments", menu: "departments" },
   { to: "/events", label: "Events" },
   { to: "/resources", label: "Resources" },
   { to: "/fund", label: "Fund" },
@@ -50,39 +70,13 @@ export const NAV_LINKS = [
 
 export const ROMAN = ["I", "II", "III", "IV", "V", "VI", "VII", "VIII"] as const;
 
-export type EventType = "Networking" | "Workshop" | "Speaker" | "Study Trip" | "Social";
+export const CO_PRESIDENT_QUOTE =
+  "EMFC was built for master's students who arrive at ESADE already close to recruiting and want a real community around it. The work and the people, in equal measure.";
 
-export type EventItem = {
-  id: string;
-  title: string;
-  date: string; // ISO date
-  type: EventType;
-  location: string;
-  description: string;
-  link?: string;
-};
-
-export const EVENT_TYPE_COLORS: Record<EventType, string> = {
-  Networking: "#2F5BFF",
-  Workshop: "#1F8A5B",
-  Speaker: "#A8844B",
-  "Study Trip": "#B4435A",
-  Social: "#6B4FB3",
-};
-
-export const EVENTS: EventItem[] = [
-  {
-    id: "kickoff-dinner-2026",
-    title: "Kickoff Dinner",
-    date: "2026-09-14",
-    type: "Social",
-    location: "Barcelona",
-    description:
-      "The founding cohort's first gathering. An evening to meet the team, welcome incoming associates and set the tone for the year ahead.",
-  },
-];
-
-export const CO_PRESIDENT_QUOTES = [
-  "EMFC was built for master's students who arrive at ESADE already close to recruiting and want a real community around it. The work and the people, in equal measure.",
-  "The Support Team is the engine behind everything members see. Corporate Relations and Marketing make the partnerships, the events and the brand of EMFC possible, working hand in hand with every investment desk.",
-] as const;
+export const formatDay = (iso: string, opts: Intl.DateTimeFormatOptions = {}) =>
+  new Date(`${iso.length === 10 ? iso : `${iso}-01`}T12:00:00`).toLocaleDateString("en-GB", {
+    day: iso.length === 10 ? "numeric" : undefined,
+    month: "long",
+    year: "numeric",
+    ...opts,
+  });

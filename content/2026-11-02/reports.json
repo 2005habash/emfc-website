@@ -1,0 +1,138 @@
+{
+  "about": "All reports and documents from all departments. 'file' is relative to the top of this package. 'where' is the page they belong on.",
+  "reports": [
+    {
+      "title": "M&A case study: Paramount Skydance's ~$111bn takeover of Warner Bros. Discovery",
+      "series": "M&A deal case study (monthly)",
+      "desk": "M&A",
+      "status": "Coming soon: 'our first M&A case study ... to be published next week' (sent 2 November 2026). No file yet.",
+      "where": "Resources page",
+      "department": "Investment Banking"
+    },
+    {
+      "title": "Real assets in Q3 2026: where the money is going",
+      "series": "Market Insight (quarterly)",
+      "desk": "Real Assets",
+      "authors": [
+        "Jan Heibel",
+        "Luca Flusche"
+      ],
+      "data_as_of": "2026-09-25",
+      "pages": 4,
+      "status": "Published on LinkedIn",
+      "file": "departments/03-private-markets/files/EMFC_RealAssets_MarketInsight_Q3_2026_vf.pdf",
+      "link": "https://lnkd.in/p/ebkynQ-q",
+      "link_note": "The LinkedIn post, as linked in the footer of the Real Assets one-pager.",
+      "where": "Resources page (as a downloadable PDF or a link to the LinkedIn post, Luca Flusche), and the Real Assets desk page.",
+      "note": "Jan Heibel also announced a 'Real Assets Q3 Market Overview' PDF: Vasco confirmed it is this same report.",
+      "department": "Private Markets"
+    },
+    {
+      "title": "EMFC Private Markets - Real Assets Division (one-pager)",
+      "series": "Desk one-pager",
+      "desk": "Real Assets",
+      "pages": 1,
+      "status": "Approved",
+      "file": "departments/03-private-markets/files/EMFC_PM_RealAssets_External_vf.pdf",
+      "contact": "(email removed)",
+      "where": "Linked from the Real Assets desk on the Private Markets page, so companies can see who the team is and how to reach them (Luca Flusche).",
+      "department": "Private Markets"
+    },
+    {
+      "title": "Deal of the Month",
+      "series": "Monthly",
+      "desk": "Private Equity",
+      "status": "In preparation, PDF to follow (Fabian Seher)",
+      "department": "Private Markets"
+    },
+    {
+      "title": "Spanish Mid-Market PE Review",
+      "series": "Annual, per Fabian's page feedback",
+      "desk": "Private Equity",
+      "status": "In preparation, PDF to follow (Fabian Seher)",
+      "department": "Private Markets"
+    },
+    {
+      "title": "Investment Memo Drafting",
+      "desk": "Private Equity",
+      "status": "In preparation, PDF to follow (Fabian Seher)",
+      "department": "Private Markets"
+    },
+    {
+      "title": "No Country for Cheap Money: Treasury Yields at Their Highest since 2007",
+      "series": "Monthly Market Views",
+      "issue": "October 2026",
+      "authors": [
+        "Luís Laboreiro (Chief Investment Officer)",
+        "Alexander Schilling (Macro Associate)"
+      ],
+      "pages": 5,
+      "file": "departments/04-asset-management/files/Monthly_Market_Views_Oct_2026.pdf",
+      "where": "Resources page",
+      "department": "Asset Management"
+    },
+    {
+      "title": "Empire Strikes Back: Nvidia reclaims control",
+      "series": "Monthly Market Views",
+      "issue": "September 2026",
+      "authors": [
+        "Luís Laboreiro (Chief Investment Officer)",
+        "Luka Thomson (Head of Fixed Income)"
+      ],
+      "pages": 4,
+      "file": "departments/04-asset-management/files/Monthly_Market_Views_Sept_2026_1.pdf",
+      "where": "Resources page",
+      "department": "Asset Management"
+    },
+    {
+      "title": "Nerves return: geopolitical tension and AI capex fears test market resilience",
+      "series": "Monthly Market Views",
+      "issue": "July 2026, Issue 07",
+      "authors": [
+        "Luís Laboreiro (Chief Investment Officer)",
+        "Luka Thomson (Head of Fixed Income)"
+      ],
+      "pages": 4,
+      "file": "departments/04-asset-management/files/Monthly_market_views_redesign.pdf",
+      "note": "The file is named 'Monthly_market_views_redesign'. It is the July 2026 issue in a different layout from the September and October issues.",
+      "where": "Resources page",
+      "department": "Asset Management"
+    },
+    {
+      "title": "EMFC Global Equity Fund: Investment Policy Statement",
+      "series": "Fund documents",
+      "issue": "Version 1.0, October 2026",
+      "about": "Active global equity paper portfolio run by the Asset Management division, benchmark MSCI World. Covers the fund overview, objective and philosophy, portfolio construction rules, investment process, governance and operating model, performance measurement and risk, and how the policy is amended.",
+      "pages": 14,
+      "file": "departments/04-asset-management/files/EMFC_Global_Equity_Fund_IPS_v1.0_October_2026.pdf",
+      "where": "Fund page",
+      "department": "Asset Management"
+    },
+    {
+      "title": "Fixed Income Market Monitor, October 2026",
+      "series": "Fixed Income Market Monitor",
+      "issue": "October 2026",
+      "authors": [
+        "Fixed Income department: section text by Joan Brugada, Nin Sacristan, Paul Emil Manner, Jules Coppens, Hugo Heise, Giulia Weber Colussi and Liam Thiele (the report prints them as Joan Brugada Mestre and Paul Manner); data pages compiled by Luka Thomson"
+      ],
+      "pages": 15,
+      "file": "departments/05-fixed-income/files/EMFC_Fixed_Income_Market_Monitor_Oct2026.pdf",
+      "note": "Its 'About this publication' note says it was 'Prepared by students for internal discussion, not investment research or advice.'",
+      "where": "Resources page",
+      "department": "Fixed Income"
+    },
+    {
+      "title": "Fixed Income Market Monitor, week ending 4 September 2026",
+      "series": "Fixed Income Market Monitor",
+      "issue": "4 September 2026",
+      "authors": [
+        "Fixed Income department; data pages compiled by Luka Thomson"
+      ],
+      "pages": 9,
+      "file": "departments/05-fixed-income/files/EMFC_Fixed_Income_Market_Monitor_Sep2026_Updated.pdf",
+      "note": "File name says 'Updated'. Its team page shows the September team (it includes Rayane and Keryann, who are not on the current list). Same 'internal discussion' note as October.",
+      "where": "Resources page",
+      "department": "Fixed Income"
+    }
+  ]
+}

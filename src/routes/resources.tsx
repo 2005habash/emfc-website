@@ -3,20 +3,24 @@ import { ArrowUpRight } from "lucide-react";
 import { useState } from "react";
 import { SiteLayout } from "@/components/layout/SiteLayout";
 import { Reveal } from "@/components/Reveal";
+import { ReportList } from "@/components/site/sections";
 import { Em, Eyebrow, PageHero } from "@/components/site/ui";
-import { IMAGES } from "@/lib/site";
+import { Dialog, DialogContent, DialogDescription, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { ALL_REPORTS } from "@/data/reports";
+import { departments } from "@/lib/departments";
+import { IMAGES, logoUrl } from "@/lib/site";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/resources")({
   head: () => ({
     meta: [
-      { title: "Resources & Research, EMFC" },
+      { title: "Resources, EMFC" },
       {
         name: "description",
         content:
-          "Research from the EMFC desks, plus curated resources and partner platforms for members targeting careers in finance.",
+          "Reports published by the EMFC desks, plus the partner platforms and databases available to members.",
       },
-      { property: "og:title", content: "Resources & Research, EMFC" },
+      { property: "og:title", content: "Resources, EMFC" },
       {
         property: "og:description",
         content: "Greenroom and other partners powering EMFC member recruiting.",
@@ -26,70 +30,8 @@ export const Route = createFileRoute("/resources")({
   component: ResourcesPage,
 });
 
-type Desk = "Investment Banking" | "Private Markets" | "Asset Management" | "Fixed Income";
-
-/**
- * Research series published by each desk. To list a published issue, add
- * `latest: { title, date, href }` to its series.
- */
-const series: {
-  desk: Desk;
-  cadence: string;
-  title: string;
-  body: string;
-  latest?: { title: string; date: string; href: string };
-}[] = [
-  {
-    desk: "Investment Banking",
-    cadence: "Monthly",
-    title: "Monthly Deal Analysis",
-    body: "A live M&A or Debt deal each month: rationale, valuation, structure, financing and key risks.",
-  },
-  {
-    desk: "Private Markets",
-    cadence: "Fortnightly",
-    title: "Deal Teardowns",
-    body: "Live deal coverage across PE, VC & Growth, Fintech and Real Assets, with full investment memos.",
-  },
-  {
-    desk: "Asset Management",
-    cadence: "Macro & Strategy",
-    title: "Market & Macro Research",
-    body: "Central banks, economic data, geopolitics and asset allocation views.",
-  },
-  {
-    desk: "Asset Management",
-    cadence: "Equity Research",
-    title: "Investment Theses",
-    body: "Equity research, valuation and risk assessment work, leading to publishable single-name and thematic pieces.",
-  },
-  {
-    desk: "Asset Management",
-    cadence: "Portfolio",
-    title: "Portfolio Reviews",
-    body: "Performance attribution, rebalancing and post-mortems across the live book.",
-  },
-  {
-    desk: "Fixed Income",
-    cadence: "Monthly",
-    title: "Monthly Credit Research",
-    body: "Spread moves and rating actions in each associate's assigned market.",
-  },
-  {
-    desk: "Fixed Income",
-    cadence: "Case study",
-    title: "Issuer Rating Case Studies",
-    body: "Full credit reviews using an S&P-style scorecard, walking through business, financial and structural risk.",
-  },
-];
-
-const filters: ("All desks" | Desk)[] = [
-  "All desks",
-  "Investment Banking",
-  "Private Markets",
-  "Asset Management",
-  "Fixed Income",
-];
+/** The departments that publish, for the library filter. */
+const publishing = departments.filter((d) => ALL_REPORTS.some((r) => r.department === d.slug));
 
 const greenroomFeatures = [
   {
@@ -117,7 +59,7 @@ const esadeResources: { name: string; domain: string; blurb: string }[] = [
     name: "GlobalData",
     domain: "globaldata.com",
     blurb:
-      "Industry, company and deal intelligence across sectors — a core source for market sizing and competitive work.",
+      "Industry, company and deal intelligence across sectors, and a core source for market sizing and competitive work.",
   },
   {
     name: "ProView",
@@ -129,7 +71,7 @@ const esadeResources: { name: string; domain: string; blurb: string }[] = [
     name: "Aranzadi",
     domain: "aranzadi.es",
     blurb:
-      "Spanish legal database of legislation, case law and doctrine — useful for regulatory and legal-adjacent research.",
+      "Spanish legal database of legislation, case law and doctrine, useful for regulatory and legal-adjacent research.",
   },
   {
     name: "Fast Company",
@@ -159,7 +101,7 @@ const esadeResources: { name: string; domain: string; blurb: string }[] = [
     name: "Financial Times",
     domain: "ft.com",
     blurb:
-      "Global business and markets daily — essential reading for finance recruiting and daily deal flow.",
+      "Global business and markets daily: essential reading for finance recruiting and daily deal flow.",
   },
   {
     name: "Harvard Business Review",
@@ -171,7 +113,7 @@ const esadeResources: { name: string; domain: string; blurb: string }[] = [
     name: "Bloomberg",
     domain: "bloomberg.com",
     blurb:
-      "Markets, macro and company news from the Bloomberg newsroom — complements terminal access.",
+      "Markets, macro and company news from the Bloomberg newsroom, complementing terminal access.",
   },
   {
     name: "California Management Review",
@@ -194,7 +136,7 @@ const esadeResources: { name: string; domain: string; blurb: string }[] = [
     name: "Workspace",
     domain: "refinitiv.com",
     blurb:
-      "LSEG Workspace (formerly Refinitiv Eikon) — real-time markets, company fundamentals and deal data.",
+      "LSEG Workspace (formerly Refinitiv Eikon): real-time markets, company fundamentals and deal data.",
   },
   {
     name: "Statista",
@@ -228,15 +170,15 @@ const esadeResources: { name: string; domain: string; blurb: string }[] = [
 ];
 
 function ResourcesPage() {
-  const [filter, setFilter] = useState<(typeof filters)[number]>("All desks");
-  const shown = filter === "All desks" ? series : series.filter((s) => s.desk === filter);
+  const [filter, setFilter] = useState<string>("all");
+  const shown = filter === "all" ? ALL_REPORTS : ALL_REPORTS.filter((r) => r.department === filter);
 
   return (
     <SiteLayout>
       <PageHero
         image={IMAGES.placaEspanya}
         alt="Plaça d'Espanya at dusk with the Venetian Towers and MNAC in the distance"
-        eyebrow="Resources & Research"
+        eyebrow="Resources"
         position="50% 35%"
         title={
           <>
@@ -245,88 +187,40 @@ function ResourcesPage() {
           </>
         }
       >
-        EMFC members get access to partner platforms and curated resources built for finance
-        recruiting in Europe.
+        The reports our desks publish, and the partner platforms and databases EMFC members use to
+        prepare for finance recruiting in Europe.
       </PageHero>
 
-      {/* Research library */}
+      {/* Publications library */}
       <section id="library" className="gutter flex scroll-mt-24 flex-col gap-10 py-16 lg:py-24">
         <Reveal className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between lg:gap-16">
           <div className="flex flex-col gap-5">
-            <Eyebrow>Research library</Eyebrow>
+            <Eyebrow>Library</Eyebrow>
             <h2 className="font-serif text-[44px]/none tracking-[-0.01em] md:text-[72px]/none">
-              Research from <Em>the desks</Em>
+              Published by <Em>the desks</Em>
             </h2>
           </div>
           <p className="max-w-[440px] text-[15px]/[1.7] text-mute md:text-base/[1.7]">
-            Each department publishes deal teardowns, equity research, and credit reports, fostering
-            a track record of rigorous analysis and professional growth.
+            Every report from every department, newest first. Each also appears on its desk's page.
           </p>
         </Reveal>
-        <div role="group" aria-label="Filter research by desk" className="flex flex-wrap gap-2">
-          {filters.map((f) => (
+        <div role="group" aria-label="Filter the library by department" className="flex flex-wrap gap-2">
+          {[{ slug: "all", name: "All departments" }, ...publishing].map((d) => (
             <button
-              key={f}
+              key={d.slug}
               type="button"
-              aria-pressed={filter === f}
-              onClick={() => setFilter(f)}
+              aria-pressed={filter === d.slug}
+              onClick={() => setFilter(d.slug)}
               className={cn(
                 "caps h-11 rounded-full border px-5 text-[10.5px] tracking-[0.16em] transition-colors md:text-[11px]",
-                filter === f
-                  ? "border-ink bg-ink text-paper"
-                  : "border-line text-ink hover:border-ink",
+                filter === d.slug ? "border-ink bg-ink text-paper" : "border-line text-ink hover:border-ink",
               )}
             >
-              {f}
+              {d.name}
             </button>
           ))}
         </div>
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4 lg:gap-6">
-          {shown.map((s) => {
-            const body = (
-              <>
-                <div className="flex flex-col gap-3.5">
-                  <div className="caps flex justify-between gap-3 text-[9.5px] tracking-[0.18em] text-mute md:text-[10px]">
-                    <span>{s.desk}</span>
-                    <span>{s.cadence}</span>
-                  </div>
-                  <h3 className="mt-1.5 font-serif text-[28px]/[1.06] md:text-3xl/[1.06]">
-                    {s.title}
-                  </h3>
-                  <p className="text-sm/[1.6] text-mute">{s.body}</p>
-                </div>
-                <div className="flex items-center justify-between gap-3 border-t border-line pt-4">
-                  <div className="flex flex-col gap-1">
-                    <span className="caps text-[9.5px] tracking-[0.18em] text-mute">
-                      Latest issue
-                    </span>
-                    <span className="font-serif text-lg/[1.15]">
-                      {s.latest ? `${s.latest.title} · ${s.latest.date}` : "Coming soon"}
-                    </span>
-                  </div>
-                  {s.latest && (
-                    <ArrowUpRight className="h-[18px] w-[18px] shrink-0" strokeWidth={1.5} />
-                  )}
-                </div>
-              </>
-            );
-            const cls =
-              "flex min-h-[300px] flex-col justify-between gap-6 border border-line bg-panel p-6 md:min-h-[330px]";
-            return s.latest ? (
-              <a
-                key={s.title}
-                href={s.latest.href}
-                className={cn(cls, "transition duration-300 hover:-translate-y-1 hover:border-ink")}
-              >
-                {body}
-              </a>
-            ) : (
-              <article key={s.title} className={cls}>
-                {body}
-              </article>
-            );
-          })}
-        </div>
+        <ReportList reports={shown} showDepartment />
       </section>
 
       {/* Featured partner */}
@@ -349,7 +243,7 @@ function ResourcesPage() {
               <h3 className="font-serif text-4xl/none md:text-[44px]/none">Greenroom Prep</h3>
               <p className="text-[15px]/[1.75] text-mute md:text-[15.5px]/[1.75]">
                 Greenroom is an AI-powered mock interview platform built specifically for finance
-                candidates targeting Investment Banking, Private Equity and Asset Management — a
+                candidates targeting Investment Banking, Private Equity and Asset Management, and a
                 natural partner for EMFC.
               </p>
               <p className="text-[15px]/[1.75] text-mute md:text-[15.5px]/[1.75]">
@@ -392,18 +286,38 @@ function ResourcesPage() {
             ESADE library.
           </p>
         </Reveal>
-        <ul className="grid grid-cols-1 gap-px border border-line bg-line sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5">
+        <ul className="grid grid-cols-2 gap-px border border-line bg-line sm:grid-cols-3 lg:grid-cols-5">
           {esadeResources.map((r) => (
             <li key={r.name} className="flex">
-              <a
-                href={`https://${r.domain}`}
-                target="_blank"
-                rel="noreferrer"
-                className="flex min-h-[150px] flex-1 flex-col gap-2.5 bg-paper px-[22px] pt-[22px] pb-6 transition-colors hover:bg-stone lg:min-h-[168px]"
-              >
-                <span className="font-serif text-[23px]/[1.1] font-semibold">{r.name}</span>
-                <span className="text-[13px]/[1.55] text-mute">{r.blurb}</span>
-              </a>
+              <Dialog>
+                <DialogTrigger className="group flex min-h-[150px] flex-1 cursor-pointer flex-col items-center justify-center gap-4 bg-paper px-4 py-6 text-center transition-colors hover:bg-stone lg:min-h-[176px]">
+                  <img
+                    src={logoUrl(r.domain, 160)}
+                    alt=""
+                    loading="lazy"
+                    className="h-12 w-12 rounded-lg object-contain transition duration-300 md:h-14 md:w-14"
+                  />
+                  <span className="font-serif text-[21px]/[1.1] font-semibold underline-offset-4 group-hover:underline md:text-[23px]/[1.1]">
+                    {r.name}
+                  </span>
+                </DialogTrigger>
+                <DialogContent className="max-w-[480px] gap-5 rounded-none border-line bg-paper p-8 text-ink sm:rounded-none">
+                  <div className="flex items-center gap-4">
+                    <img src={logoUrl(r.domain, 160)} alt="" className="h-14 w-14 rounded-lg object-contain" />
+                    <DialogTitle className="font-serif text-[32px]/[1.05] font-medium">{r.name}</DialogTitle>
+                  </div>
+                  <DialogDescription className="text-[15px]/[1.65] text-mute">{r.blurb}</DialogDescription>
+                  <a
+                    href={`https://${r.domain}`}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="btn btn-sm btn-ink self-start"
+                  >
+                    Visit website
+                    <ArrowUpRight className="h-3.5 w-3.5" strokeWidth={1.75} />
+                  </a>
+                </DialogContent>
+              </Dialog>
             </li>
           ))}
         </ul>

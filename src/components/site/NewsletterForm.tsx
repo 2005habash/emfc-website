@@ -1,12 +1,16 @@
+import { Link } from "@tanstack/react-router";
 import { Loader2 } from "lucide-react";
 import { useId, useState } from "react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
 
-/** Newsletter sign-up. Saves the address to the newsletter_signups table. */
+/**
+ * Newsletter sign-up. Saves the address to the newsletter_signups table, only with the sender's
+ * consent to be contacted (decided 2 November 2026). The privacy page explains how it is used.
+ */
 export function NewsletterForm({
-  label = "Newsletter · Sign up to receive news and updates",
+  label = "Newsletter: news and upcoming events",
   dark = false,
   className,
 }: {
@@ -17,11 +21,16 @@ export function NewsletterForm({
   const id = useId();
   const [email, setEmail] = useState("");
   const [busy, setBusy] = useState(false);
+  const [consent, setConsent] = useState(false);
 
   async function signup(e: React.FormEvent) {
     e.preventDefault();
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
       toast.error("Please enter a valid email");
+      return;
+    }
+    if (!consent) {
+      toast.error("Please tick the box to agree to be contacted.");
       return;
     }
     setBusy(true);
@@ -33,6 +42,7 @@ export function NewsletterForm({
     }
     toast.success("Subscribed. Thank you.");
     setEmail("");
+    setConsent(false);
   }
 
   return (
@@ -41,7 +51,7 @@ export function NewsletterForm({
         htmlFor={id}
         className={cn(
           "caps text-[10px] tracking-[0.22em] md:text-[10.5px]",
-          dark ? "text-brass-light" : "text-mute",
+          dark ? "text-bull-light" : "text-mute",
         )}
       >
         {label}
@@ -72,6 +82,25 @@ export function NewsletterForm({
           {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : "Subscribe"}
         </button>
       </div>
+      <label
+        htmlFor={`${id}-consent`}
+        className={cn("flex items-start gap-2.5 text-[13px]/[1.5]", dark ? "text-[#C9CEDD]" : "text-mute")}
+      >
+        <input
+          id={`${id}-consent`}
+          type="checkbox"
+          required
+          checked={consent}
+          onChange={(e) => setConsent(e.target.checked)}
+          className={cn("mt-[3px] h-4 w-4 shrink-0", dark ? "accent-bull-light" : "accent-bull")}
+        />
+        <span>
+          I consent to being contacted about future events.{" "}
+          <Link to="/privacy" className="underline underline-offset-2">
+            How we use your email
+          </Link>
+        </span>
+      </label>
     </form>
   );
 }
