@@ -3,6 +3,7 @@ import { useEffect, useState, type ReactNode } from "react";
 import { cn } from "@/lib/utils";
 import { Linkedin } from "lucide-react";
 import { Dialog, DialogContent, DialogDescription, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { track } from "@/lib/analytics";
 import { initialsOf, type Member } from "@/lib/team";
 
 type Tone = "ink" | "light" | "hero";
@@ -164,7 +165,7 @@ export function PersonCard({
 }) {
   const s = sizes[size];
   return (
-    <Dialog>
+    <Dialog onOpenChange={(open) => open && track({ kind: "profile_open", path: window.location.pathname, target: member.name })}>
       <DialogTrigger
         className={cn(
           "group flex cursor-pointer flex-col text-left outline-none focus-visible:ring-2 focus-visible:ring-bull focus-visible:ring-offset-4 focus-visible:ring-offset-paper",
@@ -219,6 +220,7 @@ function ProfileDialog({ member }: { member: Member }) {
           {member.linkedin && (
             <a
               href={member.linkedin}
+              data-linkedin-of={member.name}
               target="_blank"
               rel="noreferrer"
               className="btn btn-sm btn-outline-ink mt-auto self-start"

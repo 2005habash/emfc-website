@@ -43,6 +43,7 @@ npm run dev        # http://localhost:8080
 | People helpers (leadership, associates by desk, homepage strip) | `src/lib/team.ts` |
 | Shared pieces: portraits, person cards and profiles, page sections | `src/components/site/ui.tsx`, `src/components/site/sections.tsx` |
 | Admin page content tabs, including Admins (who has admin access) | `src/components/admin/ContentManagers.tsx` |
+| Analytics: what is counted (`src/lib/analytics.ts`) and the admin page's Analytics tab (`src/components/admin/Analytics.tsx`); database in `supabase/migrations/20261103120000_analytics.sql` | anonymous page views, profile opens, LinkedIn clicks and report downloads; no names, IPs or cookies |
 | An event's page, also used for the admin page's preview | `src/components/site/EventArticle.tsx` |
 | The picture shown when a link to the site is shared | `public/images/share/emfc.jpg`, made from `tools/share-card.html` (instructions inside) |
 | The full fund page, hidden until `FUND_PAGE_LIVE` is true | `src/components/fund/FundFull.tsx` |

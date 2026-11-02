@@ -7,6 +7,7 @@ import { departments } from "@/lib/departments";
 import { Download, LogOut, Loader2, ChevronDown, ChevronRight, ExternalLink, X, FileText, Users, Calendar, TrendingUp, Building2, Archive, ArrowUpDown, ArrowUp, ArrowDown } from "lucide-react";
 import { toast } from "sonner";
 import { zip } from "fflate";
+import { AnalyticsManager } from "@/components/admin/Analytics";
 import { AdminsManager, EnquiriesManager, EventsManager, ReportsManager } from "@/components/admin/ContentManagers";
 
 // The admin page, at an unlisted address. Sign-in and the admin role are checked against Supabase,
@@ -130,6 +131,7 @@ function NoAccess({ email }: { email: string }) {
 }
 
 const TABS = [
+  { id: "analytics", label: "Analytics" },
   { id: "events", label: "Events" },
   { id: "reports", label: "Reports" },
   { id: "enquiries", label: "Sponsorship enquiries" },
@@ -138,7 +140,7 @@ const TABS = [
 ] as const;
 
 function AdminTabs() {
-  const [tab, setTab] = useState<(typeof TABS)[number]["id"]>("events");
+  const [tab, setTab] = useState<(typeof TABS)[number]["id"]>("analytics");
   return (
     <div>
       <div className="container-wide flex flex-wrap items-center justify-between gap-4 pt-10">
@@ -163,6 +165,7 @@ function AdminTabs() {
         <Dashboard />
       ) : (
         <div className="container-wide py-8">
+          {tab === "analytics" && <AnalyticsManager />}
           {tab === "events" && <EventsManager />}
           {tab === "reports" && <ReportsManager />}
           {tab === "enquiries" && <EnquiriesManager />}

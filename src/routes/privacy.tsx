@@ -31,6 +31,10 @@ const sections = [
     body: "Member profiles show only what members agreed to share: name, photo, role, programme, LinkedIn and up to three firms. Statistics about the club are totals and never describe one person.",
   },
   {
+    title: "Visit counts",
+    body: "To see which pages and profiles people find useful, the site counts visits anonymously: the page, the country and the kind of device, with no names, IP addresses or cookies. A visitor is counted once a day with a code that changes every day, so nobody can be followed over time. Only the club's administrators see the totals.",
+  },
+  {
     title: "Where it is kept",
     body: "Sign-ups and enquiries are stored in the club's database, hosted by Supabase, and only the club's administrators can read them. Firm logos on this site are loaded from logo.dev. We use no advertising or tracking cookies; the site only remembers whether you chose light or dark mode, in your own browser.",
   },
@@ -49,7 +53,7 @@ function PrivacyPage() {
           <h1 className="font-serif text-[52px]/[0.98] tracking-[-0.01em] md:text-[76px]/[0.98]">
             Your <Em>data</Em>
           </h1>
-          <p className="text-[15px]/[1.7] text-mute">Last updated 2 November 2026.</p>
+          <p className="text-[15px]/[1.7] text-mute">Last updated 3 November 2026.</p>
         </div>
         <div className="flex flex-col lg:col-span-7 lg:col-start-6">
           {sections.map((s) => (

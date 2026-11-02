@@ -6,11 +6,13 @@ import {
   useRouter,
   HeadContent,
   Scripts,
+  useRouterState,
 } from "@tanstack/react-router";
 import { useEffect, type ReactNode } from "react";
 
 import appCss from "../styles.css?url";
 import { Toaster } from "@/components/ui/sonner";
+import { takeReferrer, track } from "@/lib/analytics";
 import { absoluteUrl, IMAGES } from "@/lib/site";
 
 function NotFoundComponent() {
@@ -118,8 +120,33 @@ function RootShell({ children }: { children: ReactNode }) {
   );
 }
 
+/** Counts page views, report downloads and members' LinkedIn clicks for the admin page's Analytics tab. */
+function useAnalytics() {
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
+  useEffect(() => {
+    track({ kind: "page_view", path: pathname, referrer: takeReferrer() });
+  }, [pathname]);
+  useEffect(() => {
+    const onClick = (e: MouseEvent) => {
+      const a = (e.target as HTMLElement).closest?.("a");
+      if (!a) return;
+      const path = window.location.pathname;
+      const member = a.getAttribute("data-linkedin-of");
+      if (member) return track({ kind: "linkedin_click", path, target: member });
+      const href = a.getAttribute("href") ?? "";
+      if (/\.pdf($|\?)/i.test(href)) {
+        const file = decodeURIComponent(href.split("?")[0].split("/").pop() ?? href);
+        track({ kind: "report_download", path, target: file });
+      }
+    };
+    document.addEventListener("click", onClick);
+    return () => document.removeEventListener("click", onClick);
+  }, []);
+}
+
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
+  useAnalytics();
   useEffect(() => {
     // Links in the admin emails (new password, confirm your email) belong on the admin page. If the
     // database's list of allowed addresses sends one to another page, carry it on with the link intact.
