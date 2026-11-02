@@ -9,16 +9,32 @@ type RevealProps = {
 };
 
 /**
+ * Marks the page as running its scripts ("reveal-ready"), which switches off the no-script fallback in
+ * styles.css so entrances play as content scrolls into view. On a slow load the fallback may already
+ * have shown some content: that content is marked as shown first, so it doesn't hide again.
+ */
+function armReveals() {
+  const root = document.documentElement;
+  if (root.classList.contains("reveal-ready")) return;
+  document.querySelectorAll<HTMLElement>("[data-reveal]:not([data-shown])").forEach((el) => {
+    if (getComputedStyle(el).opacity === "1") el.setAttribute("data-shown", "");
+  });
+  root.classList.add("reveal-ready");
+}
+
+/**
  * Fades its content up once it scrolls into view. The content is in the page from the start: it is only
  * hidden while the page is marked as allowed to animate (the "motion" class, set before paint), so it
- * stays visible with reduced motion, without JavaScript, and if the script never runs (styles.css shows
- * anything still hidden after three seconds).
+ * stays visible with reduced motion and without JavaScript, and if the scripts never run, styles.css
+ * shows anything still hidden after three seconds.
  */
 export function Reveal({ children, className, delay = 0, as: Tag = "div" }: RevealProps) {
   const ref = useRef<HTMLElement>(null);
   useEffect(() => {
     const el = ref.current;
     if (!el) return;
+    armReveals();
+    if (el.hasAttribute("data-shown")) return;
     const io = new IntersectionObserver(
       (entries) => {
         if (entries.some((e) => e.isIntersecting)) {

@@ -1,4 +1,4 @@
-import { createFileRoute, Link, notFound } from "@tanstack/react-router";
+import { createFileRoute, Link, notFound, redirect } from "@tanstack/react-router";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 import { SiteLayout } from "@/components/layout/SiteLayout";
 import {
@@ -24,6 +24,11 @@ import { cn } from "@/lib/utils";
 export const Route = createFileRoute("/departments/$department_/$desk")({
   beforeLoad: ({ params }) => {
     if (!getDesk(params.department, params.desk)) throw notFound();
+    // Old department names (before November 2026) go to the current address.
+    const d = getDepartment(params.department)!;
+    if (d.slug !== params.department) {
+      throw redirect({ to: "/departments/$department/$desk", params: { department: d.slug, desk: params.desk } });
+    }
   },
   loader: async () => {
     const [events, reports] = await Promise.all([loadEvents(), loadReports()]);

@@ -221,7 +221,13 @@ function ResourcesPage() {
             </button>
           ))}
         </div>
-        <ReportList reports={shown} showDepartment />
+        {shown.length > 0 ? (
+          <ReportList reports={shown} showDepartment />
+        ) : (
+          <p className="border-t border-ink pt-6 font-serif text-[26px]/[1.2] italic text-mute">
+            No reports published yet.
+          </p>
+        )}
       </section>
 
       {/* Featured partner */}

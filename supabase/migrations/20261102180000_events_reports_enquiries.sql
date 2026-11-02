@@ -71,6 +71,8 @@ create table if not exists public.sponsorship_enquiries (
   email text not null check (char_length(email) between 3 and 200),
   format text not null check (char_length(format) <= 60),
   message text not null check (char_length(message) between 10 and 4000),
+  -- Sent too fast or with the hidden field filled in: saved for review, not emailed.
+  suspected_bot boolean not null default false,
   created_at timestamptz not null default now()
 );
 alter table public.sponsorship_enquiries enable row level security;

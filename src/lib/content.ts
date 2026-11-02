@@ -68,30 +68,59 @@ const toReport = (r: ReportRow): Report => ({
   status: r.status,
 });
 
-/** Resolves with the query's rows, or rejects if the database takes longer than `ms`. */
-function within<T>(query: PromiseLike<T>, ms = 2500) {
-  return Promise.race([
-    query,
-    new Promise<never>((_, reject) => setTimeout(() => reject(new Error("timeout")), ms)),
-  ]);
-}
-
-export async function loadEvents(): Promise<EventItem[]> {
+/** Resolves with the query's result, or rejects if the database takes longer than `ms`. */
+async function within<T>(query: PromiseLike<T>, ms = 2500): Promise<T> {
+  let timer: ReturnType<typeof setTimeout> | undefined;
   try {
-    const { data, error } = await within(supabase.from("events" as never).select("*").order("date"));
-    const rows = (data ?? []) as unknown as EventRow[];
-    return error || rows.length === 0 ? EVENTS : rows.map(toEvent);
-  } catch {
-    return EVENTS;
+    return await Promise.race([
+      query,
+      new Promise<never>((_, reject) => {
+        timer = setTimeout(() => reject(new Error("timeout")), ms);
+      }),
+    ]);
+  } finally {
+    clearTimeout(timer);
   }
 }
 
-export async function loadReports(): Promise<Report[]> {
-  try {
-    const { data, error } = await within(supabase.from("reports" as never).select("*"));
-    const rows = (data ?? []) as unknown as ReportRow[];
-    return error || rows.length === 0 ? REPORTS : rows.map(toReport);
-  } catch {
-    return REPORTS;
-  }
+// Every page asks for the same two lists, so they are kept for a short while instead of being fetched
+// again on each navigation. The admin page clears them after each save.
+const TTL = 30_000;
+const cache = new Map<string, { at: number; value: Promise<unknown> }>();
+function cached<T>(key: string, load: () => Promise<T>): Promise<T> {
+  const hit = cache.get(key);
+  if (hit && Date.now() - hit.at < TTL) return hit.value as Promise<T>;
+  const value = load();
+  cache.set(key, { at: Date.now(), value });
+  return value;
 }
+export const invalidateContent = () => cache.clear();
+
+// Only published rows, also for a signed-in admin (who may read hidden ones). The bundled lists are
+// used only when the database can't answer (no table yet, an error, a timeout), never because a list
+// is empty: an empty list means the admins removed everything.
+export const loadEvents = (): Promise<EventItem[]> =>
+  cached("events", async () => {
+    try {
+      const { data, error } = await within(
+        supabase.from("events" as never).select("*").eq("published" as never, true as never).order("date"),
+      );
+      if (error) return EVENTS;
+      return ((data ?? []) as unknown as EventRow[]).map(toEvent);
+    } catch {
+      return EVENTS;
+    }
+  });
+
+export const loadReports = (): Promise<Report[]> =>
+  cached("reports", async () => {
+    try {
+      const { data, error } = await within(
+        supabase.from("reports" as never).select("*").eq("published" as never, true as never),
+      );
+      if (error) return REPORTS;
+      return ((data ?? []) as unknown as ReportRow[]).map(toReport);
+    } catch {
+      return REPORTS;
+    }
+  });

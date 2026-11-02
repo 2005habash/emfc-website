@@ -2,6 +2,7 @@ import { Eye, EyeOff, Loader2, Pencil, Plus, Trash2, Upload, X } from "lucide-re
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { invalidateContent } from "@/lib/content";
 import { EVENT_TYPE_COLORS, type EventPhoto, type EventType } from "@/data/events";
 import { departments } from "@/lib/departments";
 import { formatDay } from "@/lib/site";
@@ -28,16 +29,38 @@ const slugify = (s: string) =>
     .replace(/^-|-$/g, "")
     .slice(0, 60);
 
+/** A photo this browser can't read, such as an iPhone HEIC photo in Chrome or Firefox. */
+class UnreadablePhoto extends Error {}
+
 /** Shrinks a photo in the browser before upload (longest side 1600 px, JPEG), so storage lasts. */
 async function shrink(file: File, max = 1600): Promise<Blob> {
-  if (!file.type.startsWith("image/")) return file;
-  const bitmap = await createImageBitmap(file);
+  let bitmap: ImageBitmap;
+  try {
+    bitmap = await createImageBitmap(file);
+  } catch {
+    throw new UnreadablePhoto(file.name);
+  }
   const scale = Math.min(1, max / Math.max(bitmap.width, bitmap.height));
   const canvas = document.createElement("canvas");
   canvas.width = Math.round(bitmap.width * scale);
   canvas.height = Math.round(bitmap.height * scale);
   canvas.getContext("2d")!.drawImage(bitmap, 0, 0, canvas.width, canvas.height);
   return new Promise((resolve) => canvas.toBlob((b) => resolve(b ?? file), "image/jpeg", 0.82));
+}
+
+/**
+ * Adds a new row, with a unique id if the one made from its title is taken, or updates an existing
+ * row by its id. Never replaces a different item.
+ */
+async function saveRow(table: "events" | "reports", row: { id: string }, isNew: boolean) {
+  if (!isNew) return supabase.from(table as never).update(row as never).eq("id", row.id);
+  let attempt = row;
+  for (let i = 0; i < 4; i++) {
+    const res = await supabase.from(table as never).insert(attempt as never);
+    if (res.error?.code !== "23505") return res; // 23505: an item with this id exists
+    attempt = { ...row, id: `${row.id}-${Math.random().toString(36).slice(2, 6)}` };
+  }
+  return { error: { message: "Could not find a free address for this item. Change its title and try again." } };
 }
 
 async function upload(bucket: "event-media" | "reports", path: string, body: Blob, contentType: string) {
@@ -112,13 +135,17 @@ export function EventsManager() {
   async function togglePublished(e: EventRow) {
     const { error } = await supabase.from("events" as never).update({ published: !e.published } as never).eq("id", e.id);
     if (error) toast.error(error.message);
-    else load();
+    else {
+      invalidateContent();
+      load();
+    }
   }
   async function remove(e: EventRow) {
     if (!confirm(`Delete "${e.title}"? This cannot be undone.`)) return;
     const { error } = await supabase.from("events" as never).delete().eq("id", e.id);
     if (error) toast.error(error.message);
     else {
+      invalidateContent();
       toast.success("Event deleted");
       load();
     }
@@ -181,18 +208,28 @@ function EventForm({ initial, onDone }: { initial: EventRow; onDone: () => void 
   async function addPhotos(files: FileList | null) {
     if (!files?.length) return;
     setBusy(true);
-    try {
-      const id = e.id || `${slugify(e.title || "event")}-${e.date}`;
-      const added: EventPhoto[] = [];
-      for (const file of Array.from(files)) {
+    const id = e.id || `${slugify(e.title || "event")}-${e.date}`;
+    const added: EventPhoto[] = [];
+    const unreadable: string[] = [];
+    for (const file of Array.from(files)) {
+      try {
         const blob = await shrink(file);
         const src = await upload("event-media", `${id}/${Date.now()}-${slugify(file.name)}.jpg`, blob, "image/jpeg");
         added.push({ src, alt: "" });
+      } catch (err) {
+        if (err instanceof UnreadablePhoto) unreadable.push(file.name);
+        else toast.error(`${file.name}: ${(err as Error).message}`);
       }
+    }
+    if (added.length) {
       set("photos", [...e.photos, ...added]);
       toast.success(`${added.length} photo${added.length === 1 ? "" : "s"} uploaded. Add a short description to each.`);
-    } catch (err) {
-      toast.error((err as Error).message);
+    }
+    if (unreadable.length) {
+      toast.error(
+        `This browser can't read ${unreadable.join(", ")} (iPhone photos are often HEIC). Open them in Preview and export as JPEG, or upload from Safari.`,
+        { duration: 10000 },
+      );
     }
     setBusy(false);
   }
@@ -205,10 +242,11 @@ function EventForm({ initial, onDone }: { initial: EventRow; onDone: () => void 
     }
     setBusy(true);
     const row = { ...e, id: e.id || `${slugify(e.title)}-${e.date}`, updated_at: new Date().toISOString() };
-    const { error } = await supabase.from("events" as never).upsert(row as never);
+    const { error } = await saveRow("events", row, isNew);
     setBusy(false);
     if (error) toast.error(error.message);
     else {
+      invalidateContent();
       toast.success(isNew ? "Event added" : "Event saved");
       onDone();
     }
@@ -351,7 +389,7 @@ const emptyReport = (): ReportRow => ({
   title: "",
   series: "",
   issue: null,
-  date: new Date().toISOString().slice(0, 7),
+  date: new Date().toISOString().slice(0, 10),
   department: departments[0].slug,
   desk: null,
   authors: [],
@@ -380,7 +418,10 @@ export function ReportsManager() {
     if (!confirm(`Delete "${r.title}"? This cannot be undone.`)) return;
     const { error } = await supabase.from("reports" as never).delete().eq("id", r.id);
     if (error) toast.error(error.message);
-    else load();
+    else {
+      invalidateContent();
+      load();
+    }
   }
 
   if (error) return <Missing error={error} />;
@@ -461,10 +502,11 @@ function ReportForm({ initial, onDone }: { initial: ReportRow; onDone: () => voi
     }
     setBusy(true);
     const row = { ...r, id: r.id || slugify(`${r.title} ${r.date}`), updated_at: new Date().toISOString() };
-    const { error } = await supabase.from("reports" as never).upsert(row as never);
+    const { error } = await saveRow("reports", row, isNew);
     setBusy(false);
     if (error) toast.error(error.message);
     else {
+      invalidateContent();
       toast.success(isNew ? "Report added" : "Report saved");
       onDone();
     }
@@ -492,8 +534,14 @@ function ReportForm({ initial, onDone }: { initial: ReportRow; onDone: () => voi
           <input className={field} value={r.issue ?? ""} onChange={(x) => set("issue", x.target.value || null)} />
         </label>
         <label className="space-y-1">
-          <span className={label}>Month it came out</span>
-          <input type="month" className={field} required value={r.date.slice(0, 7)} onChange={(x) => set("date", x.target.value)} />
+          <span className={label}>Date it came out</span>
+          <input
+            type="date"
+            className={field}
+            required
+            value={r.date.length === 7 ? `${r.date}-01` : r.date}
+            onChange={(x) => set("date", x.target.value)}
+          />
         </label>
         <label className="space-y-1">
           <span className={label}>Pages</span>
@@ -571,7 +619,16 @@ function ReportForm({ initial, onDone }: { initial: ReportRow; onDone: () => voi
 
 /* ------------------------------------------------------------- Enquiries */
 
-type Enquiry = { id: string; name: string; firm: string; email: string; format: string; message: string; created_at: string };
+type Enquiry = {
+  id: string;
+  name: string;
+  firm: string;
+  email: string;
+  format: string;
+  message: string;
+  suspected_bot: boolean;
+  created_at: string;
+};
 
 export function EnquiriesManager() {
   const [rows, setRows] = useState<Enquiry[] | null>(null);
@@ -612,6 +669,11 @@ export function EnquiriesManager() {
               <p className="text-xs text-muted-foreground">
                 {new Date(q.created_at).toLocaleString("en-GB")}, interested in {q.format.toLowerCase()}
               </p>
+              {q.suspected_bot && (
+                <p className="mt-1 text-xs font-medium text-destructive">
+                  Possibly automated: sent too fast or with the hidden field filled in. Not emailed; check before replying.
+                </p>
+              )}
             </div>
             <div className="flex gap-2">
               <a className={button} href={`mailto:${q.email}?subject=${encodeURIComponent("Your EMFC sponsorship enquiry")}`}>

@@ -67,6 +67,7 @@ function SponsorshipPage() {
     website: "",
   });
   const [status, setStatus] = useState<"idle" | "sending" | "sent" | "error">("idle");
+  const [problem, setProblem] = useState<string | null>(null);
   const openedAt = useRef(Date.now());
   const set =
     (k: keyof typeof form) =>
@@ -75,9 +76,30 @@ function SponsorshipPage() {
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
+    // The same checks as the server, on the trimmed text, so the message says what to fix.
+    const clean = {
+      ...form,
+      name: form.name.trim(),
+      firm: form.firm.trim(),
+      email: form.email.trim(),
+      message: form.message.trim(),
+    };
+    const issue =
+      clean.name.length < 2
+        ? "Please enter your name."
+        : clean.firm.length < 2
+          ? "Please enter your firm."
+          : clean.message.length < 10
+            ? "Please tell us a little more about what you'd like to run, in at least 10 characters."
+            : null;
+    setProblem(issue);
+    if (issue) {
+      setStatus("error");
+      return;
+    }
     setStatus("sending");
     try {
-      const res = await sendSponsorshipEnquiry({ data: { ...form, elapsed: Date.now() - openedAt.current } });
+      const res = await sendSponsorshipEnquiry({ data: { ...clean, elapsed: Date.now() - openedAt.current } });
       setStatus(res.ok ? "sent" : "error");
     } catch {
       setStatus("error");
@@ -348,7 +370,7 @@ function SponsorshipPage() {
                 <div className="flex flex-col gap-4 sm:col-span-2 sm:flex-row sm:items-center sm:justify-between sm:gap-6">
                   {status === "error" ? (
                     <span role="alert" className="text-[13.5px]/[1.5] text-[#B4435A]">
-                      Your enquiry could not be sent. Please try again in a moment, or message us on LinkedIn.
+                      {problem ?? "Your enquiry could not be sent. Please try again in a moment, or message us on LinkedIn."}
                     </span>
                   ) : (
                     <span className="text-[13.5px]/[1.5] text-mute">

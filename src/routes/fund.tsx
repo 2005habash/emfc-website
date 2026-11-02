@@ -66,7 +66,7 @@ function FundComingSoon() {
           </p>
         </Reveal>
         <Reveal className="flex flex-col gap-8 lg:col-span-7 lg:col-start-6">
-          <ReportList reports={documents} />
+          {documents.length > 0 && <ReportList reports={documents} />}
           <div className="flex flex-wrap gap-2.5">
             <Link
               to="/departments/$department/$desk"

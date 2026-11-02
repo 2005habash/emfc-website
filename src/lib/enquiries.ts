@@ -26,7 +26,7 @@ const Enquiry = z.object({
 export type EnquiryInput = z.input<typeof Enquiry>;
 type Valid = z.output<typeof Enquiry>;
 
-async function email(d: Valid) {
+async function email(d: Valid, suspected: boolean) {
   const key = process.env.RESEND_API_KEY;
   const to = (process.env.SPONSORSHIP_RECIPIENTS ?? "")
     .split(",")
@@ -60,7 +60,7 @@ async function email(d: Valid) {
       from: process.env.SPONSORSHIP_FROM ?? "EMFC website <onboarding@resend.dev>",
       to,
       reply_to: d.email,
-      subject: `Sponsorship enquiry: ${d.firm}`,
+      subject: `${suspected ? "[Possibly automated] " : ""}Sponsorship enquiry: ${d.firm}`,
       text,
     }),
   });
@@ -71,8 +71,10 @@ async function email(d: Valid) {
 export const sendSponsorshipEnquiry = createServerFn({ method: "POST" })
   .inputValidator((data: unknown) => Enquiry.parse(data))
   .handler(async ({ data }) => {
-    // Bots fill the hidden field or submit instantly: answer as if it worked, and drop it.
-    if (data.website || data.elapsed < 2500) return { ok: true };
+    // Bots fill the hidden field or submit within moments of the page loading. Such an enquiry is still
+    // saved, marked for the admins to check, but not emailed, so a quick real sender is never lost.
+    const suspected = Boolean(data.website) || data.elapsed < 2500;
+    if (suspected) console.warn(`[sponsorship] Enquiry from ${data.firm} looks automated: saved for review, emailed only if saving fails`);
 
     const { error } = await supabase.from("sponsorship_enquiries" as never).insert({
       name: data.name,
@@ -80,9 +82,11 @@ export const sendSponsorshipEnquiry = createServerFn({ method: "POST" })
       email: data.email,
       format: data.format,
       message: data.message,
+      suspected_bot: suspected,
     } as never);
     if (error) console.error("[sponsorship] Could not save the enquiry", error.message);
 
-    const sent = await email(data);
+    // Email every clean enquiry, and any enquiry that could not be saved, so none is lost.
+    const sent = !suspected || error ? await email(data, suspected) : false;
     return { ok: sent || !error };
   });

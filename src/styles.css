@@ -269,7 +269,9 @@ html.motion [data-reveal] {
 html.motion [data-reveal]:not([data-shown]) {
   opacity: 0;
   transform: translateY(28px);
-  /* If the script never marks it as shown, show it anyway. */
+}
+/* If the scripts never run (they set "reveal-ready"), show everything after three seconds anyway. */
+html.motion:not(.reveal-ready) [data-reveal]:not([data-shown]) {
   animation: reveal-fallback 0s linear 3s forwards;
 }
 @keyframes reveal-fallback {
