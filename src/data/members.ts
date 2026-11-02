@@ -208,9 +208,8 @@ export const MEMBERS: Member[] = [
     "programme": "Master in Finance",
     "linkedin": "https://www.linkedin.com/in/zaid-habash",
     "firms": [
-      "Sequoia Capital",
-      "Accel",
-      "Index Ventures"
+      "Nordea",
+      "Lovable"
     ],
     "photo": "/images/team/zaid-habash.jpg"
   },

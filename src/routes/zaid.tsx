@@ -26,7 +26,7 @@ const HEADLINES = [
   "Markets rally on news that Zaid has had his coffee",
   "Lovable files missing persons report for emfc.es",
   "Scientists confirm the em dash was banned for its own safety",
-  "Sequoia, Accel and Index Ventures reportedly still talking about him",
+  "Sequoia, Accel and Index Ventures added to the VC & Growth target list, reportedly nervous",
   "Local VC & Growth desk grows, experts say this is not a coincidence",
   "Barcelona tourism up 0% but spiritually up 400%",
 ];
@@ -35,7 +35,7 @@ const NUMBERS = [
   { value: 1, label: "Club website, rebuilt from scratch", note: "Lovable is still processing it" },
   { value: 66, label: "Portraits cropped to the exact same head size", note: "No floating torsos. Ever." },
   { value: 0, label: "Em dashes tolerated", note: "Zero. Not one. Don't even think about it." },
-  { value: 3, label: "Legendary VC firms on his profile", note: "Sequoia, Accel, Index. Casual." },
+  { value: 2, label: "Firms on his CV, one of which built the old version of this site", note: "Nordea and Lovable. He then replaced the Lovable site. Ruthless." },
   { value: 15, label: "Desk pages, each with its own personality", note: "Like children. He has favourites." },
   { value: 100, suffix: "%", label: "Of this page written about Zaid", note: "As it should be" },
 ];

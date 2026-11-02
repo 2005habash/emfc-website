@@ -2,7 +2,7 @@
 // rather than retyped. Usage:
 //   node tools/import-members.mjs [content/2026-11-02]
 // Reads members.json (the form, in site order) and kept-members.json (people kept from the old
-// site), applies the site's naming decisions and the title and desk changes in role-changes.json,
+// site), applies the site's naming decisions and the title, desk and firm changes in role-changes.json,
 // and writes one typed list. Emails are never copied.
 import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
@@ -79,6 +79,7 @@ for (const c of roleChanges) {
   const m = members.find((x) => x.slug === c.slug);
   if (!m) throw new Error(`role-changes.json: no member ${c.slug}`);
   if (c.title) m.title = c.title;
+  if (c.firms) m.firms = c.firms.slice(0, 3);
   if (c.desk === null) delete m.desk;
   else if (c.desk) m.desk = slugify(c.desk);
 }

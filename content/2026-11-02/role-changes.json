@@ -1,12 +1,55 @@
 {
- "about": "Changes to titles and desks after the member form, applied by tools/import-members.mjs. desk null means the person works across the department's desks.",
+ "about": "Changes to titles, desks and firms after the member form, applied by tools/import-members.mjs. desk null means the person works across the department's desks; firms replaces the firms listed in the form.",
  "changes": [
-  { "slug": "erik-oostendorp", "title": "Associate, Investment Banking", "desk": null, "note": "Investment Banking associates work on both desks (Zaid, 3 November 2026)." },
-  { "slug": "jack-hermansson", "title": "Associate, Investment Banking", "desk": null, "note": "As above." },
-  { "slug": "kian-chirani", "title": "Associate, Investment Banking", "desk": null, "note": "As above." },
-  { "slug": "alice-lafreniere", "title": "Associate, Investment Banking", "desk": null, "note": "As above." },
-  { "slug": "henri-de-canecaude", "title": "Associate, Investment Banking", "desk": null, "note": "As above." },
-  { "slug": "shaivam-sundeep-ravani", "title": "Associate, Fintech", "desk": "Fintech", "note": "On the Fintech desk (Zaid, 3 November 2026)." },
-  { "slug": "lili-anna-paczolay-nagy", "title": "Associate, Private Equity", "desk": "Private Equity", "note": "On the Private Equity desk (Zaid, 3 November 2026)." }
+  {
+   "slug": "erik-oostendorp",
+   "title": "Associate, Investment Banking",
+   "desk": null,
+   "note": "Investment Banking associates work on both desks (Zaid, 3 November 2026)."
+  },
+  {
+   "slug": "jack-hermansson",
+   "title": "Associate, Investment Banking",
+   "desk": null,
+   "note": "As above."
+  },
+  {
+   "slug": "kian-chirani",
+   "title": "Associate, Investment Banking",
+   "desk": null,
+   "note": "As above."
+  },
+  {
+   "slug": "alice-lafreniere",
+   "title": "Associate, Investment Banking",
+   "desk": null,
+   "note": "As above."
+  },
+  {
+   "slug": "henri-de-canecaude",
+   "title": "Associate, Investment Banking",
+   "desk": null,
+   "note": "As above."
+  },
+  {
+   "slug": "shaivam-sundeep-ravani",
+   "title": "Associate, Fintech",
+   "desk": "Fintech",
+   "note": "On the Fintech desk (Zaid, 3 November 2026)."
+  },
+  {
+   "slug": "lili-anna-paczolay-nagy",
+   "title": "Associate, Private Equity",
+   "desk": "Private Equity",
+   "note": "On the Private Equity desk (Zaid, 3 November 2026)."
+  },
+  {
+   "slug": "zaid-habash",
+   "firms": [
+    "Nordea",
+    "Lovable"
+   ],
+   "note": "The form listed his VC & Growth target firms (Sequoia Capital, Accel, Index Ventures) as his experience; his experience is Nordea and Lovable (Zaid, 3 November 2026)."
+  }
  ]
 }
