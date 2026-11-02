@@ -6,7 +6,8 @@ import { Reveal } from "@/components/Reveal";
 import { ReportList } from "@/components/site/sections";
 import { Em, Eyebrow, PageHero } from "@/components/site/ui";
 import { Dialog, DialogContent, DialogDescription, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { ALL_REPORTS } from "@/data/reports";
+import { sortReports } from "@/data/reports";
+import { loadReports } from "@/lib/content";
 import { departments } from "@/lib/departments";
 import { IMAGES, logoUrl } from "@/lib/site";
 import { cn } from "@/lib/utils";
@@ -27,11 +28,9 @@ export const Route = createFileRoute("/resources")({
       },
     ],
   }),
+  loader: async () => sortReports(await loadReports()),
   component: ResourcesPage,
 });
-
-/** The departments that publish, for the library filter. */
-const publishing = departments.filter((d) => ALL_REPORTS.some((r) => r.department === d.slug));
 
 const greenroomFeatures = [
   {
@@ -170,8 +169,10 @@ const esadeResources: { name: string; domain: string; blurb: string }[] = [
 ];
 
 function ResourcesPage() {
+  const reports = Route.useLoaderData();
+  const publishing = departments.filter((d) => reports.some((r) => r.department === d.slug));
   const [filter, setFilter] = useState<string>("all");
-  const shown = filter === "all" ? ALL_REPORTS : ALL_REPORTS.filter((r) => r.department === filter);
+  const shown = filter === "all" ? reports : reports.filter((r) => r.department === filter);
 
   return (
     <SiteLayout>

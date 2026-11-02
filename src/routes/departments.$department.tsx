@@ -16,6 +16,7 @@ import {
 import { Em, Eyebrow, PersonCard } from "@/components/site/ui";
 import { eventsFor } from "@/data/events";
 import { reportsFor } from "@/data/reports";
+import { loadEvents, loadReports } from "@/lib/content";
 import { getDepartment, type Department, type Desk } from "@/lib/departments";
 import { associatesOf, leadershipOf } from "@/lib/team";
 
@@ -26,6 +27,10 @@ export const Route = createFileRoute("/departments/$department")({
     if (d.slug !== params.department) {
       throw redirect({ to: "/departments/$department", params: { department: d.slug } });
     }
+  },
+  loader: async () => {
+    const [events, reports] = await Promise.all([loadEvents(), loadReports()]);
+    return { events, reports };
   },
   head: ({ params }) => {
     const d = getDepartment(params.department);
@@ -96,14 +101,15 @@ function DepartmentPage() {
   const { department } = Route.useParams();
   const d = getDepartment(department)!;
   const leaders = leadershipOf(d.slug);
-  const reports = reportsFor(d.slug);
-  const events = eventsFor(d.slug);
+  const data = Route.useLoaderData();
+  const reports = reportsFor(data.reports, d.slug);
+  const events = eventsFor(data.events, d.slug);
   const deskNames = Object.fromEntries(d.desks.map((k) => [k.slug, k.name]));
   const associates = associatesOf(d.slug);
   // Associates by desk, then anyone in the department without a desk.
   const byDesk = [
     ...d.desks.map((k) => ({ name: k.name, members: associatesOf(d.slug, k.slug) })),
-    { name: d.desks.length ? `${d.name}, all desks` : undefined, members: associates.filter((m) => !m.desk) },
+    { name: d.desks.length ? d.name : undefined, members: associates.filter((m) => !m.desk) },
   ].filter((g) => g.members.length > 0);
 
   return (

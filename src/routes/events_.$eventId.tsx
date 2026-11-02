@@ -5,20 +5,22 @@ import { SiteLayout } from "@/components/layout/SiteLayout";
 import { TypeDot } from "@/components/site/sections";
 import { Em, Eyebrow } from "@/components/site/ui";
 import { Dialog, DialogClose, DialogContent, DialogTitle } from "@/components/ui/dialog";
-import { EVENTS, type EventPhoto } from "@/data/events";
+import type { EventPhoto } from "@/data/events";
+import { loadEvents } from "@/lib/content";
 import { getDepartment } from "@/lib/departments";
 import { icsHref } from "@/lib/ics";
 import { formatDay, IMAGES } from "@/lib/site";
 import { cn } from "@/lib/utils";
 
-const eventById = (id: string) => EVENTS.find((e) => e.id === id);
-
 export const Route = createFileRoute("/events_/$eventId")({
-  beforeLoad: ({ params }) => {
-    if (!eventById(params.eventId)) throw notFound();
+  loader: async ({ params }) => {
+    const events = await loadEvents();
+    const event = events.find((e) => e.id === params.eventId);
+    if (!event) throw notFound();
+    return { event, events };
   },
-  head: ({ params }) => {
-    const e = eventById(params.eventId);
+  head: ({ loaderData }) => {
+    const e = loaderData?.event;
     return {
       meta: [
         { title: `${e?.title ?? "Event"}, EMFC` },
@@ -97,8 +99,7 @@ function Lightbox({
 }
 
 function EventPage() {
-  const { eventId } = Route.useParams();
-  const e = eventById(eventId)!;
+  const { event: e, events: EVENTS } = Route.useLoaderData();
   const [open, setOpen] = useState<number | null>(null);
   const today = new Date().toISOString().slice(0, 10);
   const upcoming = e.date >= today;

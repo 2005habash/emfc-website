@@ -201,7 +201,7 @@ export const EVENTS: EventItem[] = [
   },
 ];
 
-export const eventsFor = (department: string, desk?: string) =>
-  EVENTS.filter((e) =>
+export const eventsFor = (events: EventItem[], department: string, desk?: string) =>
+  events.filter((e) =>
     desk ? e.desks?.includes(`${department}/${desk}`) : e.departments.includes(department),
   ).sort((a, b) => b.date.localeCompare(a.date));

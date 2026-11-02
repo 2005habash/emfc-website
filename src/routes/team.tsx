@@ -86,7 +86,7 @@ function associateGroups(d: Department) {
     }))
     .filter((g) => g.members.length > 0);
   const rest = all.filter((m) => !m.desk);
-  if (rest.length) groups.push({ label: d.desks.length ? `${d.name}, all desks` : "Associates", members: rest });
+  if (rest.length) groups.push({ label: d.desks.length ? d.name : "Associates", members: rest });
   return groups;
 }
 

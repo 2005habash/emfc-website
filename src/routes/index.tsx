@@ -6,7 +6,7 @@ import { SiteLayout } from "@/components/layout/SiteLayout";
 import { Reveal } from "@/components/Reveal";
 import { NewsletterForm } from "@/components/site/NewsletterForm";
 import { CountUp, Em, Eyebrow, Numeral, PhotoCaption, Portrait } from "@/components/site/ui";
-import { EVENTS } from "@/data/events";
+import { loadEvents } from "@/lib/content";
 import { STATS } from "@/data/stats";
 import { departments } from "@/lib/departments";
 import {
@@ -37,6 +37,7 @@ export const Route = createFileRoute("/")({
       { property: "twitter:image", content: IMAGES.placaEspanya },
     ],
   }),
+  loader: () => loadEvents(),
   component: Home,
 });
 
@@ -562,6 +563,7 @@ function Join() {
       })
     : "";
 
+  const EVENTS = Route.useLoaderData();
   const today = new Date().toISOString().slice(0, 10);
   const sorted = [...EVENTS].sort((a, b) => a.date.localeCompare(b.date));
   const next = sorted.find((e) => e.date >= today);

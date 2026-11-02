@@ -3,7 +3,8 @@ import { ArrowLeft, ArrowRight, ArrowUpRight, CalendarPlus, Images, Linkedin, Ma
 import { useState } from "react";
 import { SiteLayout } from "@/components/layout/SiteLayout";
 import { Em, Eyebrow, PageHero } from "@/components/site/ui";
-import { EVENT_TYPE_COLORS, EVENTS, type EventItem, type EventType } from "@/data/events";
+import { EVENT_TYPE_COLORS, type EventItem, type EventType } from "@/data/events";
+import { loadEvents } from "@/lib/content";
 import { IMAGES, SOCIAL } from "@/lib/site";
 import { cn } from "@/lib/utils";
 import { icsHref } from "@/lib/ics";
@@ -25,6 +26,7 @@ export const Route = createFileRoute("/events")({
       },
     ],
   }),
+  loader: () => loadEvents(),
   component: EventsPage,
 });
 
@@ -170,9 +172,7 @@ function EventFeature({ e, past = false }: { e: EventItem; past?: boolean }) {
             )}
             {e.photos?.length ? `Photos and details` : "Details"}
           </Link>
-        </div>
-        {!past && (
-          <div className="mt-1 flex flex-wrap gap-2.5">
+          {!past && (
             <a
               href={icsHref(e)}
               download={`${e.id}.ics`}
@@ -181,24 +181,25 @@ function EventFeature({ e, past = false }: { e: EventItem; past?: boolean }) {
               <CalendarPlus className="h-3.5 w-3.5" strokeWidth={1.75} />
               Add to calendar
             </a>
-            {e.link && (
-              <a
-                href={e.link}
-                target="_blank"
-                rel="noreferrer"
-                className="btn btn-outline-ink h-[46px] px-5 text-[11px]"
-              >
-                Register
-              </a>
-            )}
-          </div>
-        )}
+          )}
+          {!past && e.link && (
+            <a
+              href={e.link}
+              target="_blank"
+              rel="noreferrer"
+              className="btn btn-outline-ink h-[46px] px-5 text-[11px]"
+            >
+              Register
+            </a>
+          )}
+        </div>
       </div>
     </article>
   );
 }
 
 function Overview() {
+  const EVENTS = Route.useLoaderData();
   const today = new Date().toISOString().slice(0, 10);
   const upcoming = EVENTS.filter((e) => e.date >= today).sort((a, b) =>
     a.date.localeCompare(b.date),
@@ -247,6 +248,7 @@ function Overview() {
 }
 
 function CalendarView() {
+  const EVENTS = Route.useLoaderData();
   // Open on the month of the next event, or the most recent one.
   const today = new Date().toISOString().slice(0, 10);
   const sorted = [...EVENTS].sort((a, b) => a.date.localeCompare(b.date));

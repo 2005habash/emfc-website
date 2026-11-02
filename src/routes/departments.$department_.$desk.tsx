@@ -15,6 +15,7 @@ import {
 import { Em, Eyebrow, PersonCard } from "@/components/site/ui";
 import { eventsFor } from "@/data/events";
 import { reportsFor } from "@/data/reports";
+import { loadEvents, loadReports } from "@/lib/content";
 import { getDepartment, getDesk } from "@/lib/departments";
 import { ROMAN } from "@/lib/site";
 import { deskTeam, leadershipOf, memberByName } from "@/lib/team";
@@ -23,6 +24,10 @@ import { cn } from "@/lib/utils";
 export const Route = createFileRoute("/departments/$department_/$desk")({
   beforeLoad: ({ params }) => {
     if (!getDesk(params.department, params.desk)) throw notFound();
+  },
+  loader: async () => {
+    const [events, reports] = await Promise.all([loadEvents(), loadReports()]);
+    return { events, reports };
   },
   head: ({ params }) => {
     const d = getDepartment(params.department);
@@ -46,8 +51,9 @@ function DeskPage() {
   const head = leadershipOf(d.slug)[0];
   const lead = k.lead ? memberByName(k.lead) : undefined;
   const team = deskTeam(d.slug, k.slug).filter((m) => m.name !== k.lead);
-  const reports = reportsFor(d.slug, k.slug);
-  const events = eventsFor(d.slug, k.slug);
+  const data = Route.useLoaderData();
+  const reports = reportsFor(data.reports, d.slug, k.slug);
+  const events = eventsFor(data.events, d.slug, k.slug);
   const at = d.desks.findIndex((x) => x.slug === k.slug);
   const prev = d.desks[(at - 1 + d.desks.length) % d.desks.length];
   const next = d.desks[(at + 1) % d.desks.length];

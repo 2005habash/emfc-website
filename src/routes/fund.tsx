@@ -5,7 +5,7 @@ import { SiteLayout } from "@/components/layout/SiteLayout";
 import { Reveal } from "@/components/Reveal";
 import { ReportList } from "@/components/site/sections";
 import { Em, Eyebrow } from "@/components/site/ui";
-import { REPORTS } from "@/data/reports";
+import { loadReports } from "@/lib/content";
 import { FUND_PAGE_LIVE, IMAGES } from "@/lib/site";
 
 export const Route = createFileRoute("/fund")({
@@ -24,13 +24,13 @@ export const Route = createFileRoute("/fund")({
       },
     ],
   }),
+  loader: async () => (await loadReports()).filter((r) => r.series === "Fund documents"),
   component: () => (FUND_PAGE_LIVE ? <FundFull /> : <FundComingSoon />),
 });
 
-const IPS = REPORTS.filter((r) => r.id === "emfc-global-equity-fund-ips");
-
 /** Shown until the portfolio is built (decided 20 October; the policy statement added 2 November). */
 function FundComingSoon() {
+  const documents = Route.useLoaderData();
   return (
     <SiteLayout>
       <section className="relative overflow-hidden bg-[#000B3D] text-white">
@@ -66,7 +66,7 @@ function FundComingSoon() {
           </p>
         </Reveal>
         <Reveal className="flex flex-col gap-8 lg:col-span-7 lg:col-start-6">
-          <ReportList reports={IPS} />
+          <ReportList reports={documents} />
           <div className="flex flex-wrap gap-2.5">
             <Link
               to="/departments/$department/$desk"

@@ -10,7 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as AdminRouteImport } from './routes/admin'
+import { Route as ClubOfficeRouteImport } from './routes/club-office'
 import { Route as EventsRouteImport } from './routes/events'
 import { Route as FundRouteImport } from './routes/fund'
 import { Route as PrivacyRouteImport } from './routes/privacy'
@@ -27,9 +27,9 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AdminRoute = AdminRouteImport.update({
-  id: '/admin',
-  path: '/admin',
+const ClubOfficeRoute = ClubOfficeRouteImport.update({
+  id: '/club-office',
+  path: '/club-office',
   getParentRoute: () => rootRouteImport,
 } as any)
 const EventsRoute = EventsRouteImport.update({
@@ -86,7 +86,7 @@ const DepartmentsDepartmentDeskRoute =
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/admin': typeof AdminRoute
+  '/club-office': typeof ClubOfficeRoute
   '/events': typeof EventsRoute
   '/fund': typeof FundRoute
   '/privacy': typeof PrivacyRoute
@@ -100,7 +100,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/admin': typeof AdminRoute
+  '/club-office': typeof ClubOfficeRoute
   '/events': typeof EventsRoute
   '/fund': typeof FundRoute
   '/privacy': typeof PrivacyRoute
@@ -115,7 +115,7 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/admin': typeof AdminRoute
+  '/club-office': typeof ClubOfficeRoute
   '/events': typeof EventsRoute
   '/fund': typeof FundRoute
   '/privacy': typeof PrivacyRoute
@@ -131,7 +131,7 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
-    | '/admin'
+    | '/club-office'
     | '/events'
     | '/fund'
     | '/privacy'
@@ -145,7 +145,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
-    | '/admin'
+    | '/club-office'
     | '/events'
     | '/fund'
     | '/privacy'
@@ -159,7 +159,7 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
-    | '/admin'
+    | '/club-office'
     | '/events'
     | '/fund'
     | '/privacy'
@@ -174,7 +174,7 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  AdminRoute: typeof AdminRoute
+  ClubOfficeRoute: typeof ClubOfficeRoute
   EventsRoute: typeof EventsRoute
   FundRoute: typeof FundRoute
   PrivacyRoute: typeof PrivacyRoute
@@ -196,11 +196,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/admin': {
-      id: '/admin'
-      path: '/admin'
-      fullPath: '/admin'
-      preLoaderRoute: typeof AdminRouteImport
+    '/club-office': {
+      id: '/club-office'
+      path: '/club-office'
+      fullPath: '/club-office'
+      preLoaderRoute: typeof ClubOfficeRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/events': {
@@ -278,7 +278,7 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  AdminRoute: AdminRoute,
+  ClubOfficeRoute: ClubOfficeRoute,
   EventsRoute: EventsRoute,
   FundRoute: FundRoute,
   PrivacyRoute: PrivacyRoute,

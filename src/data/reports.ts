@@ -171,7 +171,7 @@ export const REPORTS: Report[] = [
 const newestFirst = (a: Report, b: Report) =>
   Number(a.status === "coming") - Number(b.status === "coming") || b.date.localeCompare(a.date);
 
-export const reportsFor = (department: string, desk?: string) =>
-  REPORTS.filter((r) => r.department === department && (desk === undefined || r.desk === desk)).sort(newestFirst);
+export const reportsFor = (reports: Report[], department: string, desk?: string) =>
+  reports.filter((r) => r.department === department && (desk === undefined || r.desk === desk)).sort(newestFirst);
 
-export const ALL_REPORTS = [...REPORTS].sort(newestFirst);
+export const sortReports = (reports: Report[]) => [...reports].sort(newestFirst);

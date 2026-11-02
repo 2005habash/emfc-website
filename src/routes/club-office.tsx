@@ -6,8 +6,11 @@ import { departments } from "@/lib/departments";
 import { Download, LogOut, Loader2, ChevronDown, ChevronRight, ExternalLink, X, FileText, Users, Calendar, TrendingUp, Building2, Archive, ArrowUpDown, ArrowUp, ArrowDown } from "lucide-react";
 import { toast } from "sonner";
 import { zip } from "fflate";
+import { EnquiriesManager, EventsManager, ReportsManager } from "@/components/admin/ContentManagers";
 
-export const Route = createFileRoute("/admin")({
+// The admin page, at an unlisted address. Sign-in and the admin role are checked against Supabase,
+// so the address alone gives no access.
+export const Route = createFileRoute("/club-office")({
   head: () => ({ meta: [{ title: "Admin, EMFC" }, { name: "robots", content: "noindex" }] }),
   component: Admin,
 });
@@ -78,7 +81,49 @@ function Admin() {
     return <SiteLayout><div className="container-emis py-24 text-center text-muted-foreground"><Loader2 className="mx-auto h-6 w-6 animate-spin" /></div></SiteLayout>;
   }
 
-  return <SiteLayout><Dashboard /></SiteLayout>;
+  return <SiteLayout><AdminTabs /></SiteLayout>;
+}
+
+const TABS = [
+  { id: "events", label: "Events" },
+  { id: "reports", label: "Reports" },
+  { id: "enquiries", label: "Sponsorship enquiries" },
+  { id: "applications", label: "Applications" },
+] as const;
+
+function AdminTabs() {
+  const [tab, setTab] = useState<(typeof TABS)[number]["id"]>("events");
+  return (
+    <div>
+      <div className="container-wide flex flex-wrap items-center justify-between gap-4 pt-10">
+        <div role="tablist" aria-label="Admin sections" className="flex flex-wrap gap-1 rounded-lg border border-border bg-card p-1">
+          {TABS.map((t) => (
+            <button
+              key={t.id}
+              role="tab"
+              aria-selected={tab === t.id}
+              onClick={() => setTab(t.id)}
+              className={`h-9 rounded-md px-4 text-sm ${tab === t.id ? "bg-navy text-primary-foreground" : "hover:bg-secondary"}`}
+            >
+              {t.label}
+            </button>
+          ))}
+        </div>
+        <button onClick={() => supabase.auth.signOut()} className="inline-flex h-9 items-center gap-2 rounded-md border border-border px-3 text-sm">
+          <LogOut className="h-4 w-4" /> Sign out
+        </button>
+      </div>
+      {tab === "applications" ? (
+        <Dashboard />
+      ) : (
+        <div className="container-wide py-8">
+          {tab === "events" && <EventsManager />}
+          {tab === "reports" && <ReportsManager />}
+          {tab === "enquiries" && <EnquiriesManager />}
+        </div>
+      )}
+    </div>
+  );
 }
 
 function Login() {

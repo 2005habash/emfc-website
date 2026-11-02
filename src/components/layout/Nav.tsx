@@ -51,7 +51,7 @@ function DepartmentsMenu({ id, onNavigate }: { id: string; onNavigate: () => voi
   return (
     <div
       id={id}
-      className="absolute inset-x-0 top-full border-b border-white/20 bg-[#000B3D] shadow-[0_24px_48px_rgb(0_0_0/0.25)]"
+      className="absolute inset-x-0 top-full border-b border-white/20 bg-[#000B3D] text-left normal-case tracking-normal shadow-[0_24px_48px_rgb(0_0_0/0.25)]"
     >
       <div className="gutter grid grid-cols-6 gap-6 py-9 xl:gap-8">
         {departments.map((d) => (
@@ -147,7 +147,7 @@ export function Nav({ overlay = false }: { overlay?: boolean }) {
     setMenu(false);
   };
 
-  const linkClass = "flex h-11 items-center px-2.5 underline-offset-8 xl:px-3.5";
+  const linkClass = "flex h-11 items-center px-2 underline-offset-8 xl:px-3.5";
   const active = { className: "text-white underline decoration-bull-light" };
   const inactive = { className: "text-[#E3E6EF] hover:underline" };
 
@@ -244,7 +244,7 @@ export function Nav({ overlay = false }: { overlay?: boolean }) {
             target="_blank"
             rel="noreferrer"
             aria-label="EMFC on Instagram"
-            className="hidden h-11 w-11 items-center justify-center rounded-full text-[#E3E6EF] hover:bg-white/10 sm:flex"
+            className="hidden h-11 w-11 items-center justify-center rounded-full text-[#E3E6EF] hover:bg-white/10 sm:flex lg:hidden xl:flex"
           >
             <Instagram className="h-[17px] w-[17px]" strokeWidth={1.6} />
           </a>
@@ -253,7 +253,7 @@ export function Nav({ overlay = false }: { overlay?: boolean }) {
             target="_blank"
             rel="noreferrer"
             aria-label="EMFC on LinkedIn"
-            className="hidden h-11 w-11 items-center justify-center rounded-full text-[#E3E6EF] hover:bg-white/10 sm:flex"
+            className="hidden h-11 w-11 items-center justify-center rounded-full text-[#E3E6EF] hover:bg-white/10 sm:flex lg:hidden xl:flex"
           >
             <Linkedin className="h-[17px] w-[17px]" strokeWidth={1.6} />
           </a>
