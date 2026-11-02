@@ -103,15 +103,17 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
   errorComponent: ErrorComponent,
 });
 
+// Runs before the page paints: applies the saved light/dark choice, and marks the page as allowed to
+// animate (unless the visitor asked for reduced motion), so entrances only hide content when they can play.
 const THEME_SCRIPT =
-  "try{if(localStorage.getItem('emfc-theme')==='dark')document.documentElement.classList.add('dark')}catch(e){}";
+  "try{if(localStorage.getItem('emfc-theme')==='dark')document.documentElement.classList.add('dark')}catch(e){}" +
+  "try{if(!matchMedia('(prefers-reduced-motion: reduce)').matches)document.documentElement.classList.add('motion')}catch(e){}";
 
 function RootShell({ children }: { children: ReactNode }) {
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
         <HeadContent />
-        {/* Apply the saved light/dark choice before the page paints. */}
         <script dangerouslySetInnerHTML={{ __html: THEME_SCRIPT }} />
       </head>
       <body>

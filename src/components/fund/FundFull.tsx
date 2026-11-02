@@ -159,7 +159,7 @@ export function FundFull() {
                     transition={{ duration: 2, delay: 0.3, ease: "easeOut" }}
                   />
                 </svg>
-                <span className="caps text-[9.5px] tracking-[0.2em] text-mute">
+                <span className="caps text-[10px] tracking-[0.2em] text-mute">
                   Illustrative shape, not performance data
                 </span>
               </div>
@@ -169,7 +169,7 @@ export function FundFull() {
                     key={label}
                     className={`flex flex-col gap-1.5 px-4 py-5 md:px-7 ${i > 0 ? "border-l border-line" : ""}`}
                   >
-                    <dt className="caps text-[9.5px] tracking-[0.18em] text-mute md:text-[10px]">
+                    <dt className="caps text-[10px] tracking-[0.18em] text-mute md:text-[10px]">
                       {label}
                     </dt>
                     <dd className="font-serif text-[34px]/none text-mute">–</dd>

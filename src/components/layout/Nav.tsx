@@ -171,7 +171,7 @@ export function Nav({ overlay = false }: { overlay?: boolean }) {
             EMFC
           </span>
           <span className="hidden h-[30px] w-px bg-white/40 sm:block lg:hidden xl:block" />
-          <span className="caps hidden text-[9px]/[1.5] tracking-[0.22em] text-[#E3E6EF] sm:block lg:hidden xl:block xl:text-[10px]/[1.5]">
+          <span className="caps hidden text-[10px]/[1.5] tracking-[0.22em] text-[#E3E6EF] sm:block lg:hidden xl:block xl:text-[10px]/[1.5]">
             ESADE Master's
             <br />
             Finance Club

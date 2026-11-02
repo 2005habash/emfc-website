@@ -126,7 +126,7 @@ function EventFeature({ e, past = false }: { e: EventItem; past?: boolean }) {
         </div>
       </div>
       <div className="flex flex-col gap-4 lg:col-span-8">
-        <h3 className="font-serif text-5xl/[0.96] tracking-[-0.01em] md:text-[64px]/[0.96]">
+        <h3 className="font-serif text-[32px]/[1.04] tracking-[-0.01em] md:text-[44px]/[1] xl:text-[52px]/[0.98]">
           <Link
             to="/events/$eventId"
             params={{ eventId: e.id }}
@@ -301,7 +301,7 @@ function CalendarView() {
             </button>
           </div>
         </div>
-        <div className="caps grid grid-cols-7 text-[9px] tracking-[0.2em] text-mute md:text-[10px]">
+        <div className="caps grid grid-cols-7 text-[10px] tracking-[0.2em] text-mute md:text-[10px]">
           {["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].map((d) => (
             <span key={d} className="px-1.5 md:px-3">
               {d}
@@ -347,7 +347,7 @@ function CalendarView() {
                 <span className="font-serif text-[52px]/[0.9] font-medium">
                   {dateOf(selected).getDate()}
                 </span>
-                <span className="caps text-[9.5px] tracking-[0.18em] text-mute">
+                <span className="caps text-[10px] tracking-[0.18em] text-mute">
                   {fmt(dateOf(selected), { month: "short", year: "numeric" })}
                 </span>
               </div>

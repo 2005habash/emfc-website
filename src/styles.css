@@ -260,6 +260,25 @@
   }
 }
 
+/* Entrances (components/Reveal.tsx): hidden only while the page may animate, shown once in view. */
+html.motion [data-reveal] {
+  transition:
+    opacity 0.7s ease-out var(--reveal-delay, 0s),
+    transform 0.7s ease-out var(--reveal-delay, 0s);
+}
+html.motion [data-reveal]:not([data-shown]) {
+  opacity: 0;
+  transform: translateY(28px);
+  /* If the script never marks it as shown, show it anyway. */
+  animation: reveal-fallback 0s linear 3s forwards;
+}
+@keyframes reveal-fallback {
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
 @keyframes kenburns {
   from {
     transform: scale(1);

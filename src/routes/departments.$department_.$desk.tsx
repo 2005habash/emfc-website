@@ -60,7 +60,7 @@ function DeskPage() {
 
   return (
     <SiteLayout>
-      <DepartmentsHero />
+      <DepartmentsHero titleAs="p" />
       <DepartmentSelector current={d.slug} />
 
       <div key={`${d.slug}/${k.slug}`}>
@@ -100,7 +100,7 @@ function DeskPage() {
             <Eyebrow>
               {k.group ? `${d.name}, ${k.group}` : d.name} desk
             </Eyebrow>
-            <h2 className="font-serif text-[56px]/[0.95] tracking-[-0.015em] md:text-8xl/[0.95]">{k.name}</h2>
+            <h1 className="font-serif text-[56px]/[0.95] tracking-[-0.015em] md:text-8xl/[0.95]">{k.name}</h1>
             <p className="max-w-[680px] text-base/[1.65] text-mute md:text-[19px]/[1.65]">{k.description}</p>
             {k.does.length > 0 && (
               <div className="mt-2 flex flex-col gap-4">

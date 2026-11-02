@@ -152,7 +152,7 @@ function Hero() {
               <dd className="font-serif text-[38px]/none font-medium md:text-5xl/none">
                 {f.value}
               </dd>
-              <dt className="caps text-[9.5px] tracking-[0.2em] text-[#D5D9E6] md:text-[10.5px]">
+              <dt className="caps text-[10px] tracking-[0.2em] text-[#D5D9E6] md:text-[10.5px]">
                 {f.label}
               </dt>
             </div>
@@ -206,7 +206,7 @@ function Intro() {
       <Reveal className="grid gap-8 lg:grid-cols-12">
         <div className="flex flex-col gap-7 lg:col-span-7">
           <Eyebrow>Welcome to EMFC</Eyebrow>
-          <p className="font-serif text-[38px]/[1.08] font-medium tracking-[-0.01em] md:text-[60px]/[1.08]">
+          <p className="font-serif text-[32px]/[1.1] font-medium tracking-[-0.01em] md:text-[60px]/[1.08]">
             A finance club built around <Em>careers</Em>, <Em>companies</Em> and the people you meet
             along the way.
           </p>
@@ -253,7 +253,7 @@ function Panorama() {
         <p className="relative font-serif text-[44px]/none italic md:text-[80px]/none">
           {STATS.nationalities} nationalities.
         </p>
-        <p className="caps relative mt-4 text-[9.5px] tracking-[0.26em] text-[#E3E6EF] md:text-[11px]">
+        <p className="caps relative mt-4 text-[10px] tracking-[0.26em] text-[#E3E6EF] md:text-[11px]">
           Built around a global recruiting horizon
         </p>
       </Reveal>
@@ -398,7 +398,7 @@ function StripTile({ m, i }: { m: Member; i: number }) {
       <Portrait member={m} alt="" alternate={i % 2 === 1} className="h-full" />
       <span className="absolute inset-x-0 bottom-0 flex translate-y-full flex-col gap-0.5 bg-[#000B3D] px-3 pt-2.5 pb-3 text-white transition-transform duration-300 group-hover:translate-y-0 group-focus-visible:translate-y-0">
         <span className="font-serif text-base/[1.1] md:text-lg/[1.1]">{m.name}</span>
-        <span className="caps text-[8px] tracking-[0.16em] text-[#D5D9E6] md:text-[8.5px]">{m.title}</span>
+        <span className="caps text-[10px] tracking-[0.16em] text-[#D5D9E6] md:text-[10px]">{m.title}</span>
       </span>
     </Link>
   );
@@ -466,7 +466,7 @@ function People() {
               <span className="font-serif text-lg/[1.15] md:text-[21px]/[1.15]">
                 {PRESIDENTS.map((p) => p.name).join(" and ")}
               </span>
-              <span className="caps text-[9.5px] tracking-[0.2em] text-mist md:text-[10px]">
+              <span className="caps text-[10px] tracking-[0.2em] text-mist md:text-[10px]">
                 Co-Presidents and Founders
               </span>
             </div>
@@ -513,7 +513,7 @@ function FundTeaser() {
             >
               <span className="mt-0.5 h-[13px] w-[13px] shrink-0 rounded-full border border-bull-light bg-night md:mt-0" />
               <span className="flex flex-col gap-1 md:gap-3.5">
-                <span className="caps text-[9.5px] tracking-[0.22em] text-haze md:text-[10.5px]">
+                <span className="caps text-[10px] tracking-[0.22em] text-haze md:text-[10.5px]">
                   Stage {ROMAN[i]}
                 </span>
                 <span className="font-serif text-[28px]/[1.1] md:text-[32px]/[1.1]">{s}</span>
@@ -606,7 +606,7 @@ function Join() {
                   <span className="font-serif text-[40px]/none font-medium md:text-[64px]/none">
                     {p.value}
                   </span>
-                  <span className="caps text-[9px] tracking-[0.22em] text-mute md:text-[10px]">
+                  <span className="caps text-[10px] tracking-[0.22em] text-mute md:text-[10px]">
                     {p.label}
                   </span>
                 </div>
@@ -643,25 +643,25 @@ function Join() {
               <span className="font-serif text-[44px]/[0.9] font-medium md:text-[52px]/[0.9]">
                 {eventDate.getDate()}
               </span>
-              <span className="caps text-[9px] tracking-[0.2em] text-mute md:text-[10px]">
+              <span className="caps text-[10px] tracking-[0.2em] text-mute md:text-[10px]">
                 {eventDate.toLocaleDateString("en-GB", { month: "short", year: "numeric" })}
               </span>
             </div>
-            <div className="flex min-w-0 flex-1 flex-col gap-1.5">
-              <span className="caps text-[9px] tracking-[0.22em] text-mute md:text-[10px]">
+            <div className="flex min-w-[55%] flex-1 flex-col gap-1.5">
+              <span className="caps text-[10px] tracking-[0.22em] text-mute md:text-[10px]">
                 {next ? "Next event" : "Latest event"}, {event.type}, {event.location}
               </span>
               <Link
                 to="/events/$eventId"
                 params={{ eventId: event.id }}
-                className="font-serif text-[28px]/[1.05] font-medium underline-offset-4 hover:underline md:text-[32px]/[1.05]"
+                className="font-serif text-[24px]/[1.1] font-medium underline-offset-4 hover:underline md:text-[32px]/[1.05]"
               >
                 {event.title}
               </Link>
             </div>
             <Link
               to="/events"
-              className="btn btn-outline-ink h-11 shrink-0 px-[18px] text-[10.5px]"
+              className="btn btn-outline-ink h-11 shrink-0 max-sm:w-full px-[18px] text-[10.5px]"
             >
               All events
               <ArrowRight className="h-3.5 w-3.5" strokeWidth={1.75} />

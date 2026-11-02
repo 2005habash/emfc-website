@@ -1,6 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import { ArrowRight, ArrowUpRight, FileText, Linkedin } from "lucide-react";
-import type { ReactNode } from "react";
+import { useEffect, useRef, type ReactNode } from "react";
 import { Reveal } from "@/components/Reveal";
 import { Em, Eyebrow, Numeral, PageHero, PersonCard } from "@/components/site/ui";
 import { EVENT_TYPE_COLORS, type EventItem, type EventType } from "@/data/events";
@@ -11,9 +11,10 @@ import type { Member } from "@/lib/team";
 import { cn } from "@/lib/utils";
 
 /** The hero shared by the department and desk pages. */
-export function DepartmentsHero() {
+export function DepartmentsHero({ titleAs = "h1" }: { titleAs?: "h1" | "p" }) {
   return (
     <PageHero
+      titleAs={titleAs}
       image={IMAGES.sagradaFamilia}
       alt="Sagrada Família rising above Barcelona's Eixample grid at sunset"
       eyebrow="Departments"
@@ -31,12 +32,22 @@ export function DepartmentsHero() {
 
 /** The row of all six departments under the page hero. The current one is highlighted. */
 export function DepartmentSelector({ current }: { current?: string }) {
+  const list = useRef<HTMLUListElement>(null);
+  // On narrow screens the row scrolls sideways: start it at the current department.
+  useEffect(() => {
+    const ul = list.current;
+    const on = ul?.querySelector<HTMLElement>('[aria-current="page"]');
+    if (ul && on && ul.scrollWidth > ul.clientWidth) ul.scrollLeft = on.offsetLeft - 20;
+  }, [current]);
   return (
     <nav
       aria-label="Departments"
       className="sticky top-[72px] z-40 border-b border-line bg-stone lg:top-[88px]"
     >
-      <ul className="gutter flex overflow-x-auto [scrollbar-width:none] lg:grid lg:grid-cols-6">
+      <ul
+        ref={list}
+        className="gutter flex overflow-x-auto [scrollbar-width:none] max-lg:[mask-image:linear-gradient(90deg,#000_82%,transparent)] lg:grid lg:grid-cols-6"
+      >
         {departments.map((d, i) => {
           const on = d.slug === current;
           return (
@@ -120,7 +131,7 @@ export function FirmsGrid({ firms, deskNames }: { firms: Firm[]; deskNames?: Rec
         >
           <span className="font-serif text-xl/[1.1] font-semibold md:text-[23px]/[1.1]">{f.name}</span>
           {deskNames && f.desks && (
-            <span className="caps text-[9px] tracking-[0.16em] text-mute md:text-[9.5px]">
+            <span className="caps text-[10px] tracking-[0.16em] text-mute md:text-[10px]">
               {f.desks.map((d) => deskNames[d] ?? d).join(", ")}
             </span>
           )}

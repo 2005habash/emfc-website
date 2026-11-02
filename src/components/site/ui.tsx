@@ -64,6 +64,7 @@ export function PageHero({
   title,
   children,
   position = "50% 50%",
+  titleAs: Title = "h1",
 }: {
   image: string;
   alt: string;
@@ -71,6 +72,8 @@ export function PageHero({
   title: ReactNode;
   children: ReactNode;
   position?: string;
+  /** "p" when the page's main heading comes later (department and desk pages). */
+  titleAs?: "h1" | "p";
 }) {
   return (
     <section className="relative overflow-hidden bg-[#000B3D] text-white">
@@ -86,9 +89,9 @@ export function PageHero({
           <Eyebrow tone="hero" className="animate-rise">
             {eyebrow}
           </Eyebrow>
-          <h1 className="animate-rise font-serif text-6xl/[0.92] tracking-[-0.015em] [animation-delay:150ms] md:text-8xl/[0.92] lg:text-[112px]/[0.92]">
+          <Title className="animate-rise font-serif text-6xl/[0.92] tracking-[-0.015em] [animation-delay:150ms] md:text-8xl/[0.92] lg:text-[112px]/[0.92]">
             {title}
-          </h1>
+          </Title>
         </div>
         <p className="max-w-[480px] animate-rise text-base/[1.7] text-[#E3E6EF] [animation-delay:320ms]">
           {children}
@@ -143,7 +146,7 @@ export function Portrait({
 const sizes = {
   lg: { name: "text-3xl/[1.05]", title: "text-[10px]", gap: "gap-3.5" },
   md: { name: "text-2xl/[1.1]", title: "text-[10px]", gap: "gap-3.5" },
-  sm: { name: "text-lg/[1.15] md:text-xl/[1.15]", title: "text-[9px] md:text-[9.5px]", gap: "gap-2.5" },
+  sm: { name: "text-lg/[1.15] md:text-xl/[1.15]", title: "text-[10px]", gap: "gap-2.5" },
 };
 
 /**
@@ -272,7 +275,7 @@ export function CountUp({
 export function PhotoCaption({ children, className }: { children: ReactNode; className?: string }) {
   return (
     <div
-      className={cn("caps text-[9px] tracking-[0.24em] text-[#D5D9E6] md:text-[10px]", className)}
+      className={cn("caps text-[10px] tracking-[0.24em] text-[#D5D9E6] md:text-[10px]", className)}
     >
       {children}
     </div>

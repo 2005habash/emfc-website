@@ -1,38 +1,45 @@
-import { motion, useReducedMotion, type Variants, type HTMLMotionProps } from "framer-motion";
-import { type ReactNode } from "react";
+import { motion, useReducedMotion, type Variants } from "framer-motion";
+import { useEffect, useRef, type CSSProperties, type ReactNode } from "react";
 
 type RevealProps = {
   children: ReactNode;
   className?: string;
   delay?: number;
   as?: "div" | "section" | "header" | "article";
-} & Omit<
-  HTMLMotionProps<"div">,
-  "initial" | "whileInView" | "viewport" | "transition" | "children"
->;
+};
 
-export function Reveal({ children, className, delay = 0, as = "div", ...rest }: RevealProps) {
-  const reduce = useReducedMotion();
-  const Comp = motion[as] as typeof motion.div;
-  if (reduce) {
-    return (
-      <Comp className={className} {...rest}>
-        {children}
-      </Comp>
+/**
+ * Fades its content up once it scrolls into view. The content is in the page from the start: it is only
+ * hidden while the page is marked as allowed to animate (the "motion" class, set before paint), so it
+ * stays visible with reduced motion, without JavaScript, and if the script never runs (styles.css shows
+ * anything still hidden after three seconds).
+ */
+export function Reveal({ children, className, delay = 0, as: Tag = "div" }: RevealProps) {
+  const ref = useRef<HTMLElement>(null);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const io = new IntersectionObserver(
+      (entries) => {
+        if (entries.some((e) => e.isIntersecting)) {
+          el.setAttribute("data-shown", "");
+          io.disconnect();
+        }
+      },
+      { rootMargin: "0px 0px -80px 0px" },
     );
-  }
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
   return (
-    <Comp
+    <Tag
+      ref={ref as never}
+      data-reveal=""
       className={className}
-      initial={{ opacity: 0, y: 28 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      // "some" rather than a fraction: tall blocks on phones can never be 20% visible at once.
-      viewport={{ once: true, amount: "some", margin: "0px 0px -80px 0px" }}
-      transition={{ duration: 0.7, ease: "easeOut", delay }}
-      {...rest}
+      style={delay ? ({ "--reveal-delay": `${delay}s` } as CSSProperties) : undefined}
     >
       {children}
-    </Comp>
+    </Tag>
   );
 }
 

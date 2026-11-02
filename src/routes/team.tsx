@@ -34,32 +34,32 @@ export const Route = createFileRoute("/team")({
 const story = [
   {
     date: "28 May 2026",
-    title: "ESADE Finance Club kick-off",
-    body: "A GreenRoom demo, the first event of one of the two clubs that merged into EMFC.",
+    title: "First kick-off",
+    body: "The ESADE Finance Club, one of the two clubs that merged into EMFC, demos GreenRoom.",
     done: true,
   },
   {
     date: "13 July 2026",
-    title: "Founding-cohort applications close",
-    body: "Associate seats for September 2026.",
+    title: "Applications close",
+    body: "The founding cohort of Associates is chosen for September 2026.",
     done: true,
   },
   {
     date: "September 2026",
-    title: "EMFC launches at ESADE",
+    title: "EMFC launches",
     body: "The first Master's Finance Club at ESADE Business School.",
     done: true,
   },
   {
     date: "26 September 2026",
-    title: "Kick Off Dinner, Barcelona",
-    body: "The founding cohort's first gathering.",
+    title: "Kick Off Dinner",
+    body: "The founding cohort's first gathering, in Barcelona.",
     done: true,
   },
   {
     date: "19 October 2026",
     title: "First open event",
-    body: "Alumni roundtables with ESADE Careers.",
+    body: "Alumni roundtables with ESADE Careers, for all master's students.",
     done: true,
   },
   {
@@ -212,7 +212,7 @@ function Team() {
                   >
                     {s.date}
                   </span>
-                  <span className="font-serif text-[26px]/[1.1] md:text-[28px]/[1.1]">{s.title}</span>
+                  <span className="font-serif text-[26px]/[1.1] md:text-[26px]/[1.1]">{s.title}</span>
                   <span className="text-sm/[1.6] text-mist">{s.body}</span>
                 </div>
               </div>

@@ -60,7 +60,7 @@ function DeskCard({ d, k }: { d: Department; k: Desk }) {
       </span>
       <span className="text-[14px]/[1.55] text-mute group-hover:text-paper/80">{k.line}</span>
       {k.lead && (
-        <span className="caps mt-auto pt-1 text-[9.5px] tracking-[0.16em] text-bull group-hover:text-bull-light">
+        <span className="caps mt-auto pt-1 text-[10px] tracking-[0.16em] text-bull group-hover:text-bull-light">
           Led by {k.lead}
         </span>
       )}
@@ -114,7 +114,7 @@ function DepartmentPage() {
 
   return (
     <SiteLayout>
-      <DepartmentsHero />
+      <DepartmentsHero titleAs="p" />
       <DepartmentSelector current={d.slug} />
 
       <div key={d.slug}>
@@ -122,7 +122,7 @@ function DepartmentPage() {
         <section className="gutter grid items-start gap-12 py-16 lg:grid-cols-12 lg:gap-8 lg:py-24">
           <div className="flex flex-col gap-6 lg:col-span-7">
             <Eyebrow>Department</Eyebrow>
-            <h2 className="font-serif text-[56px]/[0.95] tracking-[-0.015em] md:text-8xl/[0.95]">{d.name}</h2>
+            <h1 className="font-serif text-[56px]/[0.95] tracking-[-0.015em] md:text-8xl/[0.95]">{d.name}</h1>
             <p className="max-w-[680px] text-base/[1.65] text-mute md:text-[19px]/[1.65]">{d.long}</p>
             <div className="mt-2">
               <Desks d={d} />

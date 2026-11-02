@@ -121,7 +121,7 @@ function SponsorshipPage() {
               <dd className="font-serif text-[40px]/none font-medium md:text-[52px]/none">
                 {f.value}
               </dd>
-              <dt className="caps text-[9.5px] tracking-[0.2em] text-mute md:text-[10.5px]">
+              <dt className="caps text-[10px] tracking-[0.2em] text-mute md:text-[10.5px]">
                 {f.label}
               </dt>
             </div>

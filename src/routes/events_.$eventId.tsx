@@ -145,7 +145,7 @@ function EventPage() {
                 {e.location}
               </span>
             </div>
-            <h1 className="font-serif text-[44px]/[0.98] tracking-[-0.01em] md:text-[68px]/[0.96]">{e.title}</h1>
+            <h1 className="font-serif text-[32px]/[1.04] tracking-[-0.01em] md:text-[48px]/[1] xl:text-[56px]/[0.98]">{e.title}</h1>
             <p className="max-w-[640px] text-base/[1.7] text-mute md:text-[18px]/[1.7]">{e.description}</p>
             {e.people && e.people.length > 0 && (
               <ul className="flex flex-col gap-2 border-t border-line pt-5">
@@ -242,6 +242,7 @@ function EventPage() {
                 <video
                   key={v}
                   src={`${v}#t=0.1`}
+                  poster={v.startsWith("/videos/") ? v.replace(/\.mp4$/, ".jpg") : undefined}
                   controls
                   muted
                   playsInline
