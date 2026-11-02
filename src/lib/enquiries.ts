@@ -69,7 +69,7 @@ async function email(d: Valid, suspected: boolean) {
 }
 
 export const sendSponsorshipEnquiry = createServerFn({ method: "POST" })
-  .inputValidator((data: unknown) => Enquiry.parse(data))
+  .validator((data: unknown) => Enquiry.parse(data))
   .handler(async ({ data }) => {
     // Bots fill the hidden field or submit within moments of the page loading. Such an enquiry is still
     // saved, marked for the admins to check, but not emailed, so a quick real sender is never lost.
