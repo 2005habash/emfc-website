@@ -7,7 +7,7 @@ import { departments } from "@/lib/departments";
 import { Download, LogOut, Loader2, ChevronDown, ChevronRight, ExternalLink, X, FileText, Users, Calendar, TrendingUp, Building2, Archive, ArrowUpDown, ArrowUp, ArrowDown } from "lucide-react";
 import { toast } from "sonner";
 import { zip } from "fflate";
-import { EnquiriesManager, EventsManager, ReportsManager } from "@/components/admin/ContentManagers";
+import { AdminsManager, EnquiriesManager, EventsManager, ReportsManager } from "@/components/admin/ContentManagers";
 
 // The admin page, at an unlisted address. Sign-in and the admin role are checked against Supabase,
 // so the address alone gives no access.
@@ -115,7 +115,7 @@ function NoAccess({ email }: { email: string }) {
       <h1 className="font-serif text-3xl text-navy">No admin access yet</h1>
       <p className="mx-auto mt-3 max-w-md text-muted-foreground">
         You're signed in as <span className="font-medium text-foreground">{email}</span>, but this account doesn't have
-        admin access. Ask the site owner to switch it on, then check again.
+        admin access. Ask an admin to switch it on in the admin page's Admins tab, then check again.
       </p>
       <div className="mt-6 flex justify-center gap-2">
         <button onClick={() => window.location.reload()} className="inline-flex h-10 items-center rounded-md bg-navy px-4 text-sm font-medium text-primary-foreground">
@@ -134,6 +134,7 @@ const TABS = [
   { id: "reports", label: "Reports" },
   { id: "enquiries", label: "Sponsorship enquiries" },
   { id: "applications", label: "Applications" },
+  { id: "admins", label: "Admins" },
 ] as const;
 
 function AdminTabs() {
@@ -165,6 +166,7 @@ function AdminTabs() {
           {tab === "events" && <EventsManager />}
           {tab === "reports" && <ReportsManager />}
           {tab === "enquiries" && <EnquiriesManager />}
+          {tab === "admins" && <AdminsManager />}
         </div>
       )}
     </div>
@@ -210,7 +212,7 @@ function Login({ notice }: { notice: string | null }) {
       const { data, error } = await supabase.auth.signUp({ email, password, options: { emailRedirectTo: here } });
       if (error) toast.error(error.message);
       // When the address has to be confirmed first, there is no session until the email's link is opened.
-      else if (!data.session) setSent(`Check ${email} for an email to confirm the address, and open its link. Then ask the site owner to give your account admin access.`);
+      else if (!data.session) setSent(`Check ${email} for an email to confirm the address, and open its link. Then ask an admin to give your account access.`);
     }
     setBusy(false);
   }
@@ -256,7 +258,7 @@ function Login({ notice }: { notice: string | null }) {
             <button type="button" className={textButton} onClick={() => switchTo("sign-in")}>Back to sign in</button>
           )}
         </div>
-        <p className="text-xs text-muted-foreground">For EMFC admins. A new account opens nothing until the site owner gives it admin access.</p>
+        <p className="text-xs text-muted-foreground">For EMFC admins. A new account opens nothing until an admin gives it access.</p>
       </form>
     </div>
   );

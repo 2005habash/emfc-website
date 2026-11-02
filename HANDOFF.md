@@ -42,7 +42,7 @@ npm run dev        # http://localhost:8080
 | Settings: socials, next intake date, fund switch, member firms, nav | `src/lib/site.ts` |
 | People helpers (leadership, associates by desk, homepage strip) | `src/lib/team.ts` |
 | Shared pieces: portraits, person cards and profiles, page sections | `src/components/site/ui.tsx`, `src/components/site/sections.tsx` |
-| Admin page content tabs | `src/components/admin/ContentManagers.tsx` |
+| Admin page content tabs, including Admins (who has admin access) | `src/components/admin/ContentManagers.tsx` |
 | An event's page, also used for the admin page's preview | `src/components/site/EventArticle.tsx` |
 | The picture shown when a link to the site is shared | `public/images/share/emfc.jpg`, made from `tools/share-card.html` (instructions inside) |
 | The full fund page, hidden until `FUND_PAGE_LIVE` is true | `src/components/fund/FundFull.tsx` |
@@ -84,7 +84,7 @@ The full list, with what each item blocks, is in `REVAMP-PLAN.md` section 13.
 4. **Email:** a Resend account; verify emfc.es there by adding its DNS records at one.com (where the domain's DNS lives), then set `RESEND_API_KEY`, `SPONSORSHIP_RECIPIENTS` (comma-separated) and `SPONSORSHIP_FROM` (for example `EMFC website <website@emfc.es>`) in the Vercel project. Without them, enquiries are saved but not emailed.
 5. **Admin logins** for the two Co-Presidents, the Head of Brand and the site owner:
    - Each of them opens `/club-office`, chooses "New admin? Create your account" and confirms the email. The account opens nothing yet.
-   - The site owner gives it the `admin` role in the SQL Editor (the query is at the top of the initial schema file). The page shows "No admin access yet" until then, with the account's email.
+   - Any admin then switches it on in the admin page's **Admins** tab (it needs `supabase/migrations/20261103090000_admin_access.sql`, already run). The page shows "No admin access yet" until then. The admin page is linked, quietly, as "Admin" at the bottom of the footer.
    - Forgotten passwords: "Forgot your password?" emails a link back to `/club-office`.
    - In Supabase, Authentication, URL Configuration: set the Site URL to `https://emfc.es` and allow the `vercel.app` address while testing. If an email link lands on another page of the site, the site forwards it to `/club-office`. Supabase's built-in email sends only a few messages an hour; for more, connect Resend as its SMTP sender.
 6. **Domain:** add emfc.es and www.emfc.es in the Vercel project, then at one.com (where the DNS lives) set the records Vercel shows: an A record for emfc.es and a CNAME for www. Afterwards, close the Lovable project.

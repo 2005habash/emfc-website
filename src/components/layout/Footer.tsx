@@ -101,6 +101,10 @@ export function Footer() {
                 Privacy
               </Link>
               <span>Launched September 2026</span>
+              {/* The admin page's sign-in, kept quiet: same colour as the text around it until hovered. */}
+              <Link to="/club-office" className="hover:text-white hover:underline">
+                Admin
+              </Link>
             </span>
           </div>
         </div>

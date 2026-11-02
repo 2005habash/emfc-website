@@ -892,3 +892,98 @@ export function EnquiriesManager() {
     </ul>
   );
 }
+
+/* ---------------------------------------------------------------- Admins */
+
+type Account = {
+  user_id: string;
+  email: string;
+  confirmed: boolean;
+  created_at: string;
+  last_sign_in_at: string | null;
+  is_admin: boolean;
+};
+
+const ADMIN_MIGRATION = "supabase/migrations/20261103090000_admin_access.sql";
+
+/** Everyone who has signed up on the admin page, with a switch for admin access. */
+export function AdminsManager() {
+  const [rows, setRows] = useState<Account[] | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [me, setMe] = useState<string | null>(null);
+  const [busy, setBusy] = useState<string | null>(null);
+
+  async function load() {
+    const { data, error } = await supabase.rpc("admin_accounts" as never);
+    if (error) setError(error.message);
+    else setRows(data as unknown as Account[]);
+  }
+  useEffect(() => {
+    load();
+    supabase.auth.getUser().then(({ data }) => setMe(data.user?.id ?? null));
+  }, []);
+
+  async function setAdmin(a: Account, admin: boolean) {
+    if (!admin && !confirm(`Remove admin access for ${a.email}?`)) return;
+    setBusy(a.user_id);
+    const { error } = await supabase.rpc("set_admin" as never, { _user_id: a.user_id, _admin: admin } as never);
+    setBusy(null);
+    if (error) toast.error(error.message);
+    else {
+      toast.success(admin ? `${a.email} is now an admin` : `${a.email} is no longer an admin`);
+      load();
+    }
+  }
+
+  if (error) {
+    return (
+      <div className="rounded-lg border border-border bg-card p-6 text-sm">
+        <p className="font-medium text-navy">The Admins tab isn't set up in the database yet.</p>
+        <p className="mt-1 text-muted-foreground">
+          Run <code>{ADMIN_MIGRATION}</code> in the Supabase project's SQL Editor.
+        </p>
+        <p className="mt-2 text-xs text-muted-foreground">Database message: {error}</p>
+      </div>
+    );
+  }
+  if (!rows) return <Loader2 className="mx-auto h-6 w-6 animate-spin text-muted-foreground" />;
+
+  return (
+    <div className="space-y-4">
+      <p className="text-sm text-muted-foreground">
+        New admins create an account on this page ("New admin? Create your account") and confirm their email. They
+        then appear here, and any admin can give them access.
+      </p>
+      <ul className="divide-y divide-border rounded-lg border border-border bg-card">
+        {rows.map((a) => (
+          <li key={a.user_id} className="flex flex-wrap items-center gap-4 p-4">
+            <div className="min-w-0 flex-1">
+              <p className="font-medium text-navy">
+                {a.email}
+                {a.user_id === me && <span className="ml-2 text-xs font-normal text-muted-foreground">(you)</span>}
+              </p>
+              <p className="text-xs text-muted-foreground">
+                {a.is_admin ? "Admin" : a.confirmed ? "No admin access" : "Email not confirmed yet"}, signed up{" "}
+                {formatDay(a.created_at.slice(0, 10))}
+              </p>
+            </div>
+            {a.is_admin ? (
+              <button
+                className={button}
+                disabled={a.user_id === me || busy === a.user_id}
+                title={a.user_id === me ? "You can't remove your own admin access" : undefined}
+                onClick={() => setAdmin(a, false)}
+              >
+                Remove admin access
+              </button>
+            ) : (
+              <button className={primary} disabled={!a.confirmed || busy === a.user_id} onClick={() => setAdmin(a, true)}>
+                {busy === a.user_id ? <Loader2 className="h-4 w-4 animate-spin" /> : "Give admin access"}
+              </button>
+            )}
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
