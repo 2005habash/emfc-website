@@ -21,6 +21,9 @@ create table if not exists public.events (
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
+grant select on public.events to anon, authenticated;
+grant insert, update, delete on public.events to authenticated;
+grant all on public.events to service_role;
 alter table public.events enable row level security;
 create policy "Anyone reads published events" on public.events
   for select to anon, authenticated using (published);
@@ -51,6 +54,9 @@ create table if not exists public.reports (
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
+grant select on public.reports to anon, authenticated;
+grant insert, update, delete on public.reports to authenticated;
+grant all on public.reports to service_role;
 alter table public.reports enable row level security;
 create policy "Anyone reads published reports" on public.reports
   for select to anon, authenticated using (published);
@@ -75,6 +81,9 @@ create table if not exists public.sponsorship_enquiries (
   suspected_bot boolean not null default false,
   created_at timestamptz not null default now()
 );
+grant insert on public.sponsorship_enquiries to anon, authenticated;
+grant select, delete on public.sponsorship_enquiries to authenticated;
+grant all on public.sponsorship_enquiries to service_role;
 alter table public.sponsorship_enquiries enable row level security;
 create policy "Anyone sends an enquiry" on public.sponsorship_enquiries
   for insert to anon, authenticated with check (true);

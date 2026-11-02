@@ -33,3 +33,9 @@ dist-ssr
 
 # design-taste-frontend working files (screenshots, inspector output)
 .taste-skill/
+
+# Local settings and keys (Supabase, Resend). Set the same names in Vercel.
+.env
+.env.*
+!.env.example
+.vercel

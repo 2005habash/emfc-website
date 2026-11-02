@@ -1,10 +1,9 @@
-<!-- LOVABLE:BEGIN -->
 > [!IMPORTANT]
-> This project is connected to [Lovable](https://lovable.dev). Avoid rewriting
-> published git history — force pushing, or rebasing/amending/squashing commits
-> that are already pushed — as it rewrites history on Lovable's side and the
-> user will likely lose their project history.
+> The site is hosted on Vercel, which deploys every push to the `main` branch of
+> `Esade-Master-Finance-Club/emfc-website` straight to https://emfc.es. Keep `main` working:
+> build and check locally (`npm run build`, `npm run lint:copy`) before pushing, and use a branch
+> and a pull request for anything larger. Never force-push or rewrite history that is already
+> pushed.
 >
-> Commits you push to the connected branch sync back to Lovable and show up in
-> the editor, so keep the branch in a working state.
-<!-- LOVABLE:END -->
+> The site was first built in Lovable and left it in November 2026; nothing here syncs to Lovable
+> any more.

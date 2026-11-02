@@ -4,7 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 
 // Sponsorship enquiries from the website. Each one is saved to the `sponsorship_enquiries` table
 // (readable by admins only) and emailed to the addresses in SPONSORSHIP_RECIPIENTS, so nothing is
-// lost if one of the two fails. Environment variables (set them in Lovable's project settings):
+// lost if one of the two fails. Environment variables (set them in .env locally and in Vercel's project settings):
 //   RESEND_API_KEY          key from resend.com
 //   SPONSORSHIP_RECIPIENTS  comma-separated addresses, for example Vasco's, Diogo's and Nick's
 //   SPONSORSHIP_FROM        sender, once emfc.es is verified in Resend: "EMFC website <website@emfc.es>"

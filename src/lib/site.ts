@@ -35,7 +35,7 @@ export const SITE_URL = "https://emfc.es";
 export const absoluteUrl = (path: string) => (/^https?:\/\//.test(path) ? path : `${SITE_URL}${path}`);
 
 /**
- * Logos come from logo.dev by domain, with the same publishable key the 2026 Lovable site used.
+ * Logos come from logo.dev by domain, with the same publishable key the first (Lovable-built) site used.
  * The key is public by design (it is sent with every logo request).
  */
 const LOGO_DEV_TOKEN = "pk_RUlFftUYS4eetzgWC4_DYA";

@@ -4,7 +4,8 @@ The EMFC (ESADE Master's Finance Club) website, rebuilt for launch. State as of 
 
 ## 1. Where it stands
 
-- **The launch build is done locally**, on the git branch `revamp` (`main` holds the 27 October starting point). Nothing is pushed or live: https://emfc.es still serves the old Lovable site.
+- **The site is leaving Lovable** (decided 2 November, evening). It moves to the club's own accounts: code in the GitHub organisation `Esade-Master-Finance-Club`, hosting on Vercel, and a new Supabase project (`rqgjcdttfccemcyxulub`) that starts fresh. Nothing from Lovable Cloud (applications, CVs, newsletter sign-ups) is carried over. Until the domain switch, https://emfc.es still serves the old Lovable site.
+- **The launch build** is on the git branch `revamp` (`main` locally holds the 27 October starting point).
 - **Built and checked:** 66 members with matching portraits, 6 department pages and 15 desk pages, 10 events with photos and clips, a library of 12 reports, the club statistics, the sponsorship form that sends from the site, the newsletter with consent, a privacy page, and an admin page. The production build passes; no page overflows at phone width.
 - **Not yet working live**, because it needs accounts (section 8): the new database tables, sponsorship emails, admin logins, publishing.
 
@@ -13,10 +14,10 @@ The EMFC (ESADE Master's Finance Club) website, rebuilt for launch. State as of 
 ```bash
 cd ~/Documents/emfc-website
 npm install        # first time only
-npm run dev        # http://localhost:8080 (Lovable's default port)
+npm run dev        # http://localhost:8080
 ```
 
-`.claude/launch.json` runs it on port 5173 for Claude's browser preview. npm works; there is no bun on the original machine.
+`.claude/launch.json` runs it on port 5173 for Claude's browser preview. Use npm. Keys go in `.env` (never committed; Vercel holds the same names): `VITE_SUPABASE_URL`, `VITE_SUPABASE_PUBLISHABLE_KEY`, `VITE_SUPABASE_PROJECT_ID`, `SUPABASE_URL`, `SUPABASE_PUBLISHABLE_KEY`, and for email `RESEND_API_KEY`, `SPONSORSHIP_RECIPIENTS`, `SPONSORSHIP_FROM`.
 
 ## 3. Design rules (keep them)
 
@@ -77,25 +78,27 @@ The full list, with what each item blocks, is in `REVAMP-PLAN.md` section 13.
 
 ## 8. Going live
 
-1. **GitHub:** in Lovable, connect the project to GitHub, clone the new repo, and compare its code with this folder's `main` branch (the September zip). Carry over anything changed on the live site since, then bring the `revamp` branch in and merge. Follow `AGENTS.md`: never force-push or rewrite pushed history, and keep the branch working, because commits sync straight into Lovable.
-2. **Database:** apply `supabase/migrations/20261102180000_events_reports_enquiries.sql` (ask Lovable to run it). It creates the events, reports and sponsorship enquiries tables, their access rules, the upload buckets, and loads the launch events and reports.
-3. **Email:** create a Resend account and set, in Lovable's project settings, `RESEND_API_KEY`, `SPONSORSHIP_RECIPIENTS` (comma-separated addresses) and, once emfc.es is verified in Resend, `SPONSORSHIP_FROM` (for example `EMFC website <website@emfc.es>`). Without them, live enquiries are saved but not emailed; locally the enquiry is printed to the server log instead.
-4. **Admin logins** for the two Co-Presidents, the Head of Brand and the site owner:
-   - Each of them opens `/club-office`, chooses "New admin? Create your account" and confirms the email if asked. The account opens nothing yet.
-   - The site owner then gives it the `admin` role in `user_roles` (ask Lovable: "give the admin role to <email>"). The page shows "No admin access yet" until then, with the account's email.
-   - Forgotten passwords: "Forgot your password?" on the same page emails a link that comes back to `/club-office`. If sign-ups are switched off in Lovable Cloud, create the accounts there instead and have each person use that link to choose their own password.
-   - Check that Lovable Cloud's sign-in settings allow `https://emfc.es` as a return address. If an email link lands on another page of the site, the site forwards it to `/club-office`.
-5. **Check, then publish:** test the sponsorship form with all three recipients, add one event and one report on the admin page, check every page in light and dark mode at phone width, then publish from Lovable.
-6. **Accounts:** move Lovable, GitHub, Supabase, the domain registrar and Resend under one club-owned login before handing over (decided 2 November).
+1. **Code:** the private repository `Esade-Master-Finance-Club/emfc-website`, with the launch build as `main`. Follow `AGENTS.md`: Vercel deploys every push to `main`.
+2. **Database:** in the Supabase project's SQL Editor, run `supabase/migrations/20261102170000_initial_schema.sql` (admin roles, applications, CV storage, newsletter), then `20261102180000_events_reports_enquiries.sql` (events, reports, enquiries, upload buckets, and the launch events and reports). The old Lovable migrations are archived in `supabase/lovable-migrations/`.
+3. **Hosting:** a Vercel project connected to the GitHub repository, with the environment variables from section 2. Check the site on its `vercel.app` address before touching the domain.
+4. **Email:** a Resend account; verify emfc.es there by adding its DNS records at one.com (where the domain's DNS lives), then set `RESEND_API_KEY`, `SPONSORSHIP_RECIPIENTS` (comma-separated) and `SPONSORSHIP_FROM` (for example `EMFC website <website@emfc.es>`) in Vercel. Without them, enquiries are saved but not emailed.
+5. **Admin logins** for the two Co-Presidents, the Head of Brand and the site owner:
+   - Each of them opens `/club-office`, chooses "New admin? Create your account" and confirms the email. The account opens nothing yet.
+   - The site owner gives it the `admin` role in the SQL Editor (the query is at the top of the initial schema file). The page shows "No admin access yet" until then, with the account's email.
+   - Forgotten passwords: "Forgot your password?" emails a link back to `/club-office`.
+   - In Supabase, Authentication, URL Configuration: set the Site URL to `https://emfc.es` and allow the `vercel.app` address while testing. If an email link lands on another page of the site, the site forwards it to `/club-office`. Supabase's built-in email sends only a few messages an hour; for more, connect Resend as its SMTP sender.
+6. **Domain:** at one.com, point emfc.es (and www) at Vercel with the records Vercel shows. The old Lovable site serves until then. Afterwards, close the Lovable project.
+7. **Check:** the sponsorship form reaches every recipient, one event and one report added on the admin page, every page in light and dark mode at phone width.
+8. **Accounts:** GitHub, Vercel, Supabase, Resend and the domain registrar under one club-owned login before handing over.
 
 ## 9. Known quirks
 
-- `npx tsc` reports one error in `src/routes/__root.tsx` (ErrorComponent props, from Lovable's template). It was there before and doesn't affect the build.
+- `npx tsc` reports one error in `src/routes/__root.tsx` (ErrorComponent props, from the original Lovable template). It was there before and doesn't affect the build.
 - Renaming or moving a route file while `npm run dev` runs can leave a stale error in the browser; reload the page.
 - Firm and resource logos load from logo.dev with the publishable key the old site used (in `src/lib/site.ts`); it is public by design. The homepage band shows them in colour, on white tiles in dark mode. If a logo looks wrong, try the firm's other domains: Lazard uses `lazardassetmanagement.com`, because `lazard.com` only returns a black letter.
 - Link previews (LinkedIn, WhatsApp) need full addresses, so pictures in page tags go through `absoluteUrl()` with `SITE_URL` (`src/lib/site.ts`). Pages without their own picture use the share image.
 - Between about 1024 and 1280px wide, the logo's subtitle and the social icons are hidden so the menu fits.
-- Don't add Tailwind, React, path-alias or Nitro plugins to `vite.config.ts`; Lovable's config already includes them.
+- `vite.config.ts` lists the build plugins itself (Tailwind, paths, TanStack Start, Nitro, React); it no longer uses Lovable's config package.
 - The admin page's event, report and enquiry tabs have not been tested end to end yet: they need the database tables and an admin login. The event form, its preview and the clip stills were checked on a temporary copy of the form without the database, and the sign-in page's modes and expired-link message in the browser.
 
 ## 10. Other files made along the way

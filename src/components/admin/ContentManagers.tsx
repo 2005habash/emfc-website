@@ -122,7 +122,7 @@ function Missing({ error }: { error: string }) {
     <div className="rounded-lg border border-border bg-card p-6 text-sm">
       <p className="font-medium text-navy">This table isn't set up in the database yet.</p>
       <p className="mt-1 text-muted-foreground">
-        Apply <code>{MIGRATION}</code> to the Supabase project (in Lovable, ask it to run the migration).
+        Run <code>{MIGRATION}</code> in the Supabase project's SQL Editor.
         Until then the site shows the events and reports bundled with the code.
       </p>
       <p className="mt-2 text-xs text-muted-foreground">Database message: {error}</p>
