@@ -124,7 +124,7 @@ function EventPage() {
     <SiteLayout>
       <article>
         <header className="gutter grid items-start gap-10 py-14 lg:grid-cols-12 lg:gap-8 lg:py-20">
-          <div className="flex flex-col gap-6 lg:col-span-7">
+          <div className="flex flex-col gap-6 lg:col-span-6">
             <Link
               to="/events"
               className="caps inline-flex items-center gap-2 self-start text-[10.5px] tracking-[0.18em] text-mute hover:text-ink"
@@ -178,7 +178,7 @@ function EventPage() {
               </a>
             )}
           </div>
-          <div className="lg:col-span-5">
+          <div className="lg:col-span-6">
             {e.photos?.length ? (
               <button
                 type="button"

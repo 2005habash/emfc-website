@@ -23,7 +23,7 @@ while todo:
     d = os.path.join(out, p.strip("/"))
     os.makedirs(d, exist_ok=True)
     open(os.path.join(d, "index.html"), "w").write(html)
-    todo += [h for h in re.findall(r'href="(/[a-z\-]*)"', html) if h not in seen]
+    todo += [h for h in re.findall(r'href="(/[a-z0-9\-/]*)"', html) if h not in seen and not h.startswith("/club-office")]
 print("pages:", sorted(seen))
 PY
 printf 'User-agent: *\nDisallow: /\n' > "$OUT/robots.txt"

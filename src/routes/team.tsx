@@ -157,7 +157,7 @@ function Team() {
                   {d.name}
                 </Link>
               </h3>
-              <p className="text-sm/[1.65] text-mute md:text-[14.5px]/[1.65]">{d.function}</p>
+              <p className="max-w-[60ch] text-sm/[1.65] text-mute md:text-[14.5px]/[1.65]">{d.function}</p>
             </div>
             <div className="flex flex-col gap-10 lg:col-span-9">
               <MemberGrid members={leadershipOf(d.slug)} />

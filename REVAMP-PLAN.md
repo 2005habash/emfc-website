@@ -1,5 +1,7 @@
 # EMFC website revamp: plan
 
+**Status, 2 November 2026:** built on the `revamp` branch (phases 0 to 4 and a polish pass). What is left before launch is in `HANDOFF.md`, sections 7 and 8.
+
 Written 2 November 2026 from everything decided so far: two review calls, the club to-do list, Vasco's content package of 2 November, and Zaid's answers to the open questions the same day (section 14). For whoever builds the launch version with Claude Code. Read `HANDOFF.md` first for how the project works; this file says what to change and in what order.
 
 ## 1. Summary

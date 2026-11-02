@@ -1,13 +1,12 @@
 # EMFC website: handoff
 
-Everything needed to pick up the EMFC (ESADE Master's Finance Club) website redesign where it was left on 27 October 2026. Written for a new owner working with Claude Code; read it once before changing anything. Previous owner: Zaid Habash (VP, VC & Growth).
+The EMFC (ESADE Master's Finance Club) website, rebuilt for launch. State as of 2 November 2026. Written for the next owner working with Claude Code: read this, then `REVAMP-PLAN.md` for every decision and the reasons behind it (section 14 lists the decisions of 2 November). Previous owner: Zaid Habash (Vice-President, VC & Growth).
 
-## 1. What this is
+## 1. Where it stands
 
-- **Live site today:** https://emfc.es, built and hosted on Lovable. The old version is still live; this redesign has **not** been published there yet.
-- **This folder:** the redesigned site. It started from the Lovable project's code (TanStack Start), with the new design built into it. It is **not** a git repository and is **not** connected to Lovable's GitHub repo yet.
-- **Design canvas (early exploration, now out of date):** https://claude.ai/artifact/DQbuDRtiXkMDsUXVunYPyL. It shows v1 "trading floor" (rejected) and v2 "Institutional" (chosen). The code is now the source of truth; the canvas does not have the latest team or photo changes.
-- **Club to-do list (content still owed by members):** https://claude.ai/artifact/JvVMVUyUEXt7MobN292FyV. Summary in section 8.
+- **The launch build is done locally**, on the git branch `revamp` (`main` holds the 27 October starting point). Nothing is pushed or live: https://emfc.es still serves the old Lovable site.
+- **Built and checked:** 66 members with matching portraits, 6 department pages and 15 desk pages, 10 events with photos and clips, a library of 12 reports, the club statistics, the sponsorship form that sends from the site, the newsletter with consent, a privacy page, and an admin page. The production build passes; no page overflows at phone width.
+- **Not yet working live**, because it needs accounts (section 8): the new database tables, sponsorship emails, admin logins, publishing.
 
 ## 2. Run it
 
@@ -17,95 +16,81 @@ npm install        # first time only
 npm run dev        # http://localhost:8080 (Lovable's default port)
 ```
 
-`.claude/launch.json` runs it on port 5173 instead, which is what Claude's browser preview uses. There is no bun on the original machine; npm works.
+`.claude/launch.json` runs it on port 5173 for Claude's browser preview. npm works; there is no bun on the original machine.
 
-## 3. Design direction (keep it)
+## 3. Design rules (keep them)
 
-"v2 · Institutional": elegant, photo-led, modelled on Wharton (pennwitg.com), McIntire (mcintireinvestmentinstitute.org), Harvard (harvardcap.org) and Yale (yalesig.org) club sites, pushed a step further.
+"v2 Institutional", modelled on the Wharton, McIntire, Harvard and Yale club sites.
 
-- **Colours** (CSS variables in `src/styles.css`, flipped for dark mode under `.dark`):
-  `--c-paper #faf8f4` (page) · `--c-stone #f1ede5` (alt sections) · `--c-ink #141b34` (text) · `--c-mute #555c72` · `--c-line #ddd6c9` · `--c-night #030c3b` (navy: nav, dark sections) · `--c-deep #02082a` · `--c-brass #a8844b` and `--c-brass-light #d9bc85` (the only accent).
-  Use the Tailwind names (`bg-night`, `text-brass`, `border-line`), never raw hex in components.
-- **Type:** Cormorant Garamond (serif, headings, italic accents via `<Em>`) + Geist (sans, body). Small caps labels use the `caps` class with wide tracking.
-- **Imagery:** Barcelona photography for heroes (`public/images/barcelona/`). Team portraits are grayscale and turn colour on hover.
-- **Motion:** subtle. `Reveal` (framer-motion fade-up on scroll), Ken Burns on heroes, the timeline line drawing in. Respects reduced motion.
-- **Voice:** restrained and factual. No hype words, no personal email addresses on the site, no chatbot (both decided by the board).
+- **Colours** (`src/styles.css`, flipped for dark mode under `.dark`): page `--c-paper #faf8f4`, alt sections `--c-stone #f1ede5`, text `--c-ink #141b34`, secondary `--c-mute #555c72`, lines `--c-line #ddd6c9`, navy `--c-night #000b3d`. The only accents are the bull logo's blues: `--c-bull #5a67a2` on light backgrounds, `--c-bull-light #9ca8d4` on navy. Use the Tailwind names (`text-bull`, `bg-night`, `border-line`), never raw hex. There is no gold anywhere any more.
+- **Type:** Cormorant Garamond (headings, italic accents via `<Em>`) and Geist (body). Small labels use `caps` with wide tracking, never below 10px.
+- **Copy rules (Vasco's):** no middle dots and no em dashes anywhere on the site; "Vice-President" written out; only Diogo Oliveira and Vasco Lemos are "Founder"; the Advisory Board are "Advisor"; the Marketing department is called Brand, and David Villar is Head of Brand.
+- **Privacy:** members show only name, photo, title, programme, LinkedIn and up to 3 firms. **No email addresses anywhere**, in the pages or in the code. Statistics are totals only.
+- **Portraits:** cut out onto white, a 1024 square, head about 55% of the height, face centred, the body always reaching the bottom edge. Grayscale until hovered.
+- **Motion:** subtle. `Reveal` fades content up once in view, but only when the page is allowed to animate (the `motion` class, set before paint in `__root.tsx`); with reduced motion or no JavaScript everything is simply visible.
 
 ## 4. Where things live
 
 | What | File |
 | --- | --- |
-| Site settings: social links, sponsorship email, next intake date, image paths, member firms, nav links, events, quotes | `src/lib/site.ts` |
-| Departments/desks: descriptions, heads, people, LinkedIn links, target firms | `src/lib/departments.ts` |
-| Team photos map, Co-Presidents, Advisory Board, homepage mosaic order | `src/lib/team.ts` |
-| Shared UI pieces (Eyebrow, Em, Numeral, PageHero, Portrait, PersonCard, CountUp) | `src/components/site/ui.tsx` |
-| Nav (overlay on hero pages, dark-mode toggle, mobile menu), Footer, layout | `src/components/layout/` |
-| Pages | `src/routes/`: `index` (home), `team`, `departments` (desk tabs via `?desk=slug`), `events` (calendar + .ics download), `resources`, `fund` (new; "coming soon" until there's data), `sponsorship` (mailto form), `admin` (Lovable's application-review page, Supabase login, `noindex`) |
-| Colours, fonts, buttons (`.btn`), animations | `src/styles.css` |
-| Images | `public/images/{barcelona,team,logo}/` |
-| Helper scripts | `tools/` (section 6) |
+| Members (generated, do not edit by hand) | `src/data/members.ts`, made by `tools/import-members.mjs` |
+| Departments, their 15 desks, texts and target firms | `src/lib/departments.ts` |
+| Events (fallback list), reports (fallback list), statistics | `src/data/events.ts`, `src/data/reports.ts`, `src/data/stats.ts` |
+| Loading events and reports from the database, with the fallback | `src/lib/content.ts` |
+| Sponsorship form's server function (save and email) | `src/lib/enquiries.ts` |
+| Settings: socials, next intake date, fund switch, member firms, nav | `src/lib/site.ts` |
+| People helpers (leadership, associates by desk, homepage strip) | `src/lib/team.ts` |
+| Shared pieces: portraits, person cards and profiles, page sections | `src/components/site/ui.tsx`, `src/components/site/sections.tsx` |
+| Admin page content tabs | `src/components/admin/ContentManagers.tsx` |
+| The full fund page, hidden until `FUND_PAGE_LIVE` is true | `src/components/fund/FundFull.tsx` |
+| Pages | `src/routes/`: `index`, `departments.index` (overview), `departments.$department`, `departments.$department_.$desk` (the `_` stops it nesting), `team`, `events`, `events_.$eventId`, `resources`, `fund`, `sponsorship`, `privacy`, `club-office` (admin) |
+| Database changes for this launch | `supabase/migrations/20261102180000_events_reports_enquiries.sql` |
+| The content package from Vasco (2 Nov), without emails | `content/2026-11-02/` (raw photos stay in the club Drive) |
+| Images, clips, report PDFs | `public/images/{team,events,barcelona,logo}`, `public/videos/events`, `public/reports` |
 
-Most content edits are data-only: change `site.ts`, `departments.ts` or `team.ts` and every page updates.
+## 5. Updating the content
 
-## 5. Team (18 people, complete)
+- **Events and reports:** once the database is set up (section 8), add and edit them on the admin page at `/club-office`, with photo and PDF uploads. Until then, edit `src/data/events.ts` and `src/data/reports.ts`.
+- **People (each September):** export the member form to `content/<date>/members.json`, then run `node tools/import-members.mjs content/<date>`. People kept from before go in `kept-members.json`; photos that don't come from the form go in `photo-overrides.json`.
+- **Portraits:** write a list `[{ "in": "<photo>", "out": "public/images/team/<slug>.jpg" }]` (add `"crop": [x, y, w, h]` for screenshots) and run `swift tools/portraits.swift <list.json>` (macOS 14+). It cuts out the person, frames the head and keeps the body to the bottom edge. Look at every result. Match photos to people only by how the sender labelled them, never by faces.
+- **Fund:** set `FUND_PAGE_LIVE = true` in `src/lib/site.ts` once there are holdings; the full page is ready behind it.
 
-Co-Presidents: Diogo Oliveira, Vasco Barahona de Lemos.
-- **Investment Banking:** Yonatan Bendler (Head), Constantin Molineus (VP M&A), João Salgado (VP Debt)
-- **Private Markets:** Jan Heibel (Head), Fabian Seher (VP PE), Zaid Habash (VP VC & Growth), Anastasia Murgida (VP Fintech), Luca Flusche (VP Real Assets)
-- **Asset Management:** Cosimo Dini (Head), Luís Laboreiro (CIO)
-- **Fixed Income:** Luka Thomson (Head)
-- **Support:** Nick Kriz (Head of Corporate Relations), David Villar (Head of Brand; the department is still named "Marketing" in `departments.ts`, worth renaming to "Brand")
-- **Advisory Board (founders):** Paul Christian Abel, Moritz Fritsch, Philip Ignatzi
+## 6. Sharing a private preview
 
-The homepage mosaic order is `MOSAIC` in `team.ts`; Anastasia is deliberately 5th (middle of the first row).
+`tools/export-static.sh` builds a static copy of all 39 pages with "don't index" protection and writes `~/Documents/emfc-website-preview.zip` (38 MB). Upload it at dash.cloudflare.com, Workers & Pages, Create, Pages, Upload assets; optionally put Cloudflare Zero Trust Access in front. In a static preview the sponsorship form cannot send (it needs the server) and shows its error message; the newsletter writes to the **real** sign-up list. Re-run the script after every change.
 
-## 6. Adding or replacing a team photo
+## 7. Before launch: what is still owed
 
-Portraits must match: background removed onto pure white, square (ideally 1024×1024), head about 55% of the frame height, hair starting about 7% from the top, face centred horizontally. Yonatan's photo is the reference.
+| Who | What |
+| --- | --- |
+| Zaid | The VC & Growth desk text (the site shows a draft from the 20 October call) and its 8 proposed firms |
+| Fabian, Anastasia | Confirm the drafted Private Equity and Fintech lines |
+| Cosimo, Luka | Confirm the drafted desk texts for Asset Management (3) and Fixed Income (6) |
+| Lara Koch, Aaron Kark, Aditya Sunil Shajwani | Head-and-shoulders photos (they show initials until then) |
+| Vasco | Confirm the Team page hero photo and that the Co-Presidents band was the section to turn white |
+| Vasco, Diogo, Nick | The addresses that should receive sponsorship enquiries |
+| Department Heads | One review round on the private preview (section 6), then freeze |
 
-1. Cut out the person (macOS 14+):
-   ```bash
-   swift tools/cutout.swift ~/Downloads/photo.jpg /tmp/cut.png
-   ```
-2. Crop a square around the head to the framing above and save as JPEG, for example with `sips -c <side> <side> --cropOffset <y> <x>` then `sips -z 1024 1024 -s format jpeg -s formatOptions 88`.
-3. Save to `public/images/team/<firstname>.jpg` and point the person's entry in `PHOTOS` (`src/lib/team.ts`) at it.
-4. Check the Team page next to the others.
+The full list, with what each item blocks, is in `REVAMP-PLAN.md` section 13.
 
-Match names to photos only from how they're labelled (on emfc.es/team or by the sender), never by guessing from faces. LinkedIn photos were used for Luca, Nick and David.
+## 8. Going live
 
-## 7. Sharing a preview
-
-The site can't be shared from localhost. `tools/export-static.sh` builds a static copy of every page with "don't index" protection (meta tag, `robots.txt`, Cloudflare `_headers`) and writes `~/Documents/emfc-website-preview.zip`. Upload it at dash.cloudflare.com → Workers & Pages → Create → Pages → Upload assets. Optionally put Cloudflare Zero Trust Access (email one-time code) in front to restrict who can see it. The newsletter form on a preview writes to the **real** Supabase sign-up list.
-
-Re-run the script after every change; the zip is a snapshot.
-
-## 8. Open items
-
-**Start with `REVAMP-PLAN.md`** (2 November 2026): the full plan for the launch version, built from the two review calls (20 and 28 October), the to-do list and Vasco's content package. It replaces the list below where they differ.
-
-**Content owed by members** (tracked in the to-do doc linked above):
-- Photos: a higher-quality photo from Diogo; kickoff dinner, roundtable (19 Oct) and CV-event photos for Events.
-- Event write-ups: kickoff dinner (26 Sept), roundtable (19 Oct), the I-squared event with Esade Careers (date + description). Upcoming events as they're confirmed. Events live in `EVENTS` in `site.ts`.
-- Every desk: review its page, fill every target-firm cell (no blanks go live), list real deliverables and cadence.
-- Fund: holdings and performance once the portfolio is built; the Fund page stays "coming soon" until then. Asset Management to describe how ideas are developed.
-- Research: Luca's published paper (PDF/link + desk); IB deal-analysis format; any Markets/Credit research; VC paper cadence.
-
-**Site settings to fill:**
-- `NEXT_INTAKE_OPENS` in `site.ts`: set an ISO date to switch "Recruiting reopens next term" into a countdown.
-- `SPONSORSHIP_EMAIL` is currently Vasco's alumni address. Switch it to a shared address (e.g. partnerships@emfc.es) once one exists; check whether the emfc.es registrar supports mailboxes. Then test the form.
-- Sponsorship pricing/tiers: not on the site yet.
-
-**Later:** EMFC's own resources section with email sign-up and consent wording ("I consent to being contacted about future events"), then decide whether to keep the Green Room and Esade databases on Resources.
-
-**Going live:** to replace emfc.es, the code has to get into the Lovable project's GitHub repo (connect Lovable to GitHub, clone it, bring these changes in, push). Read `AGENTS.md` first: never force-push or rewrite pushed history on that repo, and keep the branch working, because commits sync straight into Lovable.
+1. **GitHub:** in Lovable, connect the project to GitHub, clone the new repo, and compare its code with this folder's `main` branch (the September zip). Carry over anything changed on the live site since, then bring the `revamp` branch in and merge. Follow `AGENTS.md`: never force-push or rewrite pushed history, and keep the branch working, because commits sync straight into Lovable.
+2. **Database:** apply `supabase/migrations/20261102180000_events_reports_enquiries.sql` (ask Lovable to run it). It creates the events, reports and sponsorship enquiries tables, their access rules, the upload buckets, and loads the launch events and reports.
+3. **Email:** create a Resend account and set, in Lovable's project settings, `RESEND_API_KEY`, `SPONSORSHIP_RECIPIENTS` (comma-separated addresses) and, once emfc.es is verified in Resend, `SPONSORSHIP_FROM` (for example `EMFC website <website@emfc.es>`). Without them, live enquiries are saved but not emailed; locally the enquiry is printed to the server log instead.
+4. **Admin logins:** give the two Co-Presidents, the Head of Brand and the site owner the `admin` role in `user_roles`.
+5. **Check, then publish:** test the sponsorship form with all three recipients, add one event and one report on the admin page, check every page in light and dark mode at phone width, then publish from Lovable.
+6. **Accounts:** move Lovable, GitHub, Supabase, the domain registrar and Resend under one club-owned login before handing over (decided 2 November).
 
 ## 9. Known quirks
 
-- `npx tsc` reports one existing type error in `src/routes/__root.tsx` (ErrorComponent props, from Lovable's template). It doesn't affect the build.
-- The desk tabs use the `?desk=` URL parameter rather than `#hash`, to avoid a server/browser rendering mismatch. Keep it that way.
-- Between about 1024 and 1280px wide, the logo's "ESADE Master's Finance Club" subtitle is hidden so it doesn't collide with the menu.
-- Lovable's `vite.config.ts` already includes Tailwind, React, the path alias and Nitro (Cloudflare target). Don't add those plugins again.
+- `npx tsc` reports one error in `src/routes/__root.tsx` (ErrorComponent props, from Lovable's template). It was there before and doesn't affect the build.
+- Renaming or moving a route file while `npm run dev` runs can leave a stale error in the browser; reload the page.
+- Firm and resource logos load from logo.dev with the publishable key the old site used (in `src/lib/site.ts`); it is public by design.
+- Between about 1024 and 1280px wide, the logo's subtitle and the social icons are hidden so the menu fits.
+- Don't add Tailwind, React, path-alias or Nitro plugins to `vite.config.ts`; Lovable's config already includes them.
+- The admin page's event, report and enquiry tabs have not been tested end to end yet: they need the database tables and an admin login.
 
-## 10. Other assets made along the way
+## 10. Other files made along the way
 
-In `~/Documents` on the original machine: `emfc-bull-logo-navy.png` (bull on navy square, 900×900, bull at 82%), `emfc-bull-logo-transparent.png`, and `emfc-website-preview.zip` (the last shareable build).
+In `~/Documents` on the original machine: `emfc-bull-logo-navy.png` (bull on a navy square, 900×900), `emfc-bull-logo-transparent.png`, and `emfc-website-preview.zip` (the latest preview build).
