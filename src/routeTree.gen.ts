@@ -13,7 +13,9 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as ClubOfficeRouteImport } from './routes/club-office'
 import { Route as EventsRouteImport } from './routes/events'
 import { Route as FundRouteImport } from './routes/fund'
+import { Route as KostyaRouteImport } from './routes/kostya'
 import { Route as PrivacyRouteImport } from './routes/privacy'
+import { Route as PuzzleRouteImport } from './routes/puzzle'
 import { Route as ResourcesRouteImport } from './routes/resources'
 import { Route as SponsorshipRouteImport } from './routes/sponsorship'
 import { Route as TeamRouteImport } from './routes/team'
@@ -43,9 +45,19 @@ const FundRoute = FundRouteImport.update({
   path: '/fund',
   getParentRoute: () => rootRouteImport,
 } as any)
+const KostyaRoute = KostyaRouteImport.update({
+  id: '/kostya',
+  path: '/kostya',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const PrivacyRoute = PrivacyRouteImport.update({
   id: '/privacy',
   path: '/privacy',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PuzzleRoute = PuzzleRouteImport.update({
+  id: '/puzzle',
+  path: '/puzzle',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ResourcesRoute = ResourcesRouteImport.update({
@@ -95,7 +107,9 @@ export interface FileRoutesByFullPath {
   '/club-office': typeof ClubOfficeRoute
   '/events': typeof EventsRoute
   '/fund': typeof FundRoute
+  '/kostya': typeof KostyaRoute
   '/privacy': typeof PrivacyRoute
+  '/puzzle': typeof PuzzleRoute
   '/resources': typeof ResourcesRoute
   '/sponsorship': typeof SponsorshipRoute
   '/team': typeof TeamRoute
@@ -110,7 +124,9 @@ export interface FileRoutesByTo {
   '/club-office': typeof ClubOfficeRoute
   '/events': typeof EventsRoute
   '/fund': typeof FundRoute
+  '/kostya': typeof KostyaRoute
   '/privacy': typeof PrivacyRoute
+  '/puzzle': typeof PuzzleRoute
   '/resources': typeof ResourcesRoute
   '/sponsorship': typeof SponsorshipRoute
   '/team': typeof TeamRoute
@@ -126,7 +142,9 @@ export interface FileRoutesById {
   '/club-office': typeof ClubOfficeRoute
   '/events': typeof EventsRoute
   '/fund': typeof FundRoute
+  '/kostya': typeof KostyaRoute
   '/privacy': typeof PrivacyRoute
+  '/puzzle': typeof PuzzleRoute
   '/resources': typeof ResourcesRoute
   '/sponsorship': typeof SponsorshipRoute
   '/team': typeof TeamRoute
@@ -143,7 +161,9 @@ export interface FileRouteTypes {
     | '/club-office'
     | '/events'
     | '/fund'
+    | '/kostya'
     | '/privacy'
+    | '/puzzle'
     | '/resources'
     | '/sponsorship'
     | '/team'
@@ -158,7 +178,9 @@ export interface FileRouteTypes {
     | '/club-office'
     | '/events'
     | '/fund'
+    | '/kostya'
     | '/privacy'
+    | '/puzzle'
     | '/resources'
     | '/sponsorship'
     | '/team'
@@ -173,7 +195,9 @@ export interface FileRouteTypes {
     | '/club-office'
     | '/events'
     | '/fund'
+    | '/kostya'
     | '/privacy'
+    | '/puzzle'
     | '/resources'
     | '/sponsorship'
     | '/team'
@@ -189,7 +213,9 @@ export interface RootRouteChildren {
   ClubOfficeRoute: typeof ClubOfficeRoute
   EventsRoute: typeof EventsRoute
   FundRoute: typeof FundRoute
+  KostyaRoute: typeof KostyaRoute
   PrivacyRoute: typeof PrivacyRoute
+  PuzzleRoute: typeof PuzzleRoute
   ResourcesRoute: typeof ResourcesRoute
   SponsorshipRoute: typeof SponsorshipRoute
   TeamRoute: typeof TeamRoute
@@ -230,11 +256,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof FundRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/kostya': {
+      id: '/kostya'
+      path: '/kostya'
+      fullPath: '/kostya'
+      preLoaderRoute: typeof KostyaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/privacy': {
       id: '/privacy'
       path: '/privacy'
       fullPath: '/privacy'
       preLoaderRoute: typeof PrivacyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/puzzle': {
+      id: '/puzzle'
+      path: '/puzzle'
+      fullPath: '/puzzle'
+      preLoaderRoute: typeof PuzzleRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/resources': {
@@ -301,7 +341,9 @@ const rootRouteChildren: RootRouteChildren = {
   ClubOfficeRoute: ClubOfficeRoute,
   EventsRoute: EventsRoute,
   FundRoute: FundRoute,
+  KostyaRoute: KostyaRoute,
   PrivacyRoute: PrivacyRoute,
+  PuzzleRoute: PuzzleRoute,
   ResourcesRoute: ResourcesRoute,
   SponsorshipRoute: SponsorshipRoute,
   TeamRoute: TeamRoute,

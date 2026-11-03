@@ -65,6 +65,7 @@ The security headers only apply to production builds: to test them locally, `npm
 | The picture shown when a link to the site is shared | `public/images/share/emfc.jpg`, made from `tools/share-card.html` (instructions inside) |
 | The full fund page, hidden until `FUND_PAGE_LIVE` is true | `src/components/fund/FundFull.tsx` |
 | Pages | `src/routes/`: `index`, `departments.index` (overview), `departments.$department`, `departments.$department_.$desk` (the `_` stops it nesting), `team`, `events`, `events_.$eventId`, `resources`, `fund`, `sponsorship`, `privacy`, `club-office` (admin) |
+| Extra pages for fun, not in the menus and kept out of search engines | `src/routes/zaid.tsx` (a tribute to the site owner), `src/routes/puzzle.tsx` with `src/components/puzzle/` (the team photo as a jigsaw), `src/routes/kostya.tsx` with `src/components/kostya/` (a joke tribute to Constantin Molineus, which he agreed to) |
 | Database: every change, in the order they were run (section 8) | `supabase/migrations/` |
 | The content package from Vasco (2 Nov), without emails | the club Drive, `content/2026-11-02/` (private; not in this repository) |
 | Images, clips, report PDFs | `public/images/{team,events,barcelona,logo}`, `public/videos/events`, `public/reports` |
