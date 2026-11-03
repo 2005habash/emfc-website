@@ -407,7 +407,8 @@ export const MEMBERS: Member[] = [
     "firms": [
       "Legacy AI",
       "United Trust Bank"
-    ]
+    ],
+    "photo": "/images/team/aaron-kark.jpg"
   },
   {
     "name": "Isabelle Oliger",
