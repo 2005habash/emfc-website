@@ -1,7 +1,14 @@
 import "./lib/error-capture";
+import { AsyncLocalStorage } from "node:async_hooks";
 
 import { consumeLastCapturedError } from "./lib/error-capture";
 import { renderErrorPage } from "./lib/error-page";
+import { newNonce, withSecurityHeaders } from "./lib/server/security-headers";
+
+// Each request gets a fresh nonce for its Content Security Policy. The router reads it from here
+// (src/router.tsx) so TanStack's inline scripts, and the theme script, carry it.
+const requestContext = new AsyncLocalStorage<{ nonce: string }>();
+(globalThis as { __emfcRequest?: typeof requestContext }).__emfcRequest = requestContext;
 
 type ServerEntry = {
   fetch: (request: Request, env: unknown, ctx: unknown) => Promise<Response> | Response;
@@ -39,10 +46,13 @@ async function normalizeCatastrophicSsrResponse(response: Response): Promise<Res
 
 export default {
   async fetch(request: Request, env: unknown, ctx: unknown) {
+    const nonce = newNonce();
     try {
       const handler = await getServerEntry();
-      const response = await handler.fetch(request, env, ctx);
-      return await normalizeCatastrophicSsrResponse(response);
+      const response = await requestContext.run({ nonce }, () => handler.fetch(request, env, ctx));
+      const checked = await normalizeCatastrophicSsrResponse(response);
+      // Development keeps Vite's own inline scripts working; the policy applies to real builds.
+      return import.meta.env.PROD ? withSecurityHeaders(checked, nonce) : checked;
     } catch (error) {
       console.error(error);
       return new Response(renderErrorPage(), {

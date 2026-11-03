@@ -4,6 +4,7 @@ import { cn } from "@/lib/utils";
 import { Linkedin } from "lucide-react";
 import { Dialog, DialogContent, DialogDescription, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { track } from "@/lib/analytics";
+import { safeUrl } from "@/lib/site";
 import { initialsOf, type Member } from "@/lib/team";
 
 type Tone = "ink" | "light" | "hero";
@@ -219,7 +220,7 @@ function ProfileDialog({ member }: { member: Member }) {
           </dl>
           {member.linkedin && (
             <a
-              href={member.linkedin}
+              href={safeUrl(member.linkedin)}
               data-linkedin-of={member.name}
               target="_blank"
               rel="noreferrer"

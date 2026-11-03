@@ -5,6 +5,7 @@ import { SiteLayout } from "@/components/layout/SiteLayout";
 import { Reveal } from "@/components/Reveal";
 import { Em, Eyebrow, Numeral, PageHero } from "@/components/site/ui";
 import { STATS, TARGET_AREAS, TARGET_CITIES } from "@/data/stats";
+import { Turnstile } from "@/components/site/Turnstile";
 import { FORMATS, sendSponsorshipEnquiry } from "@/lib/enquiries";
 import { IMAGES, ROMAN, SOCIAL } from "@/lib/site";
 import { cn } from "@/lib/utils";
@@ -68,6 +69,7 @@ function SponsorshipPage() {
   });
   const [status, setStatus] = useState<"idle" | "sending" | "sent" | "error">("idle");
   const [problem, setProblem] = useState<string | null>(null);
+  const [turnstile, setTurnstile] = useState<string | undefined>();
   const openedAt = useRef(Date.now());
   const set =
     (k: keyof typeof form) =>
@@ -99,7 +101,9 @@ function SponsorshipPage() {
     }
     setStatus("sending");
     try {
-      const res = await sendSponsorshipEnquiry({ data: { ...clean, elapsed: Date.now() - openedAt.current } });
+      const res = await sendSponsorshipEnquiry({ data: { ...clean, elapsed: Date.now() - openedAt.current, turnstile } });
+      if (!res.ok && res.reason === "limit") setProblem("You've sent a few enquiries in the last hour. We'll be in touch; please try again later if needed.");
+      if (!res.ok && res.reason === "check") setProblem("The bot check didn't go through. Please tick it again and resend.");
       setStatus(res.ok ? "sent" : "error");
     } catch {
       setStatus("error");
@@ -366,6 +370,9 @@ function SponsorshipPage() {
                     value={form.website}
                     onChange={set("website")}
                   />
+                </div>
+                <div className="sm:col-span-2">
+                  <Turnstile onToken={setTurnstile} />
                 </div>
                 <div className="flex flex-col gap-4 sm:col-span-2 sm:flex-row sm:items-center sm:justify-between sm:gap-6">
                   {status === "error" ? (

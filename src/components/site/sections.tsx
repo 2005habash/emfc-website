@@ -6,7 +6,7 @@ import { Em, Eyebrow, Numeral, PageHero, PersonCard } from "@/components/site/ui
 import { EVENT_TYPE_COLORS, type EventItem, type EventType } from "@/data/events";
 import type { Report } from "@/data/reports";
 import { departments, getDepartment, type Firm, type WorkItem } from "@/lib/departments";
-import { formatDay, IMAGES, ROMAN, SOCIAL } from "@/lib/site";
+import { formatDay, IMAGES, ROMAN, SOCIAL, safeUrl } from "@/lib/site";
 import type { Member } from "@/lib/team";
 import { cn } from "@/lib/utils";
 
@@ -168,12 +168,12 @@ export function ReportList({ reports, showDepartment = false }: { reports: Repor
             </div>
             {r.status === "published" && r.file ? (
               <div className="flex flex-wrap gap-2.5">
-                <a href={r.file} target="_blank" rel="noreferrer" className="btn btn-sm btn-ink">
+                <a href={safeUrl(r.file)} target="_blank" rel="noreferrer" className="btn btn-sm btn-ink">
                   <FileText className="h-3.5 w-3.5" strokeWidth={1.75} />
                   Read PDF
                 </a>
                 {r.link && (
-                  <a href={r.link} target="_blank" rel="noreferrer" className="btn btn-sm btn-outline-ink">
+                  <a href={safeUrl(r.link)} target="_blank" rel="noreferrer" className="btn btn-sm btn-outline-ink">
                     <Linkedin className="h-3.5 w-3.5" strokeWidth={1.75} />
                     On LinkedIn
                   </a>

@@ -1,7 +1,6 @@
 import { createStart, createMiddleware } from "@tanstack/react-start";
 
 import { renderErrorPage } from "./lib/error-page";
-import { attachSupabaseAuth } from "@/integrations/supabase/auth-attacher";
 
 const errorMiddleware = createMiddleware().server(async ({ next }) => {
   try {
@@ -18,7 +17,8 @@ const errorMiddleware = createMiddleware().server(async ({ next }) => {
   }
 });
 
+// The server functions (enquiries, newsletter, analytics) don't use the visitor's sign-in, so no
+// sign-in token is sent to them.
 export const startInstance = createStart(() => ({
-  functionMiddleware: [attachSupabaseAuth],
   requestMiddleware: [errorMiddleware],
 }));

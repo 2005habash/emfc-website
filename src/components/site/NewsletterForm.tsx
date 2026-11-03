@@ -2,11 +2,11 @@ import { Link } from "@tanstack/react-router";
 import { Loader2 } from "lucide-react";
 import { useId, useState } from "react";
 import { toast } from "sonner";
-import { supabase } from "@/integrations/supabase/client";
+import { subscribe } from "@/lib/newsletter";
 import { cn } from "@/lib/utils";
 
 /**
- * Newsletter sign-up. Saves the address to the newsletter_signups table, only with the sender's
+ * Newsletter sign-up. The server saves the address (src/lib/newsletter.ts), only with the sender's
  * consent to be contacted (decided 2 November 2026). The privacy page explains how it is used.
  */
 export function NewsletterForm({
@@ -34,10 +34,10 @@ export function NewsletterForm({
       return;
     }
     setBusy(true);
-    const { error } = await supabase.from("newsletter_signups" as never).insert({ email } as never);
+    const res = await subscribe({ data: { email, consent: true } }).catch(() => ({ ok: false, reason: undefined }));
     setBusy(false);
-    if (error && !error.message.toLowerCase().includes("duplicate")) {
-      toast.error("Could not subscribe. Try again.");
+    if (!res.ok) {
+      toast.error(res.reason === "limit" ? "You've signed up a few times already. Try again later." : "Could not subscribe. Try again.");
       return;
     }
     toast.success("Subscribed. Thank you.");

@@ -7,13 +7,13 @@ import { supabase } from "@/integrations/supabase/client";
 import { invalidateContent } from "@/lib/content";
 import { clipPoster, EVENT_TYPE_COLORS, type EventPhoto, type EventType } from "@/data/events";
 import { departments } from "@/lib/departments";
-import { formatDay } from "@/lib/site";
+import { toCsv } from "@/lib/csv";
+import { formatDay, safeUrl, todayInBarcelona } from "@/lib/site";
 import { cn } from "@/lib/utils";
 
 // The admin page's content tabs: events, reports and sponsorship enquiries. They write to the
 // tables created by supabase/migrations/20261102180000_events_reports_enquiries.sql.
 
-const MIGRATION = "supabase/migrations/20261102180000_events_reports_enquiries.sql";
 const field = "h-10 w-full rounded-md border border-input bg-background px-3 text-sm";
 const label = "text-xs font-medium text-muted-foreground";
 const button =
@@ -111,6 +111,23 @@ async function saveRow(table: "events" | "reports", row: { id: string }, isNew: 
   return { error: { message: "Could not find a free address for this item. Change its title and try again." } };
 }
 
+/** The storage paths of uploaded files among these addresses (bundled files like /images/... are skipped). */
+function storedPaths(bucket: "event-media" | "reports", urls: (string | null | undefined)[]) {
+  const prefix = supabase.storage.from(bucket).getPublicUrl("").data.publicUrl.replace(/\/$/, "") + "/";
+  return urls.filter((u): u is string => Boolean(u?.startsWith(prefix))).map((u) => decodeURIComponent(u.slice(prefix.length)));
+}
+
+/** Deletes an item's uploaded files after the item itself is deleted, so storage doesn't fill with orphans. */
+async function removeFiles(bucket: "event-media" | "reports", urls: (string | null | undefined)[]) {
+  const paths = storedPaths(bucket, urls);
+  if (!paths.length) return;
+  const { error } = await supabase.storage.from(bucket).remove(paths);
+  if (error) toast.error(`The item is deleted, but some of its files weren't: ${error.message}`);
+}
+
+/** A link typed into the admin page must be https (or empty). */
+const badLink = (url: string | null | undefined) => Boolean(url?.trim()) && !/^https:\/\//i.test(url!.trim());
+
 async function upload(bucket: "event-media" | "reports", path: string, body: Blob, contentType: string) {
   const { error } = await supabase.storage.from(bucket).upload(path, body, { contentType, upsert: true });
   if (error) throw error;
@@ -118,12 +135,24 @@ async function upload(bucket: "event-media" | "reports", path: string, body: Blo
 }
 
 function Missing({ error }: { error: string }) {
+  const notSetUp = /does not exist|schema cache|Could not find/i.test(error);
+  const refused = /permission denied|Only admins|42501|row-level security/i.test(error);
   return (
     <div className="rounded-lg border border-border bg-card p-6 text-sm">
-      <p className="font-medium text-navy">This table isn't set up in the database yet.</p>
+      <p className="font-medium text-navy">
+        {notSetUp ? "This part isn't set up in the database yet." : refused ? "The database refused this." : "This couldn't be loaded."}
+      </p>
       <p className="mt-1 text-muted-foreground">
-        Run <code>{MIGRATION}</code> in the Supabase project's SQL Editor.
-        Until then the site shows the events and reports bundled with the code.
+        {notSetUp ? (
+          <>
+            Run the files in <code>supabase/migrations</code> in the Supabase project's SQL Editor. Until then the site
+            shows the events and reports bundled with the code.
+          </>
+        ) : refused ? (
+          "Your account may not have access to this, or your session needs its two-factor code again: sign out and back in."
+        ) : (
+          "Reload the page to try again."
+        )}
       </p>
       <p className="mt-2 text-xs text-muted-foreground">Database message: {error}</p>
     </div>
@@ -152,7 +181,7 @@ type EventRow = {
 const emptyEvent = (): EventRow => ({
   id: "",
   title: "",
-  date: new Date().toISOString().slice(0, 10),
+  date: todayInBarcelona(),
   type: "Speaker",
   location: "ESADE Sant Cugat",
   description: "",
@@ -189,10 +218,11 @@ export function EventsManager() {
     }
   }
   async function remove(e: EventRow) {
-    if (!confirm(`Delete "${e.title}"? This cannot be undone.`)) return;
+    if (!confirm(`Delete "${e.title}" and its photos, clips and slides? This cannot be undone.`)) return;
     const { error } = await supabase.from("events" as never).delete().eq("id", e.id);
     if (error) toast.error(error.message);
     else {
+      await removeFiles("event-media", [...e.photos.map((p) => p.src), ...e.videos, ...e.videos.map(clipPoster), ...e.recap]);
       invalidateContent();
       toast.success("Event deleted");
       load();
@@ -347,6 +377,10 @@ function EventForm({ initial, onDone }: { initial: EventRow; onDone: () => void 
     ev.preventDefault();
     if (e.photos.some((p) => !p.alt.trim())) {
       toast.error("Describe every photo in a few words, for people using screen readers.");
+      return;
+    }
+    if (badLink(e.link)) {
+      toast.error("The registration link must start with https://");
       return;
     }
     setBusy(true);
@@ -591,7 +625,7 @@ const emptyReport = (): ReportRow => ({
   title: "",
   series: "",
   issue: null,
-  date: new Date().toISOString().slice(0, 10),
+  date: todayInBarcelona(),
   department: departments[0].slug,
   desk: null,
   authors: [],
@@ -617,10 +651,11 @@ export function ReportsManager() {
   }, []);
 
   async function remove(r: ReportRow) {
-    if (!confirm(`Delete "${r.title}"? This cannot be undone.`)) return;
+    if (!confirm(`Delete "${r.title}" and its PDF? This cannot be undone.`)) return;
     const { error } = await supabase.from("reports" as never).delete().eq("id", r.id);
     if (error) toast.error(error.message);
     else {
+      await removeFiles("reports", [r.file]);
       invalidateContent();
       load();
     }
@@ -653,7 +688,7 @@ export function ReportsManager() {
             </div>
             <div className="flex gap-2">
               {r.file && (
-                <a className={button} href={r.file} target="_blank" rel="noreferrer">
+                <a className={button} href={safeUrl(r.file)} target="_blank" rel="noreferrer">
                   PDF
                 </a>
               )}
@@ -700,6 +735,10 @@ function ReportForm({ initial, onDone }: { initial: ReportRow; onDone: () => voi
     ev.preventDefault();
     if (r.status === "published" && !r.file && !r.link) {
       toast.error("A published report needs a PDF or a link. Mark it 'in preparation' otherwise.");
+      return;
+    }
+    if (badLink(r.link)) {
+      toast.error("The link must start with https://");
       return;
     }
     setBusy(true);
@@ -803,7 +842,7 @@ function ReportForm({ initial, onDone }: { initial: ReportRow; onDone: () => voi
           <input type="file" accept="application/pdf" className="sr-only" disabled={busy} onChange={(x) => addPdf(x.target.files)} />
         </label>
         {r.file && (
-          <a href={r.file} target="_blank" rel="noreferrer" className="text-sm underline">
+          <a href={safeUrl(r.file)} target="_blank" rel="noreferrer" className="text-sm underline">
             Current PDF
           </a>
         )}
@@ -893,114 +932,195 @@ export function EnquiriesManager() {
   );
 }
 
-/* ---------------------------------------------------------------- Admins */
+/* ---------------------------------------------------------------- Access */
 
-type Account = {
+type Person = {
   user_id: string;
   email: string;
   confirmed: boolean;
   created_at: string;
   last_sign_in_at: string | null;
-  is_admin: boolean;
+  role: "admin" | "editor" | null;
+  two_factor: boolean;
 };
 
-const ADMIN_MIGRATION = "supabase/migrations/20261103090000_admin_access.sql";
+const ROLE_LABEL = { admin: "Admin", editor: "Editor", none: "No access" } as const;
 
-/** Everyone who has signed up on the admin page, with a switch for admin access. */
-export function AdminsManager() {
-  const [rows, setRows] = useState<Account[] | null>(null);
+/**
+ * Everyone who has signed up on the admin page. Admins give a role (editors manage events and reports;
+ * admins also see people's data and manage access), deny a sign-up, or reset a lost authenticator.
+ * Nobody changes their own access, so the club always keeps an admin.
+ */
+export function AccessManager() {
+  const [rows, setRows] = useState<Person[] | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [me, setMe] = useState<string | null>(null);
   const [busy, setBusy] = useState<string | null>(null);
 
   async function load() {
-    const { data, error } = await supabase.rpc("admin_accounts" as never);
+    const { data, error } = await supabase.rpc("access_accounts" as never);
     if (error) setError(error.message);
-    else setRows(data as unknown as Account[]);
+    else setRows(data as unknown as Person[]);
   }
   useEffect(() => {
     load();
     supabase.auth.getUser().then(({ data }) => setMe(data.user?.id ?? null));
   }, []);
 
-  async function setAdmin(a: Account, admin: boolean) {
-    if (!admin && !confirm(`Remove admin access for ${a.email}?`)) return;
-    setBusy(a.user_id);
-    const { error } = await supabase.rpc("set_admin" as never, { _user_id: a.user_id, _admin: admin } as never);
+  async function run(p: Person, fn: string, args: Record<string, unknown>, done: string) {
+    setBusy(p.user_id);
+    const { error } = await supabase.rpc(fn as never, args as never);
     setBusy(null);
     if (error) toast.error(error.message);
     else {
-      toast.success(admin ? `${a.email} is now an admin` : `${a.email} is no longer an admin`);
+      toast.success(done);
       load();
     }
   }
+  const setRole = (p: Person, role: keyof typeof ROLE_LABEL) => {
+    if (role === "none" && !confirm(`Remove all access for ${p.email}?`)) return;
+    run(p, "set_role", { _user_id: p.user_id, _role: role }, `${p.email}: ${ROLE_LABEL[role]}`);
+  };
+  const deny = (p: Person) => {
+    if (!confirm(`Deny ${p.email}? Their account is deleted, so they can't sign in. They can sign up again later.`)) return;
+    run(p, "deny_account", { _user_id: p.user_id }, `${p.email} was denied`);
+  };
+  const resetFactor = (p: Person) => {
+    if (!confirm(`Reset two-factor sign-in for ${p.email}? They set it up again at their next sign-in.`)) return;
+    run(p, "reset_two_factor", { _user_id: p.user_id }, `Two-factor reset for ${p.email}`);
+  };
 
-  async function deny(a: Account) {
-    if (!confirm(`Deny ${a.email}? Their account is deleted, so they can't sign in. They can sign up again later.`)) return;
-    setBusy(a.user_id);
-    const { error } = await supabase.rpc("deny_account" as never, { _user_id: a.user_id } as never);
-    setBusy(null);
-    if (error) toast.error(error.message);
-    else {
-      toast.success(`${a.email} was denied`);
-      load();
-    }
-  }
-
-  if (error) {
-    return (
-      <div className="rounded-lg border border-border bg-card p-6 text-sm">
-        <p className="font-medium text-navy">The Admins tab isn't set up in the database yet.</p>
-        <p className="mt-1 text-muted-foreground">
-          Run <code>{ADMIN_MIGRATION}</code> in the Supabase project's SQL Editor.
-        </p>
-        <p className="mt-2 text-xs text-muted-foreground">Database message: {error}</p>
-      </div>
-    );
-  }
+  if (error) return <Missing error={error} />;
   if (!rows) return <Loader2 className="mx-auto h-6 w-6 animate-spin text-muted-foreground" />;
 
   return (
     <div className="space-y-4">
       <p className="text-sm text-muted-foreground">
-        New admins create an account on this page ("New admin? Create your account") and confirm their email. They
-        then appear here, and any admin can give them access, or deny the sign-up.
+        New people create an account on this page ("New admin? Create your account") and confirm their email. Then
+        give them access here: <strong>Editor</strong> manages events and reports; <strong>Admin</strong> also sees
+        enquiries, applications and the newsletter, and manages access. Everyone with access signs in with two-factor.
       </p>
       <ul className="divide-y divide-border rounded-lg border border-border bg-card">
-        {rows.map((a) => (
-          <li key={a.user_id} className="flex flex-wrap items-center gap-4 p-4">
-            <div className="min-w-0 flex-1">
-              <p className="font-medium text-navy">
-                {a.email}
-                {a.user_id === me && <span className="ml-2 text-xs font-normal text-muted-foreground">(you)</span>}
-              </p>
-              <p className="text-xs text-muted-foreground">
-                {a.is_admin ? "Admin" : a.confirmed ? "No admin access" : "Email not confirmed yet"}, signed up{" "}
-                {formatDay(a.created_at.slice(0, 10))}
-              </p>
-            </div>
-            {a.is_admin ? (
-              <button
-                className={button}
-                disabled={a.user_id === me || busy === a.user_id}
-                title={a.user_id === me ? "You can't remove your own admin access" : undefined}
-                onClick={() => setAdmin(a, false)}
-              >
-                Remove admin access
-              </button>
-            ) : (
-              <div className="flex gap-2">
-                <button className={button} disabled={busy === a.user_id} onClick={() => deny(a)}>
-                  Deny
-                </button>
-                <button className={primary} disabled={!a.confirmed || busy === a.user_id} onClick={() => setAdmin(a, true)}>
-                  {busy === a.user_id ? <Loader2 className="h-4 w-4 animate-spin" /> : "Give admin access"}
-                </button>
+        {rows.map((p) => {
+          const self = p.user_id === me;
+          return (
+            <li key={p.user_id} className="flex flex-wrap items-center gap-4 p-4">
+              <div className="min-w-0 flex-1">
+                <p className="font-medium text-navy">
+                  {p.email}
+                  {self && <span className="ml-2 text-xs font-normal text-muted-foreground">(you)</span>}
+                </p>
+                <p className="text-xs text-muted-foreground">
+                  {p.confirmed ? ROLE_LABEL[p.role ?? "none"] : "Email not confirmed yet"}
+                  {p.role && (p.two_factor ? ", two-factor on" : ", two-factor not set up yet")}, signed up{" "}
+                  {formatDay(p.created_at.slice(0, 10))}
+                </p>
               </div>
-            )}
-          </li>
-        ))}
+              <div className="flex flex-wrap items-center gap-2">
+                <label className="sr-only" htmlFor={`role-${p.user_id}`}>
+                  Access for {p.email}
+                </label>
+                <select
+                  id={`role-${p.user_id}`}
+                  className={cn(field, "h-9 w-auto")}
+                  value={p.role ?? "none"}
+                  disabled={self || !p.confirmed || busy === p.user_id}
+                  title={self ? "You can't change your own access" : undefined}
+                  onChange={(x) => setRole(p, x.target.value as keyof typeof ROLE_LABEL)}
+                >
+                  <option value="none">No access</option>
+                  <option value="editor">Editor</option>
+                  <option value="admin">Admin</option>
+                </select>
+                {p.two_factor && !self && (
+                  <button className={button} disabled={busy === p.user_id} onClick={() => resetFactor(p)}>
+                    Reset two-factor
+                  </button>
+                )}
+                {!p.role && !self && (
+                  <button className={button} disabled={busy === p.user_id} onClick={() => deny(p)}>
+                    Deny
+                  </button>
+                )}
+              </div>
+            </li>
+          );
+        })}
       </ul>
+    </div>
+  );
+}
+
+/* ------------------------------------------------------------ Newsletter */
+
+type Signup = { id: string; email: string; created_at: string };
+
+/** Newsletter sign-ups: list, export and delete (the privacy page promises deletion on request). */
+export function NewsletterManager() {
+  const [rows, setRows] = useState<Signup[] | null>(null);
+  const [error, setError] = useState<string | null>(null);
+
+  async function load() {
+    const { data, error } = await supabase
+      .from("newsletter_signups" as never)
+      .select("id, email, created_at")
+      .order("created_at", { ascending: false });
+    if (error) setError(error.message);
+    else setRows(data as unknown as Signup[]);
+  }
+  useEffect(() => {
+    load();
+  }, []);
+
+  async function remove(n: Signup) {
+    if (!confirm(`Delete ${n.email} from the newsletter? This cannot be undone.`)) return;
+    const { error } = await supabase.from("newsletter_signups" as never).delete().eq("id", n.id);
+    if (error) toast.error(error.message);
+    else {
+      toast.success(`${n.email} deleted`);
+      load();
+    }
+  }
+  function exportCsv() {
+    if (!rows) return;
+    const blob = new Blob([toCsv(["email", "signed up"], rows.map((r) => [r.email, r.created_at]))], { type: "text/csv" });
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = `emfc-newsletter-${todayInBarcelona()}.csv`;
+    a.click();
+    URL.revokeObjectURL(a.href);
+  }
+
+  if (error) return <Missing error={error} />;
+  if (!rows) return <Loader2 className="mx-auto h-6 w-6 animate-spin text-muted-foreground" />;
+  return (
+    <div className="space-y-4">
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <p className="text-sm text-muted-foreground">
+          {rows.length} {rows.length === 1 ? "address" : "addresses"}, all with consent to be contacted. Delete anyone who
+          asks to be removed.
+        </p>
+        <button className={button} onClick={exportCsv} disabled={rows.length === 0}>
+          Export CSV
+        </button>
+      </div>
+      {rows.length === 0 ? (
+        <p className="text-sm text-muted-foreground">No sign-ups yet.</p>
+      ) : (
+        <ul className="divide-y divide-border rounded-lg border border-border bg-card">
+          {rows.map((n) => (
+            <li key={n.id} className="flex items-center justify-between gap-4 p-4 text-sm">
+              <span>{n.email}</span>
+              <span className="flex items-center gap-3">
+                <span className="text-xs text-muted-foreground">{formatDay(n.created_at.slice(0, 10))}</span>
+                <button className={button} onClick={() => remove(n)} title={`Delete ${n.email}`}>
+                  <Trash2 className="h-4 w-4" />
+                </button>
+              </span>
+            </li>
+          ))}
+        </ul>
+      )}
     </div>
   );
 }

@@ -9,16 +9,7 @@ import { CountUp, Em, Eyebrow, Numeral, PhotoCaption, Portrait } from "@/compone
 import { loadEvents } from "@/lib/content";
 import { STATS } from "@/data/stats";
 import { departments } from "@/lib/departments";
-import {
-  CO_PRESIDENT_QUOTE,
-  FUND_PAGE_LIVE,
-  IMAGES,
-  logoUrl,
-  MEMBER_FIRMS,
-  NEXT_INTAKE_OPENS,
-  ROMAN,
-  SOCIAL,
-} from "@/lib/site";
+import { CO_PRESIDENT_QUOTE, FUND_PAGE_LIVE, IMAGES, logoUrl, MEMBER_FIRMS, NEXT_INTAKE_OPENS, ROMAN, SOCIAL, todayInBarcelona } from "@/lib/site";
 import { leadershipOf, PEOPLE_STRIP, PRESIDENTS, type Member } from "@/lib/team";
 import { cn } from "@/lib/utils";
 
@@ -562,7 +553,7 @@ function Join() {
     : "";
 
   const EVENTS = Route.useLoaderData();
-  const today = new Date().toISOString().slice(0, 10);
+  const today = todayInBarcelona();
   const sorted = [...EVENTS].sort((a, b) => a.date.localeCompare(b.date));
   const next = sorted.find((e) => e.date >= today);
   const event = next ?? sorted[sorted.length - 1];

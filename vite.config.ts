@@ -24,7 +24,22 @@ export default defineConfig(({ command }) => ({
       // Files under a server/ folder, and "server-only" imports, never reach the browser.
       importProtection: { behavior: "error", client: { files: ["**/server/**"], specifiers: ["server-only"] } },
     }),
-    command === "build" && nitro({ preset: process.env.NITRO_PRESET }),
+    command === "build" &&
+      nitro({
+        preset: process.env.NITRO_PRESET,
+        // Every response, static files included. Pages also get a Content Security Policy with a
+        // per-request nonce (src/lib/server/security-headers.ts, which repeats these four).
+        routeRules: {
+          "/**": {
+            headers: {
+              "X-Content-Type-Options": "nosniff",
+              "X-Frame-Options": "DENY",
+              "Referrer-Policy": "strict-origin-when-cross-origin",
+              "Permissions-Policy": "camera=(), microphone=(), geolocation=(), payment=(), usb=(), interest-cohort=()",
+            },
+          },
+        },
+      }),
     viteReact(),
   ],
 }));

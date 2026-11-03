@@ -6,12 +6,17 @@ import { SiteLayout } from "@/components/layout/SiteLayout";
 import { departments } from "@/lib/departments";
 import { Download, LogOut, Loader2, ChevronDown, ChevronRight, ExternalLink, X, FileText, Users, Calendar, TrendingUp, Building2, Archive, ArrowUpDown, ArrowUp, ArrowDown } from "lucide-react";
 import { toast } from "sonner";
+import { toCsv } from "@/lib/csv";
 import { zip } from "fflate";
 import { AnalyticsManager } from "@/components/admin/Analytics";
-import { AdminsManager, EnquiriesManager, EventsManager, ReportsManager } from "@/components/admin/ContentManagers";
+import { BackupManager, backupDue } from "@/components/admin/Backup";
+import { AccessManager, EnquiriesManager, EventsManager, NewsletterManager, ReportsManager } from "@/components/admin/ContentManagers";
+import { SetUpTwoFactor, TwoFactorCode } from "@/components/admin/TwoFactor";
 
-// The admin page, at an unlisted address. Sign-in and the admin role are checked against Supabase,
-// so the address alone gives no access.
+// The admin page, at an unlisted address. Two levels of access: editors manage events and reports;
+// admins also see people's data (enquiries, applications, newsletter) and manage access. Every editor
+// and admin signs in with two-factor (TwoFactor.tsx); the database checks the role and the second
+// factor itself, so the address and the page code alone give no access.
 export const Route = createFileRoute("/club-office")({
   head: () => ({ meta: [{ title: "Admin, EMFC" }, { name: "robots", content: "noindex" }] }),
   component: Admin,
@@ -39,10 +44,16 @@ type Account = { userId: string; email: string };
 const toAccount = (s: Session | null): Account | null =>
   s?.user ? { userId: s.user.id, email: s.user.email ?? "" } : null;
 
+export type Role = "admin" | "editor";
+/** Two-factor state of the signed-in person: none set up, set up but not used in this session, or done. */
+type Factor = "setup" | "code" | "done";
+
 function Admin() {
   const navigate = useNavigate();
   const [account, setAccount] = useState<Account | null>(null);
-  const [isAdmin, setIsAdmin] = useState<boolean | null>(null);
+  const [role, setRole] = useState<Role | null | undefined>(undefined);
+  const [factor, setFactor] = useState<Factor | undefined>(undefined);
+  const [recheck, setRecheck] = useState(0);
   const [checking, setChecking] = useState(true);
   // The link in a "new password" email signs the person in and lands here with ?reset=1; an expired
   // link lands with an error instead. Both are read on the first render, before anything else happens.
@@ -69,25 +80,27 @@ function Admin() {
     return () => { mounted = false; sub.subscription.unsubscribe(); };
   }, []);
 
-  // The admin role is checked for every account that signs in, also straight after the sign-in form.
+  // The role and the two-factor state are checked for every account that signs in, also straight
+  // after the sign-in form, and again after the two-factor step.
   const userId = account?.userId;
   useEffect(() => {
-    setIsAdmin(null);
+    setRole(undefined);
+    setFactor(undefined);
     if (!userId) return;
     let live = true;
-    supabase
-      .from("user_roles" as never)
-      .select("role")
-      .eq("user_id", userId)
-      .eq("role", "admin")
-      .maybeSingle()
-      .then(({ data, error }) => {
-        if (!live) return;
-        if (error) toast.error(error.message);
-        setIsAdmin(!!data);
-      });
+    (async () => {
+      const [{ data: roles, error }, { data: aal }] = await Promise.all([
+        supabase.from("user_roles" as never).select("role").eq("user_id", userId),
+        supabase.auth.mfa.getAuthenticatorAssuranceLevel(),
+      ]);
+      if (!live) return;
+      if (error) toast.error(error.message);
+      const held = ((roles ?? []) as { role: string }[]).map((r) => r.role);
+      setRole(held.includes("admin") ? "admin" : held.includes("editor") ? "editor" : null);
+      setFactor(aal?.currentLevel === "aal2" ? "done" : aal?.nextLevel === "aal2" ? "code" : "setup");
+    })();
     return () => { live = false; };
-  }, [userId]);
+  }, [userId, recheck]);
 
   const waiting = <SiteLayout><div className="container-emis py-24 text-center text-muted-foreground"><Loader2 className="mx-auto h-6 w-6 animate-spin" /></div></SiteLayout>;
   if (checking) return waiting;
@@ -105,9 +118,12 @@ function Admin() {
     );
   }
   if (!account) return <SiteLayout><Login notice={notice} /></SiteLayout>;
-  if (isAdmin === null) return waiting;
-  if (!isAdmin) return <SiteLayout><NoAccess email={account.email} /></SiteLayout>;
-  return <SiteLayout><AdminTabs /></SiteLayout>;
+  if (role === undefined || factor === undefined) return waiting;
+  if (role === null) return <SiteLayout><NoAccess email={account.email} /></SiteLayout>;
+  const again = () => setRecheck((n) => n + 1);
+  if (factor === "setup") return <SiteLayout><SetUpTwoFactor email={account.email} onDone={again} /></SiteLayout>;
+  if (factor === "code") return <SiteLayout><TwoFactorCode onDone={again} /></SiteLayout>;
+  return <SiteLayout><AdminTabs role={role} /></SiteLayout>;
 }
 
 function NoAccess({ email }: { email: string }) {
@@ -116,7 +132,7 @@ function NoAccess({ email }: { email: string }) {
       <h1 className="font-serif text-3xl text-navy">No admin access yet</h1>
       <p className="mx-auto mt-3 max-w-md text-muted-foreground">
         You're signed in as <span className="font-medium text-foreground">{email}</span>, but this account doesn't have
-        admin access. Ask an admin to switch it on in the admin page's Admins tab, then check again.
+        access yet. Ask an admin to give it access on the admin page's Access tab, then check again.
       </p>
       <div className="mt-6 flex justify-center gap-2">
         <button onClick={() => window.location.reload()} className="inline-flex h-10 items-center rounded-md bg-navy px-4 text-sm font-medium text-primary-foreground">
@@ -130,22 +146,36 @@ function NoAccess({ email }: { email: string }) {
   );
 }
 
+/** Tabs, and who sees them. Editors: events and reports. Admins: everything. */
 const TABS = [
-  { id: "analytics", label: "Analytics" },
-  { id: "events", label: "Events" },
-  { id: "reports", label: "Reports" },
-  { id: "enquiries", label: "Sponsorship enquiries" },
-  { id: "applications", label: "Applications" },
-  { id: "admins", label: "Admins" },
+  { id: "analytics", label: "Analytics", admin: true },
+  { id: "events", label: "Events", admin: false },
+  { id: "reports", label: "Reports", admin: false },
+  { id: "enquiries", label: "Sponsorship enquiries", admin: true },
+  { id: "newsletter", label: "Newsletter", admin: true },
+  { id: "applications", label: "Applications", admin: true },
+  { id: "access", label: "Access", admin: true },
+  { id: "backup", label: "Backup", admin: true },
 ] as const;
 
-function AdminTabs() {
-  const [tab, setTab] = useState<(typeof TABS)[number]["id"]>("analytics");
+function AdminTabs({ role }: { role: Role }) {
+  const tabs = TABS.filter((t) => role === "admin" || !t.admin);
+  const [tab, setTab] = useState<(typeof TABS)[number]["id"]>(role === "admin" ? "analytics" : "events");
   return (
     <div>
+      {role === "admin" && backupDue() && tab !== "backup" && (
+        <div className="container-wide pt-6">
+          <p className="rounded-md border border-border bg-secondary px-4 py-2 text-sm">
+            No backup from this browser in the last week.{" "}
+            <button className="font-medium text-navy underline underline-offset-4" onClick={() => setTab("backup")}>
+              Download one
+            </button>
+          </p>
+        </div>
+      )}
       <div className="container-wide flex flex-wrap items-center justify-between gap-4 pt-10">
         <div role="tablist" aria-label="Admin sections" className="flex flex-wrap gap-1 rounded-lg border border-border bg-card p-1">
-          {TABS.map((t) => (
+          {tabs.map((t) => (
             <button
               key={t.id}
               role="tab"
@@ -169,7 +199,9 @@ function AdminTabs() {
           {tab === "events" && <EventsManager />}
           {tab === "reports" && <ReportsManager />}
           {tab === "enquiries" && <EnquiriesManager />}
-          {tab === "admins" && <AdminsManager />}
+          {tab === "newsletter" && <NewsletterManager />}
+          {tab === "access" && <AccessManager />}
+          {tab === "backup" && <BackupManager />}
         </div>
       )}
     </div>
@@ -442,8 +474,8 @@ function Dashboard() {
 
   function exportCSV() {
     const cols: (keyof Application)[] = ["created_at","department","position_type","full_name","email","program","graduation_year","nationality","linkedin_url","experience","desk_preference","motivation","relevant_experience","cv_path"];
-    const esc = (v: unknown) => `"${String(v ?? "").replace(/"/g, '""')}"`;
-    const csv = [cols.join(","), ...filtered.map((r) => cols.map((c) => esc(r[c])).join(","))].join("\n");
+    // Applicants type these fields, so they are made safe to open in Excel (no formulas).
+    const csv = toCsv(cols, filtered.map((r) => cols.map((c) => r[c])));
     const blob = new Blob([csv], { type: "text/csv" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");

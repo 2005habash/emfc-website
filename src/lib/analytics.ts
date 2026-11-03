@@ -1,12 +1,13 @@
 import { createServerFn } from "@tanstack/react-start";
-import { getRequest } from "@tanstack/react-start/server";
 import { z } from "zod";
-import { supabase } from "@/integrations/supabase/client";
+import { todayInBarcelona } from "@/lib/site";
 
 // Anonymous site analytics, shown on the admin page's Analytics tab. Each event is saved to the
 // analytics_events table without names, IP addresses or cookies: the country and device come from
-// the request, and "visitor" is a daily code hashed from the address and browser, so a person counts
-// once a day and can't be followed across days. Bots and link previews are not counted.
+// the request, and "visitor" is a daily code made with a key only the server knows, so a person counts
+// once a day and can't be followed across days or traced back to an address. Only the server writes
+// the table; one visitor can record at most 150 events in 10 minutes. Bots and link previews are not
+// counted.
 
 const Event = z.object({
   kind: z.enum(["page_view", "profile_open", "linkedin_click", "report_download"]),
@@ -18,33 +19,23 @@ export type AnalyticsEvent = z.input<typeof Event>;
 
 const BOT = /bot|crawl|spider|slurp|preview|facebookexternalhit|embedly|lighthouse|headless|monitor|curl|python|wget/i;
 
-async function visitorCode(ip: string, userAgent: string) {
-  const day = new Date().toISOString().slice(0, 10);
-  const text = `${process.env.ANALYTICS_SALT ?? "emfc-analytics"}|${day}|${ip}|${userAgent}`;
-  const hash = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(text));
-  return [...new Uint8Array(hash)]
-    .slice(0, 12)
-    .map((b) => b.toString(16).padStart(2, "0"))
-    .join("");
-}
-
 export const recordEvent = createServerFn({ method: "POST" })
   .validator((data: unknown) => Event.parse(data))
   .handler(async ({ data }) => {
-    const headers = getRequest().headers;
-    const userAgent = headers.get("user-agent") ?? "";
+    const guard = await import("@/lib/server/guard");
+    const { ip, userAgent, country } = guard.requestInfo();
     if (!userAgent || BOT.test(userAgent)) return { ok: false };
-    const ip = (headers.get("x-forwarded-for") ?? "").split(",")[0].trim() || headers.get("x-real-ip") || "";
-    const country = headers.get("x-vercel-ip-country")?.slice(0, 2).toUpperCase() || null;
+    const visitor = await guard.fingerprint("visitor", todayInBarcelona(), ip, userAgent);
+    if ((await guard.recentCount("analytics_events", 10, "visitor", visitor)) >= 150) return { ok: false };
     const device = /iPad|Tablet/i.test(userAgent) ? "tablet" : /Mobi|Android|iPhone/i.test(userAgent) ? "mobile" : "desktop";
-    const { error } = await supabase.from("analytics_events" as never).insert({
+    const { error } = await guard.admin.from("analytics_events" as never).insert({
       kind: data.kind,
       path: data.path,
       target: data.target ?? null,
       referrer: data.referrer ?? null,
       country,
       device,
-      visitor: await visitorCode(ip, userAgent),
+      visitor,
     } as never);
     if (error) console.error("[analytics] Could not save the event", error.message);
     return { ok: !error };

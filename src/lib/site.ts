@@ -32,6 +32,18 @@ export const IMAGES = {
 
 /** The live address. Link previews need full addresses for their pictures, not paths. */
 export const SITE_URL = "https://www.emfc.es";
+/** Today's date in Barcelona (YYYY-MM-DD). Events are "upcoming" or "past" by Barcelona's calendar,
+ * the same on the server and in the browser, wherever either is. */
+export const todayInBarcelona = (at: Date = new Date()) =>
+  new Intl.DateTimeFormat("en-CA", { timeZone: "Europe/Madrid", year: "numeric", month: "2-digit", day: "2-digit" }).format(at);
+
+/** Only links that are safe to put in a page: https, mailto or a path on this site. Anything else
+ * (for example a "javascript:" link typed into the admin page) is dropped. */
+export const safeUrl = (url: string | null | undefined) => {
+  const u = url?.trim();
+  return u && /^(https:\/\/|mailto:|\/(?!\/))/i.test(u) ? u : undefined;
+};
+
 export const absoluteUrl = (path: string) => (/^https?:\/\//.test(path) ? path : `${SITE_URL}${path}`);
 
 /**

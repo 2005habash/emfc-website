@@ -5,7 +5,7 @@ import { SiteLayout } from "@/components/layout/SiteLayout";
 import { Em, Eyebrow, PageHero } from "@/components/site/ui";
 import { EVENT_TYPE_COLORS, type EventItem, type EventType } from "@/data/events";
 import { loadEvents } from "@/lib/content";
-import { IMAGES, SOCIAL } from "@/lib/site";
+import { IMAGES, SOCIAL, todayInBarcelona, safeUrl } from "@/lib/site";
 import { cn } from "@/lib/utils";
 import { icsHref } from "@/lib/ics";
 import { TypeDot } from "@/components/site/sections";
@@ -184,7 +184,7 @@ function EventFeature({ e, past = false }: { e: EventItem; past?: boolean }) {
           )}
           {!past && e.link && (
             <a
-              href={e.link}
+              href={safeUrl(e.link)}
               target="_blank"
               rel="noreferrer"
               className="btn btn-outline-ink h-[46px] px-5 text-[11px]"
@@ -200,7 +200,7 @@ function EventFeature({ e, past = false }: { e: EventItem; past?: boolean }) {
 
 function Overview() {
   const EVENTS = Route.useLoaderData();
-  const today = new Date().toISOString().slice(0, 10);
+  const today = todayInBarcelona();
   const upcoming = EVENTS.filter((e) => e.date >= today).sort((a, b) =>
     a.date.localeCompare(b.date),
   );
@@ -250,7 +250,7 @@ function Overview() {
 function CalendarView() {
   const EVENTS = Route.useLoaderData();
   // Open on the month of the next event, or the most recent one.
-  const today = new Date().toISOString().slice(0, 10);
+  const today = todayInBarcelona();
   const sorted = [...EVENTS].sort((a, b) => a.date.localeCompare(b.date));
   const anchor = sorted.find((e) => e.date >= today) ?? sorted[sorted.length - 1];
   const start = anchor ? dateOf(anchor) : new Date();

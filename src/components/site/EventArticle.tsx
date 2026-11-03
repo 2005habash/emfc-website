@@ -7,7 +7,7 @@ import { Dialog, DialogClose, DialogContent, DialogTitle } from "@/components/ui
 import { clipPoster, type EventItem, type EventPhoto } from "@/data/events";
 import { getDepartment } from "@/lib/departments";
 import { icsHref } from "@/lib/ics";
-import { formatDay, IMAGES } from "@/lib/site";
+import { formatDay, IMAGES, todayInBarcelona } from "@/lib/site";
 import { cn } from "@/lib/utils";
 
 // An event's page: text, place, departments, photos, clips and the recap. Used by the event route and
@@ -79,7 +79,7 @@ function Lightbox({
 
 export function EventArticle({ event: e, older, newer }: { event: EventItem; older?: EventItem; newer?: EventItem }) {
   const [open, setOpen] = useState<number | null>(null);
-  const today = new Date().toISOString().slice(0, 10);
+  const today = todayInBarcelona();
   const upcoming = e.date >= today;
   const cover = e.photos?.[0]?.src ?? e.recap?.[0] ?? IMAGES.portOlimpic;
   const tags = [
