@@ -1,10 +1,14 @@
 import { supabase } from "@/integrations/supabase/client";
 import { EVENTS, type EventItem, type EventPhoto, type EventType } from "@/data/events";
 import { REPORTS, type Report } from "@/data/reports";
+import { departmentSlug } from "@/lib/departments";
 
 // Events and reports come from the database once the admin page is in use, so new ones need no
 // code change. Until the tables exist, or if the database can't be reached in time, the site uses
-// the lists bundled in src/data.
+// the lists bundled in src/data. Departments saved under an old name read as their current one.
+
+/** A desk saved as "department/desk", with the department under its current name. */
+export const deskSlug = (desk: string) => desk.replace(/^[^/]+/, departmentSlug);
 
 type EventRow = {
   id: string;
@@ -45,8 +49,8 @@ const toEvent = (r: EventRow): EventItem => ({
   location: r.location,
   description: r.description,
   people: r.people ?? [],
-  departments: r.departments ?? [],
-  desks: r.desks ?? [],
+  departments: (r.departments ?? []).map(departmentSlug),
+  desks: (r.desks ?? []).map(deskSlug),
   photos: r.photos ?? [],
   videos: r.videos ?? [],
   recap: r.recap ?? [],
@@ -59,7 +63,7 @@ const toReport = (r: ReportRow): Report => ({
   series: r.series,
   issue: r.issue ?? undefined,
   date: r.date,
-  department: r.department,
+  department: departmentSlug(r.department),
   desk: r.desk ?? undefined,
   authors: r.authors ?? [],
   pages: r.pages ?? undefined,

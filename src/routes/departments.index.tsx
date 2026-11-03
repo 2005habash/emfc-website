@@ -28,7 +28,7 @@ export const Route = createFileRoute("/departments/")({
       {
         property: "og:description",
         content:
-          "Investment Banking, Private Markets, Asset Management, Fixed Income, Corporate Relations and Brand.",
+          "Investment Banking, Private Markets, Asset Management, Fixed Income, Corporate Relations and Marketing.",
       },
     ],
   }),

@@ -37,7 +37,7 @@ const pillars = [
   },
   {
     title: "Six Departments",
-    body: "Coverage across IB, Private Markets, Asset Management, Fixed Income, Corporate Relations and Brand.",
+    body: "Coverage across IB, Private Markets, Asset Management, Fixed Income, Corporate Relations and Marketing.",
   },
   {
     title: "Industry Access",

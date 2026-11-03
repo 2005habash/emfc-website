@@ -5,9 +5,9 @@ import { EventArticle } from "@/components/site/EventArticle";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { downloadBlob, readAll } from "@/components/admin/data";
 import { supabase } from "@/integrations/supabase/client";
-import { invalidateContent } from "@/lib/content";
+import { deskSlug, invalidateContent } from "@/lib/content";
 import { clipPoster, EVENT_TYPE_COLORS, type EventPhoto, type EventType } from "@/data/events";
-import { departments } from "@/lib/departments";
+import { departments, departmentSlug } from "@/lib/departments";
 import { toCsv } from "@/lib/csv";
 import { formatDay, safeUrl, todayInBarcelona } from "@/lib/site";
 import { cn } from "@/lib/utils";
@@ -205,7 +205,15 @@ export function EventsManager() {
   async function load() {
     const { data, error } = await supabase.from("events" as never).select("*").order("date", { ascending: false });
     if (error) setError(error.message);
-    else setRows(data as unknown as EventRow[]);
+    // A department saved under an old name shows, and is saved again, under its current one.
+    else
+      setRows(
+        (data as unknown as EventRow[]).map((e) => ({
+          ...e,
+          departments: (e.departments ?? []).map(departmentSlug),
+          desks: (e.desks ?? []).map(deskSlug),
+        })),
+      );
   }
   useEffect(() => {
     load();
@@ -537,7 +545,7 @@ function EventForm({ initial, onDone }: { initial: EventRow; onDone: () => void 
       </fieldset>
 
       <fieldset className="space-y-3">
-        <legend className={label}>Recap slides (the images of the Brand team's LinkedIn post, in order)</legend>
+        <legend className={label}>Recap slides (the images of the Marketing team's LinkedIn post, in order)</legend>
         {e.recap.length > 0 && (
           <div className="flex gap-3 overflow-x-auto pb-1">
             {e.recap.map((src, i) => (
@@ -646,7 +654,7 @@ export function ReportsManager() {
   async function load() {
     const { data, error } = await supabase.from("reports" as never).select("*").order("date", { ascending: false });
     if (error) setError(error.message);
-    else setRows(data as unknown as ReportRow[]);
+    else setRows((data as unknown as ReportRow[]).map((r) => ({ ...r, department: departmentSlug(r.department) })));
   }
   useEffect(() => {
     load();

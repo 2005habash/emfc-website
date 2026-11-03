@@ -21,7 +21,8 @@ const overrides = Object.fromEntries(
   JSON.parse(readFileSync(join(dir, "photo-overrides.json"), "utf8")).overrides.map((o) => [o.slug, o.photo]),
 );
 
-// The Marketing department is called Brand on the site (decided 2 November 2026).
+// The form's department names. Marketing was called Brand on the site from 2 to 4 November 2026;
+// it is Marketing again, with the form's own titles.
 const DEPARTMENTS = {
   "Co-Presidents": "co-presidents",
   "Investment Banking": "investment-banking",
@@ -29,7 +30,7 @@ const DEPARTMENTS = {
   "Asset Management": "asset-management",
   "Fixed Income": "fixed-income",
   "Corporate Relations": "corporate-relations",
-  Marketing: "brand",
+  Marketing: "marketing",
   "Advisory Board": "advisory-board",
 };
 const POSITIONS = {
@@ -48,8 +49,6 @@ const slugify = (s) =>
     .replace(/&/g, " and ")
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/^-|-$/g, "");
-const retitle = (title) =>
-  title.replace(/^Head of Marketing$/, "Head of Brand").replace(/^Associate, Marketing$/, "Associate, Brand");
 
 const toMember = (p) => {
   const department = DEPARTMENTS[p.department];
@@ -58,7 +57,7 @@ const toMember = (p) => {
   return {
     name: p.name,
     slug: slugify(p.name),
-    title: retitle(p.title),
+    title: p.title,
     department,
     position,
     ...(p.desk ? { desk: slugify(p.desk) } : {}),
