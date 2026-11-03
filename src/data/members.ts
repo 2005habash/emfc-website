@@ -407,7 +407,8 @@ export const MEMBERS: Member[] = [
     "firms": [
       "Legacy AI",
       "United Trust Bank"
-    ]
+    ],
+    "photo": "/images/team/aaron-kark.jpg"
   },
   {
     "name": "Isabelle Oliger",
@@ -795,7 +796,8 @@ export const MEMBERS: Member[] = [
       "Lloyds Banking Group",
       "HSBC",
       "EY"
-    ]
+    ],
+    "photo": "/images/team/aditya-sunil-shajwani.jpg"
   },
   {
     "name": "Anubhav Tamak",
