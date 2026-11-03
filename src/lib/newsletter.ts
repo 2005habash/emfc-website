@@ -17,7 +17,7 @@ export const subscribe = createServerFn({ method: "POST" })
   .handler(async ({ data }): Promise<SignupResult> => {
     const guard = await import("@/lib/server/guard");
     const sender = await guard.fingerprint("newsletter", guard.requestInfo().ip);
-    if ((await guard.recentCount("newsletter_signups", 60, "sender", sender)) >= 5) return { ok: false, reason: "limit" };
+    if (!(await guard.takeSlot("newsletter", sender, 60, 5))) return { ok: false, reason: "limit" };
     const { error } = await guard.admin.from("newsletter_signups" as never).insert({ email: data.email, sender } as never);
     if (error && error.code !== "23505") {
       console.error("[newsletter] Could not save the sign-up", error.message);

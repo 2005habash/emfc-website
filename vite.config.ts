@@ -5,6 +5,7 @@ import viteReact from "@vitejs/plugin-react";
 import { nitro } from "nitro/vite";
 import { defineConfig } from "vite";
 import tsConfigPaths from "vite-tsconfig-paths";
+import { BASE_SECURITY_HEADERS } from "./src/lib/server/security-headers.ts";
 
 // Builds the site for Vercel. Nitro packages the server: on Vercel it builds Vercel's output by
 // itself; elsewhere a plain Node server. Set NITRO_PRESET to choose (tools/export-static.sh uses
@@ -27,18 +28,9 @@ export default defineConfig(({ command }) => ({
     command === "build" &&
       nitro({
         preset: process.env.NITRO_PRESET,
-        // Every response, static files included. Pages also get a Content Security Policy with a
-        // per-request nonce (src/lib/server/security-headers.ts, which repeats these four).
-        routeRules: {
-          "/**": {
-            headers: {
-              "X-Content-Type-Options": "nosniff",
-              "X-Frame-Options": "DENY",
-              "Referrer-Policy": "strict-origin-when-cross-origin",
-              "Permissions-Policy": "camera=(), microphone=(), geolocation=(), payment=(), usb=(), interest-cohort=()",
-            },
-          },
-        },
+        // Every response, static files included, gets the same headers as the pages. Pages also get a
+        // Content Security Policy with a per-request nonce (src/lib/server/security-headers.ts).
+        routeRules: { "/**": { headers: BASE_SECURITY_HEADERS } },
       }),
     viteReact(),
   ],

@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { EventArticle } from "@/components/site/EventArticle";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
+import { downloadBlob, readAll } from "@/components/admin/data";
 import { supabase } from "@/integrations/supabase/client";
 import { invalidateContent } from "@/lib/content";
 import { clipPoster, EVENT_TYPE_COLORS, type EventPhoto, type EventType } from "@/data/events";
@@ -991,7 +992,7 @@ export function AccessManager() {
     run(p, "deny_account", { _user_id: p.user_id }, `${p.email} was denied`);
   };
   const resetFactor = (p: Person) => {
-    if (!confirm(`Reset two-factor sign-in for ${p.email}? They set it up again at their next sign-in.`)) return;
+    if (!confirm(`Reset two-factor sign-in for ${p.email}? They are signed out everywhere, and set it up again when they next sign in.`)) return;
     run(p, "reset_two_factor", { _user_id: p.user_id }, `Two-factor reset for ${p.email}`);
   };
 
@@ -1066,12 +1067,12 @@ export function NewsletterManager() {
   const [error, setError] = useState<string | null>(null);
 
   async function load() {
-    const { data, error } = await supabase
-      .from("newsletter_signups" as never)
-      .select("id, email, created_at")
-      .order("created_at", { ascending: false });
-    if (error) setError(error.message);
-    else setRows(data as unknown as Signup[]);
+    try {
+      const all = await readAll<Signup>("newsletter_signups", "id, email, created_at");
+      setRows(all.sort((a, b) => b.created_at.localeCompare(a.created_at)));
+    } catch (err) {
+      setError((err as Error).message);
+    }
   }
   useEffect(() => {
     load();
@@ -1089,11 +1090,7 @@ export function NewsletterManager() {
   function exportCsv() {
     if (!rows) return;
     const blob = new Blob([toCsv(["email", "signed up"], rows.map((r) => [r.email, r.created_at]))], { type: "text/csv" });
-    const a = document.createElement("a");
-    a.href = URL.createObjectURL(blob);
-    a.download = `emfc-newsletter-${todayInBarcelona()}.csv`;
-    a.click();
-    URL.revokeObjectURL(a.href);
+    downloadBlob(blob, `emfc-newsletter-${todayInBarcelona()}.csv`);
   }
 
   if (error) return <Missing error={error} />;

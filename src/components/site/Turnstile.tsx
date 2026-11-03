@@ -2,7 +2,8 @@ import { useEffect, useRef } from "react";
 
 // Cloudflare Turnstile, a privacy-friendly bot check, on the sponsorship form. Most people see a small
 // box that ticks itself. Shown only when VITE_TURNSTILE_SITE_KEY is set (a public key, from the
-// Cloudflare dashboard); the server checks the token with TURNSTILE_SECRET_KEY.
+// Cloudflare dashboard); the server checks the token with TURNSTILE_SECRET_KEY. A token works only
+// once, so the form shows a new check (a new `key`) after every send that doesn't go through.
 
 const SITE_KEY = import.meta.env.VITE_TURNSTILE_SITE_KEY as string | undefined;
 const SCRIPT = "https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit";
@@ -24,7 +25,12 @@ function loadScript() {
     s.src = SCRIPT;
     s.async = true;
     s.onload = () => resolve();
-    s.onerror = () => reject(new Error("Turnstile did not load"));
+    s.onerror = () => {
+      // Forgotten, so the next check (after a failed send) tries to load it again.
+      s.remove();
+      loading = undefined;
+      reject(new Error("Turnstile did not load"));
+    };
     document.head.appendChild(s);
   });
   return loading;
