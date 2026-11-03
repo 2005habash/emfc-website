@@ -1,6 +1,6 @@
 // Club statistics from the member form (64 answers, closed 1 November 2026), plus the two leaders
 // on the site who did not fill it in. Totals only, nothing about one person, and only figures that
-// help the club (Vasco's decision). Source: content/2026-11-02/statistics.
+// help the club (Vasco's decision). Source: the content package statistics (club Drive).
 
 export const STATS = {
   members: 66,

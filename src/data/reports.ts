@@ -1,5 +1,5 @@
 // Every report and document the departments have published or announced, from the content package
-// of 2 November 2026 (content/2026-11-02/reports.json). Each one shows on its desk or department
+// of 2 November 2026 (reports.json, club Drive). Each one shows on its desk or department
 // page and in the library on the Resources page (decided 2 November).
 // Once the admin page is live, reports come from the database and this list is the fallback.
 

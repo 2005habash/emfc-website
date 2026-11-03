@@ -1,7 +1,7 @@
 // Departments and their desks. Texts are the departments' own, word for word, from the content package
-// of 2 November 2026 (content/2026-11-02/departments). People come from src/data/members.ts.
+// of 2 November 2026 (departments/, in the club Drive). People come from src/data/members.ts.
 // `drafted: true` marks a text written from the department's material, waiting for its Head or
-// Vice-President to confirm (see REVAMP-PLAN.md, section 13). The flag is never shown on the site.
+// Vice-President to confirm (see the revamp plan in the club Drive, section 13). The flag is never shown on the site.
 
 export type Firm = {
   name: string;

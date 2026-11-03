@@ -54,7 +54,7 @@ const LOGO_DEV_TOKEN = "pk_RUlFftUYS4eetzgWC4_DYA";
 export const logoUrl = (domain: string, size = 120) =>
   `https://img.logo.dev/${domain}?token=${LOGO_DEV_TOKEN}&format=png&size=${size}&retina=true`;
 
-/** "Where our members have worked": firms from the member form (content/2026-11-02/statistics). */
+/** "Where our members have worked": firms from the member form (the content package statistics, club Drive). */
 export const MEMBER_FIRMS = [
   { name: "J.P. Morgan", domain: "jpmorgan.com" },
   { name: "UBS", domain: "ubs.com" },

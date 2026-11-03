@@ -40,3 +40,9 @@ dist-ssr
 !.env.example
 .vercel
 !.env.production
+
+# The club's content packages (member form exports, drafts, internal stats) are private: keep
+# them in the club Drive or ~/Documents/emfc-private, never in this public repository.
+/content/
+REVAMP-PLAN.md
+SECURITY-PLAN.md

@@ -1,13 +1,19 @@
 # EMFC website: handoff
 
-The EMFC (ESADE Master's Finance Club) website, rebuilt for launch. State as of 2 November 2026. Written for the next owner working with Claude Code: read this, then `REVAMP-PLAN.md` for every decision and the reasons behind it (section 14 lists the decisions of 2 November). Previous owner: Zaid Habash (Vice-President, VC & Growth).
+The EMFC (ESADE Master's Finance Club) website. State as of 3 November 2026. Written for the next owner working with Claude Code: read this and `AGENTS.md` first. Previous owner: Zaid Habash (Vice-President, VC & Growth).
+
+**This repository is public.** The club's private documents stay out of it, in the club Drive (on the original machine also in `~/Documents/emfc-private`): the revamp plan `REVAMP-PLAN.md` (every decision of the rebuild and its reasons; section 13 is what is still owed, section 14 the decisions of 2 November), the security plan `SECURITY-PLAN.md`, and the content packages `content/<date>/` (the member form export, the departments' texts, events, reports and the internal statistics). `.gitignore` keeps those names out. Never commit people's details, email addresses or keys here.
 
 ## 1. Where it stands
 
-- **The site is leaving Lovable** (decided 2 November, evening). It moves to the club's own accounts: code on GitHub at `2005habash/emfc-website` (public; Vercel's free plan only deploys personal repositories, so it moves to a club account at the handover with Settings, Transfer), hosting on Vercel, and a new Supabase project (`rqgjcdttfccemcyxulub`) that starts fresh. Nothing from Lovable Cloud (applications, CVs, newsletter sign-ups) is carried over. Until the domain switch, https://emfc.es still serves the old Lovable site.
-- **The launch build** is on the git branch `revamp` (`main` locally holds the 27 October starting point).
-- **Built and checked:** 66 members with matching portraits, 6 department pages and 15 desk pages, 10 events with photos and clips, a library of 12 reports, the club statistics, the sponsorship form that sends from the site, the newsletter with consent, a privacy page, and an admin page. The production build passes; no page overflows at phone width.
-- **Not yet working live**, because it needs accounts (section 8): the new database tables, sponsorship emails, admin logins, publishing.
+- **Live at https://www.emfc.es** (emfc.es forwards to it) since 3 November 2026. The site has left Lovable: https://emfc.lovable.app forwards to emfc.es, and nothing from Lovable Cloud (applications, CVs, newsletter sign-ups) was carried over.
+- **Code:** github.com/2005habash/emfc-website, branch `main` (locally the branch `revamp` tracks it). Vercel deploys every push to `main`, see `AGENTS.md`.
+- **Hosting:** Vercel, project `emfc1/emfc-website`, free plan. The free plan only deploys repositories of a personal GitHub account, so at the handover the repository moves to a club-owned personal account (GitHub, Settings, Transfer), not to an organisation.
+- **Database, sign-in and uploads:** Supabase project `rqgjcdttfccemcyxulub` ("emfc", eu-west-1), free plan. Supabase's Vercel integration keeps its keys in the Vercel project (production only).
+- **Email:** Resend, sending as @emfc.es: the sponsorship enquiries, and the admin page's sign-in emails (Supabase sends them through Resend).
+- **Domain:** emfc.es at one.com, which also holds the DNS (the records for Vercel and Resend).
+- **Built and checked:** 66 members with matching portraits, 6 department pages and 15 desk pages, 10 events with photos and clips, a library of 12 reports, the club statistics, the sponsorship form, the newsletter with consent, a privacy page, anonymous analytics, and the admin page with two levels of access and two-factor sign-in (section 9).
+- **Security, part 2** (`supabase/migrations/20261103170000_security_lockdown.sql`) runs once the admins have set up two-factor sign-in; until then the database still accepts the older, looser rules for events, reports and the people's data.
 
 ## 2. Run it
 
@@ -17,7 +23,13 @@ npm install        # first time only
 npm run dev        # http://localhost:8080
 ```
 
-`.claude/launch.json` runs it on port 5173 for Claude's browser preview. Use npm. Keys go in `.env` (never committed; Vercel holds the same names): `VITE_SUPABASE_URL`, `VITE_SUPABASE_PUBLISHABLE_KEY`, `VITE_SUPABASE_PROJECT_ID`, `SUPABASE_URL`, `SUPABASE_PUBLISHABLE_KEY`, and for email `RESEND_API_KEY`, `SPONSORSHIP_RECIPIENTS`, `SPONSORSHIP_FROM`.
+`.claude/launch.json` runs it on port 5173 for Claude's browser preview. Use npm, and run `npm run build` and `npm run lint:copy` before every push. The public Supabase values are committed in `.env.production`. Secrets go in `.env` (never committed; Vercel holds the same names):
+
+- `SUPABASE_SECRET_KEY` (Supabase, Project Settings, API Keys): the server saves enquiries, newsletter sign-ups and analytics with it. Without it, those forms fail locally with "No server secret".
+- `RESEND_API_KEY`, `SPONSORSHIP_RECIPIENTS` (comma-separated), `SPONSORSHIP_FROM`: the sponsorship emails. Without them an enquiry is saved and printed to the server log, not emailed.
+- `TURNSTILE_SECRET_KEY`, with `VITE_TURNSTILE_SITE_KEY` in `.env.production`: the bot check on the sponsorship form (section 9). Optional.
+
+The security headers only apply to production builds: to test them locally, `npm run build`, then `node .output/server/index.mjs`.
 
 ## 3. Design rules (keep them)
 
@@ -38,32 +50,37 @@ npm run dev        # http://localhost:8080
 | Departments, their 15 desks, texts and target firms | `src/lib/departments.ts` |
 | Events (fallback list), reports (fallback list), statistics | `src/data/events.ts`, `src/data/reports.ts`, `src/data/stats.ts` |
 | Loading events and reports from the database, with the fallback | `src/lib/content.ts` |
-| Sponsorship form's server function (save and email) | `src/lib/enquiries.ts` |
+| Sponsorship form's server function (checks, saves and emails) | `src/lib/enquiries.ts` |
+| Newsletter sign-up's server function | `src/lib/newsletter.ts` |
+| Server-only helpers: the secret-key database client, rate limits, the bot check | `src/lib/server/guard.ts` (nothing in `server/` can reach the browser) |
+| Security headers and the Content Security Policy | `src/lib/server/security-headers.ts`, applied in `src/server.ts`; static files get theirs in `vite.config.ts` |
 | Settings: socials, next intake date, fund switch, member firms, nav | `src/lib/site.ts` |
 | People helpers (leadership, associates by desk, homepage strip) | `src/lib/team.ts` |
 | Shared pieces: portraits, person cards and profiles, page sections | `src/components/site/ui.tsx`, `src/components/site/sections.tsx` |
-| Admin page content tabs, including Admins (who has admin access) | `src/components/admin/ContentManagers.tsx` |
+| The admin page: sign-in, two-factor, which tabs each level sees | `src/routes/club-office.tsx`, `src/components/admin/TwoFactor.tsx` |
+| Admin page tabs: events, reports, enquiries, newsletter, applications, Access (who can do what) | `src/components/admin/ContentManagers.tsx` |
+| Admin page's Backup tab (one zip of the data and files) | `src/components/admin/Backup.tsx` |
 | Analytics: what is counted (`src/lib/analytics.ts`) and the admin page's Analytics tab (`src/components/admin/Analytics.tsx`); database in `supabase/migrations/20261103120000_analytics.sql` | anonymous page views, profile opens, LinkedIn clicks and report downloads; no names, IPs or cookies |
 | An event's page, also used for the admin page's preview | `src/components/site/EventArticle.tsx` |
 | The picture shown when a link to the site is shared | `public/images/share/emfc.jpg`, made from `tools/share-card.html` (instructions inside) |
 | The full fund page, hidden until `FUND_PAGE_LIVE` is true | `src/components/fund/FundFull.tsx` |
 | Pages | `src/routes/`: `index`, `departments.index` (overview), `departments.$department`, `departments.$department_.$desk` (the `_` stops it nesting), `team`, `events`, `events_.$eventId`, `resources`, `fund`, `sponsorship`, `privacy`, `club-office` (admin) |
-| Database changes for this launch | `supabase/migrations/20261102180000_events_reports_enquiries.sql` |
-| The content package from Vasco (2 Nov), without emails | `content/2026-11-02/` (raw photos stay in the club Drive) |
+| Database: every change, in the order they were run (section 8) | `supabase/migrations/` |
+| The content package from Vasco (2 Nov), without emails | the club Drive, `content/2026-11-02/` (private; not in this repository) |
 | Images, clips, report PDFs | `public/images/{team,events,barcelona,logo}`, `public/videos/events`, `public/reports` |
 
 ## 5. Updating the content
 
-- **Events and reports:** once the database is set up (section 8), add and edit them on the admin page at `/club-office`, with photo and PDF uploads. An event also takes short MP4 clips (a still for each is made on upload) and the Brand team's recap slides, and **Preview** shows the event page before it is saved or shown. Until then, edit `src/data/events.ts` and `src/data/reports.ts`.
-- **People (each September):** export the member form to `content/<date>/members.json`, then run `node tools/import-members.mjs content/<date>`. People kept from before go in `kept-members.json`; photos that don't come from the form go in `photo-overrides.json`.
+- **Events and reports:** editors and admins add and edit them on the admin page at `/club-office`, with photo and PDF uploads. An event also takes short MP4 clips (a still for each is made on upload) and the Brand team's recap slides, and **Preview** shows the event page before it is saved or shown. `src/data/events.ts` and `src/data/reports.ts` are only the fallback for when the database can't be reached.
+- **People (each September):** make a new private content package in the club Drive: the member form export as `content/<date>/members.json`, plus `kept-members.json` (people kept from before), `photo-overrides.json` (photos that don't come from the form) and `role-changes.json` (title, desk and firm changes), copied from the last package and updated. Then run `node tools/import-members.mjs <that folder>`.
 - **Portraits:** write a list `[{ "in": "<photo>", "out": "public/images/team/<slug>.jpg" }]` (add `"crop": [x, y, w, h]` for screenshots) and run `swift tools/portraits.swift <list.json>` (macOS 14+). It cuts out the person, frames the head and keeps the body to the bottom edge. Look at every result. Match photos to people only by how the sender labelled them, never by faces.
 - **Fund:** set `FUND_PAGE_LIVE = true` in `src/lib/site.ts` once there are holdings; the full page is ready behind it.
 
-## 6. Sharing a private preview
+## 6. Previews
 
-`tools/export-static.sh` builds a static copy of all 39 pages with "don't index" protection and writes `~/Documents/emfc-website-preview.zip` (38 MB). Upload it at dash.cloudflare.com, Workers & Pages, Create, Pages, Upload assets; optionally put Cloudflare Zero Trust Access in front. In a static preview the sponsorship form cannot send (it needs the server) and shows its error message; the newsletter writes to the **real** sign-up list. Re-run the script after every change.
+Every branch pushed to GitHub other than `main` gets a private preview on Vercel (the project's Deployments page; only members of the Vercel team can open it). Previews don't get the Supabase secret key (the integration sets it for production only), so on a preview the sponsorship form, the newsletter and analytics can't save. `tools/export-static.sh` still builds a static copy, `~/Documents/emfc-website-preview.zip`, for sharing outside Vercel; nothing can be sent from it.
 
-## 7. Before launch: what is still owed
+## 7. What is still owed
 
 | Who | What |
 | --- | --- |
@@ -72,27 +89,48 @@ npm run dev        # http://localhost:8080
 | Cosimo, Luka | Confirm the drafted desk texts for Asset Management (3) and Fixed Income (6) |
 | Lara Koch, Aaron Kark, Aditya Sunil Shajwani | Head-and-shoulders photos (they show initials until then) |
 | Vasco | Confirm the Team page hero photo and that the Co-Presidents band was the section to turn white |
-| Vasco, Diogo, Nick | The addresses that should receive sponsorship enquiries |
-| Department Heads | One review round on the private preview (section 6), then freeze |
+| Department Heads | One review round on the live site |
 
-The full list, with what each item blocks, is in `REVAMP-PLAN.md` section 13.
+The full list, with what each item blocks, is in the revamp plan (club Drive), section 13.
 
-## 8. Going live
+## 8. How it is set up
 
-1. **Code:** the private repository `2005habash/emfc-website`, with the launch build as `main`. Follow `AGENTS.md`: Vercel deploys every push to `main`.
-2. **Database:** in the Supabase project's SQL Editor, run `supabase/migrations/20261102170000_initial_schema.sql` (admin roles, applications, CV storage, newsletter), then `20261102180000_events_reports_enquiries.sql` (events, reports, enquiries, upload buckets, and the launch events and reports). The old Lovable migrations are archived in `supabase/lovable-migrations/`.
-3. **Hosting:** a Vercel project connected to the GitHub repository, with the build settings Vercel suggests. The public Supabase values are in the repository (`.env.production`), so Vercel only needs the email keys. Check the site on its `vercel.app` address before touching the domain.
-4. **Email:** a Resend account; verify emfc.es there by adding its DNS records at one.com (where the domain's DNS lives), then set `RESEND_API_KEY`, `SPONSORSHIP_RECIPIENTS` (comma-separated) and `SPONSORSHIP_FROM` (for example `EMFC website <website@emfc.es>`) in the Vercel project. Without them, enquiries are saved but not emailed.
-5. **Admin logins** for the two Co-Presidents, the Head of Brand and the site owner:
-   - Each of them opens `/club-office`, chooses "New admin? Create your account" and confirms the email. The account opens nothing yet.
-   - Any admin then switches it on in the admin page's **Admins** tab (it needs `supabase/migrations/20261103090000_admin_access.sql`, already run). The page shows "No admin access yet" until then. The admin page is linked, quietly, as "Admin" at the bottom of the footer.
-   - Forgotten passwords: "Forgot your password?" emails a link back to `/club-office`.
-   - In Supabase, Authentication, URL Configuration: set the Site URL to `https://emfc.es` and allow the `vercel.app` address while testing. If an email link lands on another page of the site, the site forwards it to `/club-office`. Supabase's built-in email sends only a few messages an hour; for more, connect Resend as its SMTP sender.
-6. **Domain:** add emfc.es and www.emfc.es in the Vercel project, then at one.com (where the DNS lives) set the records Vercel shows: an A record for emfc.es and a CNAME for www. Afterwards, close the Lovable project.
-7. **Check:** the sponsorship form reaches every recipient, one event and one report added on the admin page, every page in light and dark mode at phone width.
-8. **Accounts:** GitHub, Vercel, Supabase, Resend and the domain registrar under one club-owned login before handing over.
+1. **Code and hosting:** `main` of `2005habash/emfc-website`, deployed by the Vercel project `emfc1/emfc-website` with the build settings Vercel suggested. Vercel's environment variables: the Supabase integration's keys (the site uses `SUPABASE_SECRET_KEY`; the Postgres, JWT, anon and `NEXT_PUBLIC_` ones are unused, and the integration keeps them in sync), `RESEND_API_KEY`, `SPONSORSHIP_RECIPIENTS`, `SPONSORSHIP_FROM`, and `TURNSTILE_SECRET_KEY` once the bot check is set up.
+2. **Database:** the files in `supabase/migrations/`, run in this order in the Supabase SQL Editor: `20261102170000_initial_schema` (roles, applications, CV storage, newsletter), `20261102180000_events_reports_enquiries` (events, reports, enquiries, upload buckets, the launch events and reports), `20261103090000_admin_access`, `20261103120000_analytics`, `20261103140000_deny_account`, `20261103160000_security_roles_and_two_factor` (security, part 1) and `20261103170000_security_lockdown` (part 2). The old Lovable migrations are archived in `supabase/lovable-migrations/`.
+3. **Sign-in:** in Supabase, Authentication: the Site URL is `https://www.emfc.es`, emails go out through Resend (custom SMTP) with a raised hourly limit, and two-factor with an authenticator app (TOTP) is on. If an email link lands on another page of the site, the site forwards it to `/club-office`.
+4. **Email:** emfc.es is verified in Resend (its DKIM, SPF and DMARC records are at one.com).
+5. **Domain:** at one.com, an A record for emfc.es and a CNAME for www, both to Vercel; Vercel forwards emfc.es to www.emfc.es.
+6. **Access to the admin page** (linked, quietly, as "Admin" at the bottom of the footer):
+   - Someone new opens `/club-office`, chooses "New admin? Create your account" and confirms the email. The account opens nothing yet.
+   - An admin gives it a level on the **Access** tab: **Editor** (events and reports) or **Admin** (everything). The admins are the site owner, the two Co-Presidents and the Head of Brand; everyone else who needs access is an editor. **Deny** deletes a sign-up nobody recognises.
+   - At their next sign-in they set up two-factor sign-in (a QR code for an authenticator app), and from then on type a code at each sign-in.
+   - A forgotten password: "Forgot your password?". A lost phone: another admin uses **Reset two-factor** on the Access tab.
+7. **Accounts:** GitHub, Vercel, Supabase, Resend, one.com and Cloudflare under one club-owned login before handing over, each with two-factor sign-in on.
 
-## 9. Known quirks
+## 9. Security
+
+- **Two levels, and two-factor enforced by the database.** Editors manage events and reports. Admins also see the enquiries, the newsletter, the analytics and the applications, manage access and download backups. The database honours either level only in a session that passed two-factor (`private.caller_is` in the security migrations), so a password alone opens nothing.
+- **The public only reads.** Anyone can read published events and reports. Sponsorship enquiries, newsletter sign-ups and analytics are saved by the site's server with the secret key (`src/lib/server/guard.ts`), with limits per sender (a hashed code, never the address itself): 3 enquiries an hour, 40 enquiry emails a day, 5 sign-ups an hour, 150 analytics events in 10 minutes.
+- **Bot check:** Cloudflare Turnstile on the sponsorship form, active once `VITE_TURNSTILE_SITE_KEY` (in `.env.production`) and `TURNSTILE_SECRET_KEY` (in Vercel) are set. Until then the form relies on the limits, a hidden field and a minimum time to fill it in.
+- **Security headers** on every response (`src/lib/server/security-headers.ts`). The Content Security Policy only runs the site's own scripts (the one inline script carries a fresh nonce per request), so injected scripts can't run; the site can't be framed; no camera, microphone or location. A new outside service (an embed, a font, a widget) has to be added there, or the browser blocks it.
+- **Links and uploads:** links saved on the admin page must be `https://` (files may also be site paths), checked in the form, in the database and when shown. Uploads are limited per bucket (event media: 50 MB, JPEG, PNG, WebP, MP4, WebM; reports: 20 MB PDF; CVs: 10 MB PDF), and deleting an event or report deletes its files.
+- **Privileges:** the public and signed-in roles have only the table rights they need, and new tables get none by default. When adding a table, grant what it needs and add its row-level policies in the same migration.
+- **Secrets** live only in Vercel and a local `.env`; `.env.production` holds public values only. If one leaks: in Supabase, API Keys, create a new secret key and delete the old one (the integration updates Vercel); in Resend, make a new API key and replace it in Vercel; then redeploy.
+- **Analytics** keep no names, addresses or cookies, and rows older than 13 months are deleted every night.
+
+**Monthly checklist** (about 15 minutes):
+
+1. Admin page, **Backup**: download the zip and keep it in the club Drive (the free database plan has no restore of its own). Weekly is better; the admin page reminds you after a week.
+2. Admin page, **Access**: remove people who have left, deny sign-ups nobody knows, and check that every editor and admin has two-factor on.
+3. Supabase: Advisors, Security Advisor shows no errors; Authentication, Users has no unexpected accounts.
+4. GitHub: merge Dependabot's updates once their Vercel preview builds; `npm audit --omit=dev` finds nothing.
+5. Vercel: the latest production deployment is one of yours and Ready; no unknown environment variables.
+6. Resend: emfc.es still verified, no spike in bounces.
+7. Once a term: send one real enquiry from www.emfc.es/sponsorship and check that every recipient gets it.
+
+Each September, at the handover: give the new admins and editors their levels and remove the old ones, move the accounts to the new owner, and rotate the Supabase secret key and the Resend API key.
+
+## 10. Known quirks
 
 - `npx tsc` reports one error in `src/routes/__root.tsx` (ErrorComponent props, from the original Lovable template). It was there before and doesn't affect the build.
 - Renaming or moving a route file while `npm run dev` runs can leave a stale error in the browser; reload the page.
@@ -100,8 +138,9 @@ The full list, with what each item blocks, is in `REVAMP-PLAN.md` section 13.
 - Link previews (LinkedIn, WhatsApp) need full addresses, so pictures in page tags go through `absoluteUrl()` with `SITE_URL` (`src/lib/site.ts`). Pages without their own picture use the share image.
 - Between about 1024 and 1280px wide, the logo's subtitle and the social icons are hidden so the menu fits.
 - `vite.config.ts` lists the build plugins itself (Tailwind, paths, TanStack Start, Nitro, React); it no longer uses Lovable's config package.
-- The admin page's event, report and enquiry tabs have not been tested end to end yet: they need the database tables and an admin login. The event form, its preview and the clip stills were checked on a temporary copy of the form without the database, and the sign-in page's modes and expired-link message in the browser.
+- On Vercel previews the Content Security Policy blocks Vercel's own feedback toolbar. That is expected and harmless.
+- Adding an event and a report on the admin page, with uploads, has not yet been tested end to end on the live site.
 
-## 10. Other files made along the way
+## 11. Other files made along the way
 
 In `~/Documents` on the original machine: `emfc-bull-logo-navy.png` (bull on a navy square, 900×900), `emfc-bull-logo-transparent.png`, and `emfc-website-preview.zip` (the latest preview build).

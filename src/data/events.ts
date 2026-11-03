@@ -1,5 +1,5 @@
 // Every EMFC event, oldest first. Texts from the content package of 2 November 2026
-// (content/2026-11-02/events): Marketing's version wins where departments differed, and the kickoff
+// (events/, in the club Drive): Marketing's version wins where departments differed, and the kickoff
 // dinner is on 26 September (decided 2 November). The site shows the day only, never a time.
 // Once the admin page is live, events come from the database and this list is the fallback.
 
