@@ -88,7 +88,7 @@ Every branch pushed to GitHub other than `main` gets a private preview on Vercel
 | Zaid | The VC & Growth desk text (the site shows a draft from the 20 October call) and its 8 proposed firms |
 | Fabian, Anastasia | Confirm the drafted Private Equity and Fintech lines |
 | Cosimo, Luka | Confirm the drafted desk texts for Asset Management (3) and Fixed Income (6) |
-| Lara Koch, Aditya Sunil Shajwani | Head-and-shoulders photos (they show initials until then) |
+| Lara Koch | A head-and-shoulders photo (she shows initials until then) |
 | Vasco | Confirm the Team page hero photo and that the Co-Presidents band was the section to turn white |
 | Department Heads | One review round on the live site |
 

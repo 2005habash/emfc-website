@@ -796,7 +796,8 @@ export const MEMBERS: Member[] = [
       "Lloyds Banking Group",
       "HSBC",
       "EY"
-    ]
+    ],
+    "photo": "/images/team/aditya-sunil-shajwani.jpg"
   },
   {
     "name": "Anubhav Tamak",
