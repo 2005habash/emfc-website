@@ -53,8 +53,9 @@ async function shrink(file: File, max = 1600, quality = 0.82): Promise<Blob> {
 /** A clip this browser can't play, so many visitors couldn't either. */
 class UnplayableClip extends Error {}
 
-/** The storage's limit for one file. Short clips are a few MB. */
+/** The storage's limits for one file (set per bucket in the database). Short clips are a few MB. */
 const MAX_CLIP_MB = 50;
+const MAX_PDF_MB = 20;
 
 /**
  * Takes a still from a clip, half a second in, for the picture shown before it plays. Resolves with
@@ -718,6 +719,10 @@ function ReportForm({ initial, onDone }: { initial: ReportRow; onDone: () => voi
     if (!file) return;
     if (file.type !== "application/pdf") {
       toast.error("Please choose a PDF.");
+      return;
+    }
+    if (file.size > MAX_PDF_MB * 1024 * 1024) {
+      toast.error(`${file.name} is over ${MAX_PDF_MB} MB. Export it smaller, then add it again.`);
       return;
     }
     setBusy(true);

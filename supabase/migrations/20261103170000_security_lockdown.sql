@@ -4,7 +4,8 @@
 --   * the public can no longer write anywhere: the website's server saves enquiries, newsletter
 --     sign-ups and analytics with the secret key; applications are closed until the next intake;
 --   * the public and signed-in roles keep only the table privileges they need;
---   * upload limits per storage bucket; links in events and reports must be https or site paths;
+--   * only editors can list the storage buckets; upload limits per bucket; links in events and
+--     reports must be https or site paths;
 --   * analytics older than 13 months are deleted every night.
 
 -- Events and reports: anyone reads what's published; editors (and admins) with two-factor do the rest.
@@ -45,7 +46,12 @@ create policy "Admins read applications" on public.applications for select to au
 
 drop policy if exists "The website records events" on public.analytics_events;
 
--- Storage: event media and report PDFs stay public to read; editors upload and remove them. CVs: admins.
+-- Storage: event media and report PDFs stay public to read by their address (public buckets need no
+-- rule for that); only editors list, upload and remove them, so drafts' files can't be found by listing.
+-- CVs: admins.
+drop policy if exists "Anyone reads event media and reports" on storage.objects;
+create policy "Editors list event media and reports" on storage.objects for select to authenticated
+  using (bucket_id in ('event-media', 'reports') and private.caller_is('editor'));
 drop policy if exists "Admins upload event media and reports" on storage.objects;
 drop policy if exists "Admins replace event media and reports" on storage.objects;
 drop policy if exists "Admins delete event media and reports" on storage.objects;
