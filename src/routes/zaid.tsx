@@ -1,10 +1,12 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Linkedin } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { SiteLayout } from "@/components/layout/SiteLayout";
 import { CountUp, Em, Eyebrow } from "@/components/site/ui";
 import { memberByName } from "@/lib/team";
 import { cn } from "@/lib/utils";
+import { MiataRun } from "@/components/zaid/MiataRun";
+import { FUN_CSS, HypeMeter, rain, useZaidKeys, ZaidRain } from "@/components/zaid/ZaidFun";
 
 // emfc.es/zaid: a deliberately over-the-top tribute to the site owner, at his request (3 November 2026).
 // Facts and photos come from his own site (~/Documents/zaidhabash-site, photos by him); everything
@@ -41,7 +43,7 @@ const HEADLINES = [
 ];
 
 const NUMBERS = [
-  { value: 3, label: "Languages he is fluent in", note: "English, Arabic, Swedish. And Excel." },
+  { value: 4, label: "Languages he is fluent in", note: "English, Arabic, Swedish and Excel" },
   { value: 42, label: "People he led as President of 180 Degrees Consulting Sweden", note: "All 42 still talk about it" },
   { value: 304, label: "Index changes hand-collected for his thesis", note: "By hand. For fun. Graded Very Good." },
   { value: 2, suffix: "/2", label: "Stock pitches the student fund invested in", note: "A perfect record. Statistically unbeatable." },
@@ -49,45 +51,6 @@ const NUMBERS = [
   { value: 10, label: "Countries visited since August 2025", note: "Source: his camera roll, which does not lie" },
   { value: 66, label: "Club portraits cropped to the exact same head size", note: "No floating torsos. Ever." },
   { value: 0, label: "Em dashes tolerated on this website", note: "Zero. Not one. Don't even think about it." },
-];
-
-const CV = [
-  {
-    where: "Strawberry, Stockholm",
-    role: "Founding GTM, AI-native browser",
-    real: "Ran outreach, discovery calls and demos, and built his own research tools with Claude Code.",
-    legend: "Found customers before the customers knew they were customers.",
-  },
-  {
-    where: "180 Degrees Consulting",
-    role: "Consultant, then Consulting Director, then President",
-    real: "12 pro bono projects, including Doctors Without Borders. 36 people recruited from 150+ applicants. SEK 65k raised.",
-    legend: "Promoted so fast the org chart needed a scroll bar. Now supports 17 branches across the Middle East and Africa.",
-  },
-  {
-    where: "Airis Garden",
-    role: "CFO of a four-person startup",
-    real: "A 12-month liquidity model, budgets and cash-flow planning.",
-    legend: "Runway so visible it can be seen from space.",
-  },
-  {
-    where: "Nordea",
-    role: "ESG Analyst",
-    real: "Calculated emissions for 150+ portfolio companies under the GHG Protocol.",
-    legend: "The planet sent a thank-you card. It was recycled, obviously.",
-  },
-  {
-    where: "Stockholm Student Investment Fund",
-    role: "Renewable Energy Analyst",
-    real: "DCF and comps pitches to professionals from ABG, Pareto and SEB.",
-    legend: "Pitched two stocks. The fund bought both. Has not missed since, mainly by not pitching again.",
-  },
-  {
-    where: "Stockholm School of Economics, then ESADE",
-    role: "BSc, then MSc in Finance (ranked #10 in Europe)",
-    real: "Thesis on whether joining the FTSE 100 still moves a stock's price. Mostly, it doesn't.",
-    legend: "Proved index inclusion no longer moves prices. He moves them instead.",
-  },
 ];
 
 const TALENTS = [
@@ -148,9 +111,14 @@ function Respects() {
       // Private mode: start from zero.
     }
   }, []);
+  const button = useRef<HTMLButtonElement>(null);
   const pay = () => {
     const next = count + 1;
     setCount(next);
+    if (next % 5 === 0 && button.current) {
+      const b = button.current.getBoundingClientRect();
+      rain(18, { x: b.left + b.width / 2, y: b.top });
+    }
     try {
       localStorage.setItem("emfc-respects", String(next));
     } catch {
@@ -161,6 +129,7 @@ function Respects() {
     <div className="flex flex-col items-center gap-6 text-center">
       <button
         type="button"
+        ref={button}
         onClick={pay}
         className={cn(
           "btn btn-ink h-16 px-10 text-[12px] transition-transform active:scale-95",
@@ -193,9 +162,33 @@ function Heading({ eyebrow, children, intro }: { eyebrow: string; children: Reac
 }
 
 function ZaidPage() {
+  const [hype, setHype] = useState(1);
+  const [maximum, setMaximum] = useState(false);
+  const [driving, setDriving] = useState(false);
+  const storm = useCallback(() => rain(60), []);
+  useZaidKeys(storm);
+  const changeHype = (n: number) => {
+    setHype(n);
+    if (n === 11 && hype !== 11) {
+      rain(90);
+      setMaximum(true);
+      setTimeout(() => setMaximum(false), 2400);
+    }
+  };
   return (
     <SiteLayout>
-      <style>{`@keyframes respect { 0% { transform: scale(1) } 40% { transform: scale(1.12) rotate(-2deg) } 100% { transform: scale(1) } }`}</style>
+      <style>{FUN_CSS}</style>
+      <ZaidRain />
+      {maximum && (
+        <div aria-hidden className="pointer-events-none fixed inset-0 z-[70] grid place-items-center">
+          <p className="animate-[maximum_2.4s_ease-out_forwards] text-center font-serif text-[22vw]/[0.85] italic text-bull drop-shadow-[0_8px_30px_rgb(0_11_61/0.35)] md:text-[16vw]/[0.85]">
+            MAXIMUM
+            <br />
+            ZAID
+          </p>
+        </div>
+      )}
+      <div className={cn(hype >= 5 && "hype-5", hype >= 7 && "hype-7", hype >= 9 && "hype-9", hype === 11 && "hype-11")}>
 
       {/* The arrival */}
       <section className="relative overflow-hidden bg-night text-white">
@@ -270,6 +263,20 @@ function ZaidPage() {
         </dl>
       </section>
 
+      {/* Hype control */}
+      <section className="border-y border-line bg-paper">
+        <div className="gutter flex flex-col items-center gap-10 py-20 text-center lg:py-28">
+          <Eyebrow center>Hype control</Eyebrow>
+          <h2 className="font-serif text-[44px]/[1] tracking-[-0.01em] md:text-[72px]/[1]">
+            This one goes to <Em>eleven</Em>
+          </h2>
+          <p className="max-w-[560px] text-[16px]/[1.6] text-mute md:text-[18px]/[1.6]">
+            Set the level of appreciation for this page. We recommend starting low. Nobody has ever started low.
+          </p>
+          <HypeMeter level={hype} onChange={changeHype} />
+        </div>
+      </section>
+
       {/* On the edge: the climber stands in front of the words, the mountains behind them */}
       <section aria-label="Via ferrata in Valais, Switzerland" className="relative overflow-hidden bg-night">
         <div className="relative aspect-[4/5] w-full sm:aspect-[16/10] lg:aspect-[16/9]">
@@ -294,31 +301,8 @@ function ZaidPage() {
         </div>
       </section>
 
-      {/* The CV */}
-      <section className="gutter flex flex-col gap-12 py-20 lg:py-28">
-        <Heading
-          eyebrow="The record"
-          intro="Every line below is true. The second half of every line is how history will remember it."
-        >
-          The CV that made <Em>recruiters weep</Em>
-        </Heading>
-        <ol className="grid gap-px bg-line md:grid-cols-2">
-          {CV.map((c, i) => (
-            <li key={c.where} className="flex flex-col gap-4 bg-paper p-8">
-              <div className="flex items-baseline justify-between gap-4">
-                <span className="caps text-[10.5px] tracking-[0.22em] text-bull">{c.where}</span>
-                <span className="font-serif text-[28px]/none italic text-bull/40">{String(i + 1).padStart(2, "0")}</span>
-              </div>
-              <h3 className="font-serif text-[30px]/[1.1]">{c.role}</h3>
-              <p className="text-[15px]/[1.6] text-mute">{c.real}</p>
-              <p className="border-t border-line pt-4 font-serif text-[22px]/[1.3] italic text-bull">{c.legend}</p>
-            </li>
-          ))}
-        </ol>
-      </section>
-
       {/* Man and machine */}
-      <section className="bg-stone">
+      <section className="overflow-hidden bg-stone">
         <div className="gutter grid items-center gap-12 py-20 lg:grid-cols-12 lg:gap-8 lg:py-28">
           <div className="flex flex-col gap-6 lg:col-span-5">
             <Eyebrow>Man and machine</Eyebrow>
@@ -343,7 +327,25 @@ function ZaidPage() {
             </dl>
           </div>
           <div className="lg:col-span-7">
-            <img src={PHOTOS.miata} alt="Zaid smiling next to his red 1991 Mazda Miata" className="mx-auto w-full max-w-[680px]" />
+            <div className="flex flex-col items-center gap-6">
+              <button
+                type="button"
+                onClick={() => setDriving(true)}
+                aria-label="Drive the Miata: start the game"
+                className="group block w-full cursor-pointer"
+              >
+                <img
+                  src={PHOTOS.miata}
+                  alt="Zaid smiling next to his red 1991 Mazda Miata"
+                  className="mx-auto w-full max-w-[680px] transition duration-300 group-hover:-translate-y-1 group-hover:scale-[1.02]"
+                />
+              </button>
+              <button type="button" onClick={() => setDriving(true)} className="btn btn-ink">
+                Drive it
+              </button>
+              <p className="caps text-[10px] tracking-[0.24em] text-mute">Click the Miata. It wants to go for a drive.</p>
+            </div>
+            <MiataRun open={driving} onClose={() => setDriving(false)} />
           </div>
         </div>
       </section>
@@ -422,6 +424,9 @@ function ZaidPage() {
             This page was absolutely not written by Zaid. It was written by the website, out of gratitude. The website
             was rebuilt by Zaid. Draw your own conclusions.
           </p>
+          <button type="button" onClick={() => rain(60)} className="caps text-[10px] tracking-[0.24em] text-bull-light underline-offset-4 hover:underline">
+            Psst: type Z A I D anywhere on this page. Or press here.
+          </button>
           {zaid.linkedin && (
             <a href={zaid.linkedin} data-linkedin-of={zaid.name} target="_blank" rel="noreferrer" className="btn btn-sm btn-outline-white">
               <Linkedin className="h-3.5 w-3.5" strokeWidth={1.75} />
@@ -430,6 +435,7 @@ function ZaidPage() {
           )}
         </div>
       </section>
+      </div>
     </SiteLayout>
   );
 }
