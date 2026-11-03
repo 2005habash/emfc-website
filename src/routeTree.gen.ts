@@ -14,6 +14,7 @@ import { Route as ClubOfficeRouteImport } from './routes/club-office'
 import { Route as EventsRouteImport } from './routes/events'
 import { Route as FundRouteImport } from './routes/fund'
 import { Route as PrivacyRouteImport } from './routes/privacy'
+import { Route as PuzzleRouteImport } from './routes/puzzle'
 import { Route as ResourcesRouteImport } from './routes/resources'
 import { Route as SponsorshipRouteImport } from './routes/sponsorship'
 import { Route as TeamRouteImport } from './routes/team'
@@ -46,6 +47,11 @@ const FundRoute = FundRouteImport.update({
 const PrivacyRoute = PrivacyRouteImport.update({
   id: '/privacy',
   path: '/privacy',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PuzzleRoute = PuzzleRouteImport.update({
+  id: '/puzzle',
+  path: '/puzzle',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ResourcesRoute = ResourcesRouteImport.update({
@@ -96,6 +102,7 @@ export interface FileRoutesByFullPath {
   '/events': typeof EventsRoute
   '/fund': typeof FundRoute
   '/privacy': typeof PrivacyRoute
+  '/puzzle': typeof PuzzleRoute
   '/resources': typeof ResourcesRoute
   '/sponsorship': typeof SponsorshipRoute
   '/team': typeof TeamRoute
@@ -111,6 +118,7 @@ export interface FileRoutesByTo {
   '/events': typeof EventsRoute
   '/fund': typeof FundRoute
   '/privacy': typeof PrivacyRoute
+  '/puzzle': typeof PuzzleRoute
   '/resources': typeof ResourcesRoute
   '/sponsorship': typeof SponsorshipRoute
   '/team': typeof TeamRoute
@@ -127,6 +135,7 @@ export interface FileRoutesById {
   '/events': typeof EventsRoute
   '/fund': typeof FundRoute
   '/privacy': typeof PrivacyRoute
+  '/puzzle': typeof PuzzleRoute
   '/resources': typeof ResourcesRoute
   '/sponsorship': typeof SponsorshipRoute
   '/team': typeof TeamRoute
@@ -144,6 +153,7 @@ export interface FileRouteTypes {
     | '/events'
     | '/fund'
     | '/privacy'
+    | '/puzzle'
     | '/resources'
     | '/sponsorship'
     | '/team'
@@ -159,6 +169,7 @@ export interface FileRouteTypes {
     | '/events'
     | '/fund'
     | '/privacy'
+    | '/puzzle'
     | '/resources'
     | '/sponsorship'
     | '/team'
@@ -174,6 +185,7 @@ export interface FileRouteTypes {
     | '/events'
     | '/fund'
     | '/privacy'
+    | '/puzzle'
     | '/resources'
     | '/sponsorship'
     | '/team'
@@ -190,6 +202,7 @@ export interface RootRouteChildren {
   EventsRoute: typeof EventsRoute
   FundRoute: typeof FundRoute
   PrivacyRoute: typeof PrivacyRoute
+  PuzzleRoute: typeof PuzzleRoute
   ResourcesRoute: typeof ResourcesRoute
   SponsorshipRoute: typeof SponsorshipRoute
   TeamRoute: typeof TeamRoute
@@ -235,6 +248,13 @@ declare module '@tanstack/react-router' {
       path: '/privacy'
       fullPath: '/privacy'
       preLoaderRoute: typeof PrivacyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/puzzle': {
+      id: '/puzzle'
+      path: '/puzzle'
+      fullPath: '/puzzle'
+      preLoaderRoute: typeof PuzzleRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/resources': {
@@ -302,6 +322,7 @@ const rootRouteChildren: RootRouteChildren = {
   EventsRoute: EventsRoute,
   FundRoute: FundRoute,
   PrivacyRoute: PrivacyRoute,
+  PuzzleRoute: PuzzleRoute,
   ResourcesRoute: ResourcesRoute,
   SponsorshipRoute: SponsorshipRoute,
   TeamRoute: TeamRoute,
