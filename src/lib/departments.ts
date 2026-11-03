@@ -533,8 +533,8 @@ export const departments: Department[] = [
     desks: [],
   },
   {
-    slug: "brand",
-    name: "Brand",
+    slug: "marketing",
+    name: "Marketing",
     short: "Brand, communications, social media and event execution.",
     long: "Open to all master's students. Own EMFC's voice, social channels, member communications and on-the-ground event execution.",
     function: "Brand, communications, social media and event execution.",
@@ -560,14 +560,19 @@ export const departments: Department[] = [
   },
 ];
 
-/** Old department slugs, for links made before the October 2026 rename. */
+/**
+ * Old department slugs, for links and saved events made before a rename: Private Markets' old name
+ * (October 2026), and Brand, Marketing's name from 2 to 4 November 2026.
+ */
 export const DEPARTMENT_ALIASES: Record<string, string> = {
   "pe-vc-fintech-real-assets": "private-markets",
-  marketing: "brand",
+  brand: "marketing",
 };
 
-export const getDepartment = (slug: string) =>
-  departments.find((d) => d.slug === (DEPARTMENT_ALIASES[slug] ?? slug));
+/** The current slug for a department, also given an old one. */
+export const departmentSlug = (slug: string) => DEPARTMENT_ALIASES[slug] ?? slug;
+
+export const getDepartment = (slug: string) => departments.find((d) => d.slug === departmentSlug(slug));
 
 export const getDesk = (department: string, desk: string) =>
   getDepartment(department)?.desks.find((k) => k.slug === desk);

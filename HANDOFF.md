@@ -37,7 +37,7 @@ The security headers only apply to production builds: to test them locally, `npm
 
 - **Colours** (`src/styles.css`, flipped for dark mode under `.dark`): page `--c-paper #faf8f4`, alt sections `--c-stone #f1ede5`, text `--c-ink #141b34`, secondary `--c-mute #555c72`, lines `--c-line #ddd6c9`, navy `--c-night #000b3d`. The only accents are the bull logo's blues: `--c-bull #5a67a2` on light backgrounds, `--c-bull-light #9ca8d4` on navy. Use the Tailwind names (`text-bull`, `bg-night`, `border-line`), never raw hex. There is no gold anywhere any more.
 - **Type:** Cormorant Garamond (headings, italic accents via `<Em>`) and Geist (body). Small labels use `caps` with wide tracking, never below 10px.
-- **Copy rules (Vasco's):** no middle dots and no em dashes anywhere on the site; "Vice-President" written out; only Diogo Oliveira and Vasco Lemos are "Founder"; the Advisory Board are "Advisor"; the Marketing department is called Brand, and David Villar is Head of Brand.
+- **Copy rules (Vasco's):** no middle dots and no em dashes anywhere on the site; "Vice-President" written out; only Diogo Oliveira and Vasco Lemos are "Founder"; the Advisory Board are "Advisor"; the Marketing department is called Marketing, and David Villar is Head of Marketing (it was called Brand from 2 to 4 November 2026; old `/departments/brand` links and saved events still work).
 - **Privacy:** members show only name, photo, title, programme, LinkedIn and up to 3 firms. **No email addresses anywhere**, in the pages or in the code. Statistics are totals only.
 - **Portraits:** cut out onto white, a 1024 square, head about 55% of the height, face centred, the body always reaching the bottom edge. Grayscale until hovered.
 - **Motion:** subtle. `Reveal` fades content up once in view, but only when the page is allowed to animate (the `motion` class, set before paint in `__root.tsx`); with reduced motion or no JavaScript everything is simply visible.
@@ -72,7 +72,7 @@ The security headers only apply to production builds: to test them locally, `npm
 
 ## 5. Updating the content
 
-- **Events and reports:** editors and admins add and edit them on the admin page at `/club-office`, with photo and PDF uploads. An event also takes short MP4 clips (a still for each is made on upload) and the Brand team's recap slides, and **Preview** shows the event page before it is saved or shown. `src/data/events.ts` and `src/data/reports.ts` are only the fallback for when the database can't be reached.
+- **Events and reports:** editors and admins add and edit them on the admin page at `/club-office`, with photo and PDF uploads. An event also takes short MP4 clips (a still for each is made on upload) and the Marketing team's recap slides, and **Preview** shows the event page before it is saved or shown. `src/data/events.ts` and `src/data/reports.ts` are only the fallback for when the database can't be reached.
 - **People (each September):** make a new private content package in the club Drive: the member form export as `content/<date>/members.json`, plus `kept-members.json` (people kept from before), `photo-overrides.json` (photos that don't come from the form) and `role-changes.json` (title, desk and firm changes), copied from the last package and updated. Then run `node tools/import-members.mjs <that folder>`.
 - **Portraits:** write a list `[{ "in": "<photo>", "out": "public/images/team/<slug>.jpg" }]` (add `"crop": [x, y, w, h]` for screenshots) and run `swift tools/portraits.swift <list.json>` (macOS 14+). It cuts out the person, frames the head and keeps the body to the bottom edge. Look at every result. Match photos to people only by how the sender labelled them, never by faces.
 - **Fund:** set `FUND_PAGE_LIVE = true` in `src/lib/site.ts` once there are holdings; the full page is ready behind it.
@@ -103,7 +103,7 @@ The full list, with what each item blocks, is in the revamp plan (club Drive), s
 5. **Domain:** at one.com, an A record for emfc.es and a CNAME for www, both to Vercel; Vercel forwards emfc.es to www.emfc.es.
 6. **Access to the admin page** (linked, quietly, as "Admin" at the bottom of the footer):
    - Someone new opens `/club-office`, chooses "New admin? Create your account" and confirms the email. The account opens nothing yet.
-   - An admin gives it a level on the **Access** tab: **Editor** (events and reports) or **Admin** (everything). The admins are the site owner, the two Co-Presidents and the Head of Brand; everyone else who needs access is an editor. **Deny** deletes a sign-up nobody recognises.
+   - An admin gives it a level on the **Access** tab: **Editor** (events and reports) or **Admin** (everything). The admins are the site owner, the two Co-Presidents and the Head of Marketing; everyone else who needs access is an editor. **Deny** deletes a sign-up nobody recognises.
    - At their next sign-in they set up two-factor sign-in (a QR code for an authenticator app), and from then on type a code at each sign-in.
    - A forgotten password: "Forgot your password?". A lost phone: another admin uses **Reset two-factor** on the Access tab.
 7. **Accounts:** GitHub, Vercel, Supabase, Resend, one.com and Cloudflare under one club-owned login before handing over, each with two-factor sign-in on.

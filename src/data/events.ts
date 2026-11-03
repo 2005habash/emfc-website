@@ -61,7 +61,7 @@ export const EVENTS: EventItem[] = [
     description:
       "The first event of the ESADE Finance Club, one of the two clubs that later merged into EMFC. Lorenzo demoed GreenRoom, a platform for finance interview prep, and the club announced a partnership giving all members free access to it.",
     people: ["Lorenzo Fabiani, founder of GreenRoom and an ESADE student"],
-    departments: ["brand"],
+    departments: ["marketing"],
   },
   {
     id: "kickoff-dinner-2026",
@@ -71,7 +71,7 @@ export const EVENTS: EventItem[] = [
     location: "Negro Rojo, Barcelona",
     description:
       "The founding cohort’s first gathering as EMFC. An evening for the new team and incoming associates to meet and set the tone for the year.",
-    departments: ["brand"],
+    departments: ["marketing"],
   },
   {
     id: "william-blair-2026-10-07",
@@ -82,7 +82,7 @@ export const EVENTS: EventItem[] = [
     description:
       "A small-group discussion with David Karasek, ESADE alumnus and Investment Banking Analyst in William Blair’s Industrials team in London, on his move from engineering into investment banking, how recruiting works, and how to land a return offer. Key advice: apply early, show real motivation beyond the technical skills, and take initiative during internships.",
     people: ["David Karasek, ESADE alumnus and Investment Banking Analyst, William Blair, London"],
-    departments: ["investment-banking", "corporate-relations", "brand"],
+    departments: ["investment-banking", "corporate-relations", "marketing"],
     desks: ["investment-banking/m-and-a"],
     photos: [
       {
@@ -143,7 +143,7 @@ export const EVENTS: EventItem[] = [
       "Fintech: Martin Nicholls, Team Lead Enterprise, Frekuent",
       "Sustainable Finance: Cristina Costa, Sustainability Lead, Kara",
     ],
-    departments: ["investment-banking", "private-markets", "corporate-relations", "brand"],
+    departments: ["investment-banking", "private-markets", "corporate-relations", "marketing"],
     desks: ["private-markets/private-equity", "private-markets/vc-and-growth", "private-markets/fintech"],
     photos: media("alumni-roundtables-2026-10-19", "photo", 10).map((src, i) => ({ src, alt: ROUNDTABLE_PHOTOS[i] })),
     videos: Array.from(
@@ -179,7 +179,7 @@ export const EVENTS: EventItem[] = [
       "Carson Wang, Wharton student, previously at Centerview Partners, Permira and Silver Lake",
       "Organised by Constantin Molineus and Investment Banking",
     ],
-    departments: ["investment-banking", "private-markets", "brand"],
+    departments: ["investment-banking", "private-markets", "marketing"],
     desks: ["investment-banking/m-and-a", "private-markets/private-equity"],
     photos: [
       {
