@@ -11,6 +11,7 @@ import { zip } from "fflate";
 import { AnalyticsManager } from "@/components/admin/Analytics";
 import { BackupManager, backupDue } from "@/components/admin/Backup";
 import { AccessManager, EnquiriesManager, EventsManager, NewsletterManager, ReportsManager } from "@/components/admin/ContentManagers";
+import { downloadBlob, readAll } from "@/components/admin/data";
 import { SetUpTwoFactor, TwoFactorCode } from "@/components/admin/TwoFactor";
 
 // The admin page, at an unlisted address. Two levels of access: editors manage events and reports;
@@ -366,9 +367,12 @@ function Dashboard() {
 
   useEffect(() => {
     (async () => {
-      const { data, error } = await supabase.from("applications").select("*").order("created_at", { ascending: false });
-      if (error) toast.error(error.message);
-      else setApps((data as Application[]) ?? []);
+      try {
+        const all = await readAll<Application>("applications");
+        setApps(all.sort((a, b) => b.created_at.localeCompare(a.created_at)));
+      } catch (err) {
+        toast.error((err as Error).message);
+      }
       setLoading(false);
     })();
   }, []);
@@ -476,11 +480,7 @@ function Dashboard() {
     const cols: (keyof Application)[] = ["created_at","department","position_type","full_name","email","program","graduation_year","nationality","linkedin_url","experience","desk_preference","motivation","relevant_experience","cv_path"];
     // Applicants type these fields, so they are made safe to open in Excel (no formulas).
     const csv = toCsv(cols, filtered.map((r) => cols.map((c) => r[c])));
-    const blob = new Blob([csv], { type: "text/csv" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url; a.download = `emfc-applications-${Date.now()}.csv`; a.click();
-    URL.revokeObjectURL(url);
+    downloadBlob(new Blob([csv], { type: "text/csv" }), `emfc-applications-${Date.now()}.csv`);
   }
 
   async function downloadAllCVs() {
@@ -517,11 +517,7 @@ function Dashboard() {
       const zipped: Uint8Array = await new Promise((resolve, reject) =>
         zip(files, { level: 0 }, (err, out) => (err ? reject(err) : resolve(out))),
       );
-      const blob = new Blob([zipped as BlobPart], { type: "application/zip" });
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement("a");
-      link.href = url; link.download = "ESADE_Finance_Club_CVs.zip"; link.click();
-      URL.revokeObjectURL(url);
+      downloadBlob(new Blob([zipped as BlobPart], { type: "application/zip" }), "ESADE_Finance_Club_CVs.zip");
       toast.success(`Downloaded ${withCV.length} CVs`, { id: t });
     } catch (err) {
       console.error(err);

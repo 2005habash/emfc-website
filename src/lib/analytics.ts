@@ -26,7 +26,7 @@ export const recordEvent = createServerFn({ method: "POST" })
     const { ip, userAgent, country } = guard.requestInfo();
     if (!userAgent || BOT.test(userAgent)) return { ok: false };
     const visitor = await guard.fingerprint("visitor", todayInBarcelona(), ip, userAgent);
-    if ((await guard.recentCount("analytics_events", 10, "visitor", visitor)) >= 150) return { ok: false };
+    if (!(await guard.takeSlot("analytics", visitor, 10, 150))) return { ok: false };
     const device = /iPad|Tablet/i.test(userAgent) ? "tablet" : /Mobi|Android|iPhone/i.test(userAgent) ? "mobile" : "desktop";
     const { error } = await guard.admin.from("analytics_events" as never).insert({
       kind: data.kind,

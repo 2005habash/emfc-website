@@ -1,14 +1,16 @@
 // Security headers for every page the server renders. The Content Security Policy only lets the
 // browser run scripts from this site, Cloudflare's bot check and inline scripts carrying this
 // request's nonce (TanStack's own and the theme script get it through the router), and only talk to
-// this site and the club's Supabase project. Static files get the simpler headers from the Nitro
-// route rules in vite.config.ts.
+// this site and the club's Supabase project. Static files get BASE_SECURITY_HEADERS through the
+// Nitro route rules in vite.config.ts.
 
-const supabase = new URL(import.meta.env.VITE_SUPABASE_URL ?? "https://rqgjcdttfccemcyxulub.supabase.co").origin;
-const supabaseSocket = supabase.replace(/^https:/, "wss:");
 const TURNSTILE = "https://challenges.cloudflare.com";
 
 export function contentSecurityPolicy(nonce: string) {
+  // Read here rather than when the file loads: vite.config.ts imports this file, and the build
+  // settings have no import.meta.env.
+  const supabase = new URL(import.meta.env.VITE_SUPABASE_URL ?? "https://rqgjcdttfccemcyxulub.supabase.co").origin;
+  const supabaseSocket = supabase.replace(/^https:/, "wss:");
   return [
     "default-src 'self'",
     `script-src 'self' 'nonce-${nonce}' ${TURNSTILE}`,

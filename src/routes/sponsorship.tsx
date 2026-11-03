@@ -5,7 +5,7 @@ import { SiteLayout } from "@/components/layout/SiteLayout";
 import { Reveal } from "@/components/Reveal";
 import { Em, Eyebrow, Numeral, PageHero } from "@/components/site/ui";
 import { STATS, TARGET_AREAS, TARGET_CITIES } from "@/data/stats";
-import { Turnstile } from "@/components/site/Turnstile";
+import { Turnstile, turnstileEnabled } from "@/components/site/Turnstile";
 import { FORMATS, sendSponsorshipEnquiry } from "@/lib/enquiries";
 import { IMAGES, ROMAN, SOCIAL } from "@/lib/site";
 import { cn } from "@/lib/utils";
@@ -70,7 +70,13 @@ function SponsorshipPage() {
   const [status, setStatus] = useState<"idle" | "sending" | "sent" | "error">("idle");
   const [problem, setProblem] = useState<string | null>(null);
   const [turnstile, setTurnstile] = useState<string | undefined>();
+  const [checkRound, setCheckRound] = useState(0);
   const openedAt = useRef(Date.now());
+  // A bot-check token works only once, so a send that didn't go through gets a fresh check.
+  const newCheck = () => {
+    setTurnstile(undefined);
+    setCheckRound((n) => n + 1);
+  };
   const set =
     (k: keyof typeof form) =>
     (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) =>
@@ -93,7 +99,9 @@ function SponsorshipPage() {
           ? "Please enter your firm."
           : clean.message.length < 10
             ? "Please tell us a little more about what you'd like to run, in at least 10 characters."
-            : null;
+            : turnstileEnabled && !turnstile
+              ? "Please complete the bot check above the button, then send."
+              : null;
     setProblem(issue);
     if (issue) {
       setStatus("error");
@@ -105,8 +113,10 @@ function SponsorshipPage() {
       if (!res.ok && res.reason === "limit") setProblem("You've sent a few enquiries in the last hour. We'll be in touch; please try again later if needed.");
       if (!res.ok && res.reason === "check") setProblem("The bot check didn't go through. Please tick it again and resend.");
       setStatus(res.ok ? "sent" : "error");
+      if (!res.ok) newCheck();
     } catch {
       setStatus("error");
+      newCheck();
     }
   }
 
@@ -372,7 +382,7 @@ function SponsorshipPage() {
                   />
                 </div>
                 <div className="sm:col-span-2">
-                  <Turnstile onToken={setTurnstile} />
+                  <Turnstile key={checkRound} onToken={setTurnstile} />
                 </div>
                 <div className="flex flex-col gap-4 sm:col-span-2 sm:flex-row sm:items-center sm:justify-between sm:gap-6">
                   {status === "error" ? (

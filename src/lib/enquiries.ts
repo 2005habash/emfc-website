@@ -4,8 +4,9 @@ import { z } from "zod";
 // Sponsorship enquiries from the website. Each one is saved to the `sponsorship_enquiries` table
 // (readable by admins only) and emailed to the addresses in SPONSORSHIP_RECIPIENTS, so nothing is
 // lost if one of the two fails. Only the server saves them (the browser can't write to that table),
-// at most 3 an hour from one visitor, and at most 40 emails a day in all: past that they are still
-// saved, for the admins, but not emailed. Environment variables (in Vercel's project settings):
+// at most 3 an hour from one visitor, and at most 40 emails a day in all, counting only enquiries that
+// pass the bot checks: past that they are still saved, for the admins, but not emailed. Environment
+// variables (in Vercel's project settings):
 //   RESEND_API_KEY          key from resend.com
 //   SPONSORSHIP_RECIPIENTS  comma-separated addresses, for example Vasco's, Diogo's and Nick's
 //   SPONSORSHIP_FROM        sender, once emfc.es is verified in Resend: "EMFC website <website@emfc.es>"
@@ -60,19 +61,24 @@ async function email(d: Valid, suspected: boolean) {
     return false;
   }
 
-  const res = await fetch("https://api.resend.com/emails", {
-    method: "POST",
-    headers: { Authorization: `Bearer ${key}`, "Content-Type": "application/json" },
-    body: JSON.stringify({
-      from: process.env.SPONSORSHIP_FROM ?? "EMFC website <onboarding@resend.dev>",
-      to,
-      reply_to: d.email,
-      subject: `${suspected ? "[Possibly automated] " : ""}Sponsorship enquiry: ${d.firm}`,
-      text,
-    }),
-  });
-  if (!res.ok) console.error("[sponsorship] Resend refused the email", res.status, await res.text());
-  return res.ok;
+  try {
+    const res = await fetch("https://api.resend.com/emails", {
+      method: "POST",
+      headers: { Authorization: `Bearer ${key}`, "Content-Type": "application/json" },
+      body: JSON.stringify({
+        from: process.env.SPONSORSHIP_FROM ?? "EMFC website <onboarding@resend.dev>",
+        to,
+        reply_to: d.email,
+        subject: `${suspected ? "[Possibly automated] " : ""}Sponsorship enquiry: ${d.firm}`,
+        text,
+      }),
+    });
+    if (!res.ok) console.error("[sponsorship] Resend refused the email", res.status, await res.text());
+    return res.ok;
+  } catch (err) {
+    console.error("[sponsorship] Resend could not be reached", (err as Error).message);
+    return false;
+  }
 }
 
 export type EnquiryResult = { ok: boolean; reason?: "limit" | "check" };
@@ -81,32 +87,41 @@ export const sendSponsorshipEnquiry = createServerFn({ method: "POST" })
   .validator((data: unknown) => Enquiry.parse(data))
   .handler(async ({ data }): Promise<EnquiryResult> => {
     const guard = await import("@/lib/server/guard");
-    const visitor = guard.requestInfo();
-    if (!(await guard.humanCheck(data.turnstile, visitor.ip))) return { ok: false, reason: "check" };
-    const sender = await guard.fingerprint("enquiry", visitor.ip);
-    if ((await guard.recentCount("sponsorship_enquiries", 60, "sender", sender)) >= PER_VISITOR_PER_HOUR) {
-      return { ok: false, reason: "limit" };
-    }
+    const { ip } = guard.requestInfo();
+    if (!(await guard.humanCheck(data.turnstile, ip))) return { ok: false, reason: "check" };
+    // Without the server secret there is no sender code, and so no hourly limit; the enquiry still goes on.
+    const sender = await guard.fingerprint("enquiry", ip).catch((err: Error) => {
+      console.error("[sponsorship]", err.message);
+      return null;
+    });
+    if (sender && !(await guard.takeSlot("enquiry", sender, 60, PER_VISITOR_PER_HOUR))) return { ok: false, reason: "limit" };
 
     // Bots fill the hidden field or submit within moments of the page loading. Such an enquiry is still
     // saved, marked for the admins to check, but not emailed, so a quick real sender is never lost.
-    // The same goes for everything past the day's email cap.
-    const overCap = (await guard.recentCount("sponsorship_enquiries", 24 * 60)) >= EMAILS_PER_DAY;
-    const suspected = Boolean(data.website) || data.elapsed < 2500 || overCap;
-    if (suspected) console.warn(`[sponsorship] Enquiry from ${data.firm} saved for review, not emailed${overCap ? " (daily cap reached)" : ""}`);
+    const suspected = Boolean(data.website) || data.elapsed < 2500;
+    // Only clean enquiries use up the day's emails, so bots caught above can't crowd out real senders.
+    // Past the cap an enquiry is saved, unmarked, for the admins.
+    const withinCap = !suspected && (await guard.takeSlot("enquiry-email", "all", 24 * 60, EMAILS_PER_DAY));
+    if (!withinCap) console.warn(`[sponsorship] Enquiry from ${data.firm} saved for review, not emailed${suspected ? "" : " (daily cap reached)"}`);
 
-    const { error } = await guard.admin.from("sponsorship_enquiries" as never).insert({
-      name: data.name,
-      firm: data.firm,
-      email: data.email,
-      format: data.format,
-      message: data.message,
-      suspected_bot: suspected,
-      sender,
-    } as never);
-    if (error) console.error("[sponsorship] Could not save the enquiry", error.message);
+    let saveError: string | undefined;
+    try {
+      const { error } = await guard.admin.from("sponsorship_enquiries" as never).insert({
+        name: data.name,
+        firm: data.firm,
+        email: data.email,
+        format: data.format,
+        message: data.message,
+        suspected_bot: suspected,
+        sender,
+      } as never);
+      saveError = error?.message;
+    } catch (err) {
+      saveError = (err as Error).message;
+    }
+    if (saveError) console.error("[sponsorship] Could not save the enquiry", saveError);
 
-    // Email every clean enquiry, and any enquiry that could not be saved, so none is lost.
-    const sent = !suspected || error ? await email(data, suspected) : false;
-    return { ok: sent || !error };
+    // Email every clean enquiry within the cap, and any enquiry that could not be saved, so none is lost.
+    const sent = withinCap || saveError ? await email(data, suspected) : false;
+    return { ok: sent || !saveError };
   });
