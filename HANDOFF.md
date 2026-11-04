@@ -13,7 +13,6 @@ The EMFC (ESADE Master's Finance Club) website. State as of 3 November 2026. Wri
 - **Email:** Resend, sending as @emfc.es: the sponsorship enquiries, and the admin page's sign-in emails (Supabase sends them through Resend).
 - **Domain:** emfc.es at one.com, which also holds the DNS (the records for Vercel and Resend).
 - **Built and checked:** 66 members with matching portraits, 6 department pages and 15 desk pages, 10 events with photos and clips, a library of 12 reports, the club statistics, the sponsorship form, the newsletter with consent, a privacy page, anonymous analytics, and the admin page with two levels of access and two-factor sign-in (section 9).
-- **Security, part 1b** (`supabase/migrations/20261103165000_rate_limits_and_sign_out.sql`) is ready to run in the SQL Editor; until it runs, the limits on enquiries, sign-ups and analytics let everything through (the server logs "Could not check the ... limit"). Remove this line once it has run.
 - **Security, part 2** (`supabase/migrations/20261103170000_security_lockdown.sql`) runs once the admins have set up two-factor sign-in; until then the database still accepts the older, looser rules for events, reports and the people's data.
 
 ## 2. Run it
