@@ -24,6 +24,8 @@ type EventRow = {
   videos: string[] | null;
   recap: string[] | null;
   link: string | null;
+  post: string | null;
+  points: string[] | null;
 };
 
 type ReportRow = {
@@ -55,6 +57,8 @@ const toEvent = (r: EventRow): EventItem => ({
   videos: r.videos ?? [],
   recap: r.recap ?? [],
   link: r.link ?? undefined,
+  post: r.post ?? undefined,
+  points: r.points ?? [],
 });
 
 const toReport = (r: ReportRow): Report => ({

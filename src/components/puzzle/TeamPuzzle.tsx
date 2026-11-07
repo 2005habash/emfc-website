@@ -353,7 +353,7 @@ export function TeamPuzzle() {
       <style>{PUZZLE_CSS}</style>
       <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between lg:gap-12">
         <p className="max-w-[560px] text-base/[1.7] md:text-lg/[1.65]">
-          The EMFC members outside ESADE, cut into {count} pieces{count === 66 ? ", one for each member" : ""}. Drag each
+          The EMFC members outside ESADE, cut into {count} pieces. Drag each
           piece to its place on the board.
         </p>
         <div role="radiogroup" aria-label="Number of pieces" className="flex shrink-0 flex-wrap gap-2">

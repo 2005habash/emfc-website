@@ -33,9 +33,9 @@ export const Route = createFileRoute("/team")({
 
 const story = [
   {
-    date: "28 May 2026",
+    date: "20 May 2026",
     title: "First kick-off",
-    body: "The ESADE Finance Club, one of the two clubs that merged into EMFC, demos GreenRoom.",
+    body: "The ESADE Master's Investment Society later took over the ESADE Finance Club to form EMFC. At the Finance Club's first event, GreenRoom gives a demo.",
     done: true,
   },
   {
@@ -51,8 +51,8 @@ const story = [
     done: true,
   },
   {
-    date: "26 September 2026",
-    title: "Kick Off Dinner",
+    date: "14 September 2026",
+    title: "Kick-off Dinner",
     body: "The founding cohort's first gathering, in Barcelona.",
     done: true,
   },

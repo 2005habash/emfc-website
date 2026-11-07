@@ -12,7 +12,7 @@ The EMFC (ESADE Master's Finance Club) website. State as of 3 November 2026. Wri
 - **Database, sign-in and uploads:** Supabase project `rqgjcdttfccemcyxulub` ("emfc", eu-west-1), free plan. Supabase's Vercel integration keeps its keys in the Vercel project (production only).
 - **Email:** Resend, sending as @emfc.es: the sponsorship enquiries, and the admin page's sign-in emails (Supabase sends them through Resend).
 - **Domain:** emfc.es at one.com, which also holds the DNS (the records for Vercel and Resend).
-- **Built and checked:** 66 members with matching portraits, 6 department pages and 15 desk pages, 10 events with photos and clips, a library of 12 reports, the club statistics, the sponsorship form, the newsletter with consent, a privacy page, anonymous analytics, and the admin page with two levels of access and two-factor sign-in (section 9).
+- **Built and checked:** 73 members with matching portraits, 6 department pages and 15 desk pages, 10 events with photos and clips, a library of 13 reports, the partners (Trakvia and Greenroom), firm logos from Vasco's logo pack, the club statistics, the sponsorship form, the newsletter with consent, a privacy page, anonymous analytics, and the admin page with two levels of access and two-factor sign-in (section 9).
 
 ## 2. Run it
 
@@ -46,6 +46,8 @@ The security headers only apply to production builds: to test them locally, `npm
 | What | File |
 | --- | --- |
 | Members (generated, do not edit by hand) | `src/data/members.ts`, made by `tools/import-members.mjs` |
+| Firm logos (generated, do not edit by hand) | `src/data/logos.ts` and `public/images/logos/`, made by `tools/import-logos.py` from Vasco's logo pack; shown by `src/components/site/FirmLogo.tsx` |
+| Partners on the Resources page (Trakvia, Greenroom) | `src/data/partners.ts` |
 | Departments, their 15 desks, texts and target firms | `src/lib/departments.ts` |
 | Events (fallback list), reports (fallback list), statistics | `src/data/events.ts`, `src/data/reports.ts`, `src/data/stats.ts` |
 | Loading events and reports from the database, with the fallback | `src/lib/content.ts` |
@@ -53,7 +55,7 @@ The security headers only apply to production builds: to test them locally, `npm
 | Newsletter sign-up's server function | `src/lib/newsletter.ts` |
 | Server-only helpers: the secret-key database client, rate limits, the bot check | `src/lib/server/guard.ts` (nothing in `server/` can reach the browser) |
 | Security headers and the Content Security Policy | `src/lib/server/security-headers.ts`, applied in `src/server.ts`; static files get theirs in `vite.config.ts` |
-| Settings: socials, next intake date, fund switch, member firms, nav | `src/lib/site.ts` |
+| Settings: socials, next intake date, fund switch, the homepage firms strip, nav | `src/lib/site.ts` |
 | People helpers (leadership, associates by desk, homepage strip) | `src/lib/team.ts` |
 | Shared pieces: portraits, person cards and profiles, page sections | `src/components/site/ui.tsx`, `src/components/site/sections.tsx` |
 | The admin page: sign-in, two-factor, which tabs each level sees | `src/routes/club-office.tsx`, `src/components/admin/TwoFactor.tsx` |
@@ -67,14 +69,17 @@ The security headers only apply to production builds: to test them locally, `npm
 | Pages | `src/routes/`: `index`, `departments.index` (overview), `departments.$department`, `departments.$department_.$desk` (the `_` stops it nesting), `team`, `events`, `events_.$eventId`, `resources`, `fund`, `sponsorship`, `privacy`, `club-office` (admin) |
 | Extra pages for fun, not in the menus and kept out of search engines | `src/routes/zaid.tsx` (a tribute to the site owner), `src/routes/puzzle.tsx` with `src/components/puzzle/` (the team photo as a jigsaw), `src/routes/kostya.tsx` with `src/components/kostya/` (a joke tribute to Constantin Molineus, which he agreed to) |
 | Database: every change, in the order they were run (section 8) | `supabase/migrations/` |
-| The content package from Vasco (2 Nov), without emails | the club Drive, `content/2026-11-02/` (private; not in this repository) |
+| The content packages from Vasco (2 Nov, and 5 Nov merged into it with the addition as received in `addition/`) | the club Drive, `content/2026-11-02/` and `content/2026-11-05/` (private; not in this repository) |
 | Images, clips, report PDFs | `public/images/{team,events,barcelona,logo}`, `public/videos/events`, `public/reports` |
 
 ## 5. Updating the content
 
 - **Events and reports:** editors and admins add and edit them on the admin page at `/club-office`, with photo and PDF uploads. An event also takes short MP4 clips (a still for each is made on upload) and the Marketing team's recap slides, and **Preview** shows the event page before it is saved or shown. `src/data/events.ts` and `src/data/reports.ts` are only the fallback for when the database can't be reached.
-- **People (each September):** make a new private content package in the club Drive: the member form export as `content/<date>/members.json`, plus `kept-members.json` (people kept from before), `photo-overrides.json` (photos that don't come from the form) and `role-changes.json` (title, desk and firm changes), copied from the last package and updated. Then run `node tools/import-members.mjs <that folder>`.
+- **People (each September):** make a new private content package in the club Drive: the member form export as `content/<date>/members.json`, plus `kept-members.json` (people kept from before), `photo-overrides.json` (photos that don't come from the form) and `role-changes.json` (title, desk and firm changes), copied from the last package and updated. Then run `node tools/import-members.mjs <that folder>` (the latest is `content/2026-11-05`). `role-changes.json` can also set `display_name` (how a name reads, for example with a designation) or hold one with `null`.
 - **Portraits:** write a list `[{ "in": "<photo>", "out": "public/images/team/<slug>.jpg" }]` (add `"crop": [x, y, w, h]` for screenshots) and run `swift tools/portraits.swift <list.json>` (macOS 14+). It cuts out the person, frames the head and keeps the body to the bottom edge. Look at every result. Match photos to people only by how the sender labelled them, never by faces.
+- **Logos:** each firm's current logo comes from Vasco's logo pack (club Drive, `content/2026-11-05/addition/logos`). When logos are added, run `python3 tools/import-logos.py "<pack>/logos"` (needs Pillow: `pip install pillow`). It trims and scales them without recolouring and rewrites `src/data/logos.ts`. A firm without a logo, or whose logo exists only in white, shows its name in text; the firms still to come are listed in `LOGOS_TO_COME`. Firm names must match the pack's names exactly.
+- **Partners:** add or change a partner in `src/data/partners.ts`; the Resources page shows each one as a block, alternating sides.
+- **Figures:** `src/data/stats.ts` feeds the homepage figures, the page descriptions and the sponsorship page; change it when a new statistics file comes.
 - **Fund:** set `FUND_PAGE_LIVE = true` in `src/lib/site.ts` once there are holdings; the full page is ready behind it.
 
 ## 6. Previews
@@ -86,9 +91,12 @@ Every branch pushed to GitHub other than `main` gets a private preview on Vercel
 | Who | What |
 | --- | --- |
 | Zaid | The VC & Growth desk text (the site shows a draft from the 20 October call) and its 8 proposed firms |
-| Fabian, Anastasia | Confirm the drafted Private Equity and Fintech lines |
+| Fabian, Anastasia | Confirm the drafted Private Equity and Fintech lines (the Fintech line now mentions the monthly FinTech Market Insight) |
 | Cosimo, Luka | Confirm the drafted desk texts for Asset Management (3) and Fixed Income (6) |
-| Lara Koch | A head-and-shoulders photo (she shows initials until then) |
+| Lara Koch | A larger photo (hers is 241 x 288 pixels, so her portrait is soft) |
+| Lili Anna Paczolay-Nagy, Hunter Crawford, Kateryna Mohylevska, Henri de Canecaude | A photo with more space around the head and shoulders: theirs are tight close-ups, so their portraits show a larger head than everyone else's (Vasco's site review H6) |
+| Kian Chirani | Confirm he holds the CFA charter before his name reads "Kian Chirani, CFA" (held in `role-changes.json`) |
+| Luís Laboreiro | Confirm Pol Bonet Malgà's desk (Equity Research assumed) |
 | Vasco | Confirm the Team page hero photo and that the Co-Presidents band was the section to turn white |
 | Department Heads | One review round on the live site |
 
@@ -97,7 +105,7 @@ The full list, with what each item blocks, is in the revamp plan (club Drive), s
 ## 8. How it is set up
 
 1. **Code and hosting:** `main` of `2005habash/emfc-website`, deployed by the Vercel project `emfc1/emfc-website` with the build settings Vercel suggested. Vercel's environment variables: the Supabase integration's keys (the site uses `SUPABASE_SECRET_KEY`; the Postgres, JWT, anon and `NEXT_PUBLIC_` ones are unused, and the integration keeps them in sync), `RESEND_API_KEY`, `SPONSORSHIP_RECIPIENTS`, `SPONSORSHIP_FROM`, and `TURNSTILE_SECRET_KEY` once the bot check is set up.
-2. **Database:** the files in `supabase/migrations/`, run in this order in the Supabase SQL Editor: `20261102170000_initial_schema` (roles, applications, CV storage, newsletter), `20261102180000_events_reports_enquiries` (events, reports, enquiries, upload buckets, the launch events and reports), `20261103090000_admin_access`, `20261103120000_analytics`, `20261103140000_deny_account`, `20261103160000_security_roles_and_two_factor` (security, part 1), `20261103165000_rate_limits_and_sign_out` (part 1b), `20261103170000_security_lockdown` (part 2, the database lockdown) and `20261104090000_safe_links_search_path` (a tidy-up the Security Advisor asked for). All of them have been run on the live project. The old Lovable migrations are archived in `supabase/lovable-migrations/`.
+2. **Database:** the files in `supabase/migrations/`, run in this order in the Supabase SQL Editor: `20261102170000_initial_schema` (roles, applications, CV storage, newsletter), `20261102180000_events_reports_enquiries` (events, reports, enquiries, upload buckets, the launch events and reports), `20261103090000_admin_access`, `20261103120000_analytics`, `20261103140000_deny_account`, `20261103160000_security_roles_and_two_factor` (security, part 1), `20261103165000_rate_limits_and_sign_out` (part 1b), `20261103170000_security_lockdown` (part 2, the database lockdown), `20261104090000_safe_links_search_path` (a tidy-up the Security Advisor asked for) and `20261107120000_event_posts_and_points` (each event's LinkedIn post and takeaways). All of them have been run on the live project. The old Lovable migrations are archived in `supabase/lovable-migrations/`.
 3. **Sign-in:** in Supabase, Authentication: the Site URL is `https://www.emfc.es`, emails go out through Resend (custom SMTP) with a raised hourly limit, and two-factor with an authenticator app (TOTP) is on. If an email link lands on another page of the site, the site forwards it to `/club-office`.
 4. **Email:** emfc.es is verified in Resend (its DKIM, SPF and DMARC records are at one.com).
 5. **Domain:** at one.com, an A record for emfc.es and a CNAME for www, both to Vercel; Vercel forwards emfc.es to www.emfc.es.
@@ -135,7 +143,7 @@ Each September, at the handover: give the new admins and editors their levels an
 
 - `npx tsc` reports one error in `src/routes/__root.tsx` (ErrorComponent props, from the original Lovable template). It was there before and doesn't affect the build.
 - Renaming or moving a route file while `npm run dev` runs can leave a stale error in the browser; reload the page.
-- Firm and resource logos load from logo.dev with the publishable key the old site used (in `src/lib/site.ts`); it is public by design. The homepage band shows them in colour, on white tiles in dark mode. If a logo looks wrong, try the firm's other domains: Lazard uses `lazardassetmanagement.com`, because `lazard.com` only returns a black letter.
+- Firm and resource logos are served from the site itself (`public/images/logos/`), no longer from logo.dev. They sit on white (`bg-plate`) in both themes, because most logos are dark and may not be recoloured. Each is sized from one height (`--logo-h`) and balanced for its proportions, so wordmarks and square marks look the same size.
 - Link previews (LinkedIn, WhatsApp) need full addresses, so pictures in page tags go through `absoluteUrl()` with `SITE_URL` (`src/lib/site.ts`). Pages without their own picture use the share image.
 - Between about 1024 and 1280px wide, the logo's subtitle and the social icons are hidden so the menu fits.
 - `vite.config.ts` lists the build plugins itself (Tailwind, paths, TanStack Start, Nitro, React); it no longer uses Lovable's config package.

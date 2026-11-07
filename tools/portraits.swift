@@ -97,7 +97,8 @@ func process(_ job: Job) throws -> String {
     let columns = Int((cx - fw * 0.45) * maskScale)...Int((cx + fw * 0.45) * maskScale)
     let searchFrom = Int(max(0, fTop - fh * 1.2) * maskScale)
     var hairTop = Double(topOfMask(mask, columns: columns, below: searchFrom) ?? Int((fTop - fh * 0.35) * maskScale)) / maskScale
-    hairTop = min(max(hairTop, fTop - fh * 0.9), fTop - fh * 0.1)
+    // Full or curly hair can stand well above the face; allow up to 1.4 face heights so it is never cut.
+    hairTop = min(max(hairTop, fTop - fh * 1.4), fTop - fh * 0.1)
 
     let chin = fBottom
     let head = chin - hairTop

@@ -45,6 +45,10 @@
   --color-field: var(--c-field);
   --color-tile: #ece7de;
   --color-tile-alt: #e4ded3;
+  /* Firm logos sit on white in both themes (most are dark and can't be recoloured), with dark text
+     for the firms whose logo is still to come. */
+  --color-plate: #ffffff;
+  --color-plate-ink: #141b34;
   --color-mist: #c9cedd;
   --color-haze: #a9b0c6;
 

@@ -177,6 +177,8 @@ type EventRow = {
   videos: string[];
   recap: string[];
   link: string | null;
+  post: string | null;
+  points: string[];
   published: boolean;
 };
 
@@ -194,6 +196,8 @@ const emptyEvent = (): EventRow => ({
   videos: [],
   recap: [],
   link: null,
+  post: null,
+  points: [],
   published: true,
 });
 
@@ -393,6 +397,10 @@ function EventForm({ initial, onDone }: { initial: EventRow; onDone: () => void 
       toast.error("The registration link must start with https://");
       return;
     }
+    if (badLink(e.post)) {
+      toast.error("The LinkedIn post link must start with https://");
+      return;
+    }
     setBusy(true);
     const row = { ...e, id: e.id || `${slugify(e.title)}-${e.date}`, updated_at: new Date().toISOString() };
     const { error } = await saveRow("events", row, isNew);
@@ -435,8 +443,12 @@ function EventForm({ initial, onDone }: { initial: EventRow; onDone: () => void 
           <input className={field} required value={e.location} onChange={(x) => set("location", x.target.value)} />
         </label>
         <label className="space-y-1">
-          <span className={label}>Registration link (optional)</span>
+          <span className={label}>Registration link (optional, shown until the day)</span>
           <input className={field} type="url" value={e.link ?? ""} onChange={(x) => set("link", x.target.value || null)} />
+        </label>
+        <label className="space-y-1">
+          <span className={label}>Our LinkedIn post about it (optional, shown as "See the post")</span>
+          <input className={field} type="url" value={e.post ?? ""} onChange={(x) => set("post", x.target.value || null)} />
         </label>
         <label className="space-y-1 md:col-span-2">
           <span className={label}>Text for the site (no middle dots or em dashes)</span>
@@ -455,6 +467,15 @@ function EventForm({ initial, onDone }: { initial: EventRow; onDone: () => void 
             rows={3}
             value={e.people.join("\n")}
             onChange={(x) => set("people", x.target.value.split("\n").filter((l) => l.trim()))}
+          />
+        </label>
+        <label className="space-y-1 md:col-span-2">
+          <span className={label}>What members took away, one per line (optional)</span>
+          <textarea
+            className={cn(field, "h-auto py-2")}
+            rows={3}
+            value={e.points.join("\n")}
+            onChange={(x) => set("points", x.target.value.split("\n").filter((l) => l.trim()))}
           />
         </label>
       </div>
@@ -604,7 +625,7 @@ function EventForm({ initial, onDone }: { initial: EventRow; onDone: () => void 
               if ((x.target as HTMLElement).closest("a")) x.preventDefault();
             }}
           >
-            <EventArticle event={{ ...e, link: e.link ?? undefined }} />
+            <EventArticle event={{ ...e, link: e.link ?? undefined, post: e.post ?? undefined }} />
           </div>
         </DialogContent>
       </Dialog>
@@ -788,16 +809,23 @@ function ReportForm({ initial, onDone }: { initial: ReportRow; onDone: () => voi
           <span className={label}>Issue (for example November 2026)</span>
           <input className={field} value={r.issue ?? ""} onChange={(x) => set("issue", x.target.value || null)} />
         </label>
-        <label className="space-y-1">
-          <span className={label}>Date it came out</span>
-          <input
-            type="date"
-            className={field}
-            required
-            value={r.date.length === 7 ? `${r.date}-01` : r.date}
-            onChange={(x) => set("date", x.target.value)}
-          />
-        </label>
+        <div className="space-y-1">
+          <label className="space-y-1">
+            <span className={label}>Date it came out</span>
+            <input
+              type="date"
+              className={field}
+              required={r.date !== ""}
+              disabled={r.date === ""}
+              value={r.date.length === 7 ? `${r.date}-01` : r.date}
+              onChange={(x) => set("date", x.target.value)}
+            />
+          </label>
+          <label className="flex items-center gap-2 text-sm text-muted-foreground">
+            <input type="checkbox" checked={r.date === ""} onChange={(x) => set("date", x.target.checked ? "" : todayInBarcelona())} />
+            No date: a standing document, such as a desk one-pager, listed after the dated reports
+          </label>
+        </div>
         <label className="space-y-1">
           <span className={label}>Pages</span>
           <input

@@ -1,4 +1,5 @@
-// Prints SQL that loads the bundled events and reports into the database, for the first migration.
+// Prints SQL that loads the bundled events and reports into the database (for a new database, after
+// every migration has run, including 20261107120000_event_posts_and_points).
 // Usage: node --experimental-strip-types tools/seed-sql.mjs > seed.sql
 const { EVENTS } = await import("../src/data/events.ts");
 const { REPORTS } = await import("../src/data/reports.ts");
@@ -9,13 +10,13 @@ const json = (v) => `${q(JSON.stringify(v ?? []))}::jsonb`;
 
 const events = EVENTS.map(
   (e) =>
-    `  (${[q(e.id), q(e.title), q(e.date), q(e.type), q(e.location), q(e.description), arr(e.people), arr(e.departments), arr(e.desks), json(e.photos), arr(e.videos), arr(e.recap), q(e.link)].join(", ")})`,
+    `  (${[q(e.id), q(e.title), q(e.date), q(e.type), q(e.location), q(e.description), arr(e.people), arr(e.departments), arr(e.desks), json(e.photos), arr(e.videos), arr(e.recap), q(e.link), q(e.post), arr(e.points)].join(", ")})`,
 );
 const reports = REPORTS.map(
   (r) =>
     `  (${[q(r.id), q(r.title), q(r.series), q(r.issue), q(r.date), q(r.department), q(r.desk), arr(r.authors), r.pages ?? "null", q(r.file), q(r.link), q(r.status)].join(", ")})`,
 );
-console.log(`insert into public.events (id, title, date, type, location, description, people, departments, desks, photos, videos, recap, link) values
+console.log(`insert into public.events (id, title, date, type, location, description, people, departments, desks, photos, videos, recap, link, post, points) values
 ${events.join(",\n")}
 on conflict (id) do nothing;
 

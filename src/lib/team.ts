@@ -37,16 +37,33 @@ export const deskTeam = (department: string, desk: string) => {
 };
 
 /**
- * Everyone with a photo, for the moving strip on the homepage. Departments take turns, so the strip
- * mixes the whole club instead of running one department after another.
+ * The order of the portraits on the homepage strip: spread evenly across both rows, as Vasco asked on
+ * 5 November 2026 (site review S4), and arranged by looking at the portraits. The site keeps only this
+ * order, nothing about anyone. Departments stay mixed. Anyone with a photo who is not in the list yet
+ * (a new member) follows at the end until the order is redone.
  */
+const STRIP_ORDER = [
+  "diogo-oliveira", "kateryna-mohylevska", "yonatan-bendler", "jan-heibel", "cosimo-dini", "maria-anjos",
+  "luka-thomson", "nick-kriz", "anastasia-murgida", "david-villar", "paul-christian-abel", "vasco-lemos",
+  "maria-fe-lopez-de-romana", "constantin-molineus", "fabian-luis-seher", "carolina-gouveia",
+  "luis-laboreiro", "nin-sacristan", "moritz-muellner", "sara-berglind-omarsdottir-saenz", "moritz-fritsch",
+  "joao-salgado", "carmen-amelia-albuja", "zaid-habash", "alexander-schilling", "joan-brugada",
+  "martina-guardiola", "aditya-sunil-shajwani", "philip-ignatzi", "alice-lafreniere", "erik-oostendorp",
+  "joao-rawes-freitas", "paul-emil-manner", "lara-koch", "anubhav-tamak", "jack-hermansson",
+  "giulia-weber-colussi", "luca-flusche", "alessandro-patta", "lili-anna-paczolay-nagy", "jules-coppens",
+  "kian-chirani", "hunter-crawford", "rui-long", "hugo-heise", "jose-rangel", "tea-polimac", "taha-aksu",
+  "louis-pfaar", "jakob-sebastian-kroen", "maria-heuveldop-pfeiffer", "jose-ruivo", "tim-constantin-ziegler",
+  "maria-jastrzebska", "mustafa-batuhan-ayd-n", "miguel-gomes", "henri-de-canecaude", "viola-suter",
+  "pol-bonet-malga", "liam-thiele", "margarida-loureiro", "marwin-aprin", "maximilian-merlin-kammermeier",
+  "walden-sanchez", "maria-marti", "paul-spieker", "alexander-kostyuk", "isabelle-oliger", "caetano-cunha",
+  "christopher-weigt", "shaivam-sundeep-ravani", "kleio-naziri", "aaron-kark",
+];
+
+/** Everyone with a photo, for the moving strip on the homepage, in STRIP_ORDER. */
 export const PEOPLE_STRIP: Member[] = (() => {
-  const queues = [...new Set(MEMBERS.map((m) => m.department))].map((d) =>
-    MEMBERS.filter((m) => m.department === d && m.photo),
-  );
-  const out: Member[] = [];
-  while (queues.some((q) => q.length)) for (const q of queues) if (q.length) out.push(q.shift()!);
-  return out;
+  const withPhoto = MEMBERS.filter((m) => m.photo);
+  const listed = STRIP_ORDER.map((slug) => withPhoto.find((m) => m.slug === slug)).filter((m): m is Member => !!m);
+  return [...listed, ...withPhoto.filter((m) => !STRIP_ORDER.includes(m.slug))];
 })();
 
 export const initialsOf = (name: string) =>

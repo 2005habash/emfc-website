@@ -5,25 +5,25 @@ import { useEffect, useState } from "react";
 import { SiteLayout } from "@/components/layout/SiteLayout";
 import { Reveal } from "@/components/Reveal";
 import { NewsletterForm } from "@/components/site/NewsletterForm";
+import { FirmLogo } from "@/components/site/FirmLogo";
 import { CountUp, Em, Eyebrow, Numeral, PhotoCaption, Portrait } from "@/components/site/ui";
 import { loadEvents } from "@/lib/content";
 import { STATS } from "@/data/stats";
 import { departments } from "@/lib/departments";
-import { CO_PRESIDENT_QUOTE, FUND_PAGE_LIVE, IMAGES, logoUrl, MEMBER_FIRMS, NEXT_INTAKE_OPENS, ROMAN, SOCIAL, todayInBarcelona } from "@/lib/site";
+import { CO_PRESIDENT_QUOTE, FUND_PAGE_LIVE, IMAGES, MEMBER_FIRMS, NEXT_INTAKE_OPENS, ROMAN, SOCIAL, todayInBarcelona } from "@/lib/site";
 import { leadershipOf, PEOPLE_STRIP, PRESIDENTS, type Member } from "@/lib/team";
 import { cn } from "@/lib/utils";
+
+/** What search engines and link previews show for emfc.es: the club's figures, which change with STATS. */
+const DESCRIPTION = `The finance club at ESADE Business School in Barcelona: ${STATS.members} master's students from ${STATS.nationalities} nationalities, ${STATS.experiencePct}% with professional experience, in ${STATS.departments} departments and ${STATS.desks} desks, built around careers, companies and community.`;
 
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
       { title: "EMFC, ESADE Master's Finance Club" },
-      {
-        name: "description",
-        content:
-          `The finance club at ESADE Business School in Barcelona: ${STATS.members} members, ${STATS.nationalities} nationalities and six departments, built around careers, companies and community.`,
-      },
+      { name: "description", content: DESCRIPTION },
       { property: "og:title", content: "EMFC, ESADE Master's Finance Club" },
-      { property: "og:description", content: "The finance club at ESADE." },
+      { property: "og:description", content: DESCRIPTION },
     ],
   }),
   loader: () => loadEvents(),
@@ -82,11 +82,16 @@ function Home() {
 }
 
 function Hero() {
+  // Vasco's eight figures (5 November 2026), in his order.
   const facts = [
     { value: <CountUp to={STATS.members} />, label: "Members" },
     { value: <CountUp to={STATS.nationalities} />, label: "Nationalities" },
+    { value: <CountUp to={STATS.internationalPct} suffix="%" />, label: "International" },
+    { value: <CountUp to={STATS.experiencePct} suffix="%" />, label: "With professional experience" },
+    { value: <CountUp to={STATS.internships} suffix="+" />, label: "Internships completed" },
     { value: <CountUp to={STATS.firms} />, label: "Firms where members have worked" },
-    { value: <CountUp to={STATS.departments} pad={2} />, label: "Departments" },
+    { value: <CountUp to={STATS.universities} />, label: `Universities, in ${STATS.universityCountries} countries` },
+    { value: <>{STATS.departments} and {STATS.desks}</>, label: "Departments and desks" },
   ];
   return (
     <section className="relative overflow-hidden bg-[#000B3D] text-white">
@@ -132,10 +137,12 @@ function Hero() {
             <div
               key={f.label}
               className={cn(
-                "flex flex-col gap-2 py-5 md:pb-8 md:pt-6",
+                "flex flex-col gap-2 py-5 md:pb-7 md:pt-6",
+                // Two to a row on phones, four on wider screens, with a line between rows and columns.
                 i % 2 === 1 && "border-l border-white/30 pl-5",
-                i < 2 && "border-b border-white/30 md:border-b-0",
-                i > 0 && "md:border-l md:border-white/30 md:pl-8",
+                i < facts.length - 2 && "border-b border-white/30",
+                i >= 4 && "md:border-b-0",
+                i % 4 === 0 ? "md:border-l-0 md:pl-0" : "md:border-l md:border-white/30 md:pl-8",
               )}
             >
               <dd className="font-serif text-[38px]/none font-medium md:text-5xl/none">
@@ -152,12 +159,12 @@ function Hero() {
   );
 }
 
-/** "Where our members have worked": one slow moving band of firm names (28 October). */
+/** "Where our members have worked": one slow moving band of the firms' logos, on white in both themes. */
 function FirmsBand() {
   return (
-    <section aria-label="Where our members have worked" className="border-b border-line">
+    <section aria-label="Where our members have worked" className="border-b border-line bg-plate">
       <div className="flex flex-col gap-4 py-7 lg:flex-row lg:items-center lg:gap-0 lg:py-9">
-        <div className="caps gutter shrink-0 text-[10px]/[1.6] tracking-[0.2em] text-mute lg:mx-0 lg:w-auto lg:max-w-none lg:border-r lg:border-line lg:pr-10 lg:text-[10.5px]/[1.6]">
+        <div className="caps gutter shrink-0 text-[10px]/[1.6] tracking-[0.2em] text-plate-ink/70 lg:mx-0 lg:w-auto lg:max-w-none lg:border-r lg:border-plate-ink/15 lg:pr-10 lg:text-[10.5px]/[1.6]">
           Where our members <br className="hidden lg:block" />
           have worked
         </div>
@@ -167,17 +174,11 @@ function FirmsBand() {
               <ul
                 key={copy}
                 aria-hidden={copy === 1}
-                className="flex shrink-0 items-center gap-14 pr-14 font-serif text-[21px] font-semibold whitespace-nowrap md:text-[24px]"
+                className="flex shrink-0 items-center gap-16 pr-16 whitespace-nowrap [--logo-h:40px] md:gap-20 md:pr-20 md:[--logo-h:48px]"
               >
-                {MEMBER_FIRMS.map((f) => (
-                  <li key={f.name} className="flex items-center gap-3.5">
-                    <img
-                      src={logoUrl(f.domain, 64)}
-                      alt=""
-                      loading="lazy"
-                      className="h-8 w-8 rounded-[6px] object-contain md:h-9 md:w-9 dark:bg-white"
-                    />
-                    {f.name}
+                {MEMBER_FIRMS.map((name) => (
+                  <li key={name} className="flex h-16 items-center md:h-20">
+                    <FirmLogo name={name} />
                   </li>
                 ))}
               </ul>
@@ -363,7 +364,7 @@ function Membership() {
               {b.library && (
                 <Link
                   to="/resources"
-                  hash="library"
+                  hash="research"
                   className="caps mt-1 self-start text-[10.5px] tracking-[0.18em] underline underline-offset-[5px]"
                 >
                   Browse the research library
@@ -381,12 +382,12 @@ function StripTile({ m, i }: { m: Member; i: number }) {
   return (
     <Link
       to="/team"
-      aria-label={`${m.name}, ${m.title}`}
+      aria-label={`${m.displayName ?? m.name}, ${m.title}`}
       className="group relative block h-[150px] w-[125px] shrink-0 overflow-hidden md:h-[220px] md:w-[183px]"
     >
-      <Portrait member={m} alt="" alternate={i % 2 === 1} className="h-full" />
+      <Portrait member={m} alternate={i % 2 === 1} className="h-full" />
       <span className="absolute inset-x-0 bottom-0 flex translate-y-full flex-col gap-0.5 bg-[#000B3D] px-3 pt-2.5 pb-3 text-white transition-transform duration-300 group-hover:translate-y-0 group-focus-visible:translate-y-0">
-        <span className="font-serif text-base/[1.1] md:text-lg/[1.1]">{m.name}</span>
+        <span className="font-serif text-base/[1.1] md:text-lg/[1.1]">{m.displayName ?? m.name}</span>
         <span className="caps text-[10px] tracking-[0.16em] text-[#D5D9E6] md:text-[10px]">{m.title}</span>
       </span>
     </Link>
@@ -446,7 +447,6 @@ function People() {
                 <Portrait
                   key={p.slug}
                   member={p}
-                  alt=""
                   className={cn("h-14 w-14 rounded-full border-2 border-night", i > 0 && "-ml-3.5")}
                 />
               ))}
@@ -633,7 +633,7 @@ function Join() {
                 {eventDate.getDate()}
               </span>
               <span className="caps text-[10px] tracking-[0.2em] text-mute md:text-[10px]">
-                {eventDate.toLocaleDateString("en-GB", { month: "short", year: "numeric" })}
+                {eventDate.toLocaleDateString("en-GB", { month: "short", year: "numeric" }).replace(/\bSept\b/, "Sep")}
               </span>
             </div>
             <div className="flex min-w-[55%] flex-1 flex-col gap-1.5">

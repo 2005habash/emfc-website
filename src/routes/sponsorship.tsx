@@ -17,7 +17,7 @@ export const Route = createFileRoute("/sponsorship")({
       {
         name: "description",
         content:
-          "Partner with EMFC to reach 66 ESADE master's students through workshops, events and brand visibility.",
+          `Partner with EMFC to reach ${STATS.members} ESADE master's students through workshops, events and brand visibility.`,
       },
       { property: "og:title", content: "Sponsor EMFC" },
       {
@@ -42,7 +42,7 @@ const facts = [
 const benefits = [
   {
     title: "Talent Pipeline",
-    body: "Direct access to 66 ESADE master's students targeting Private Equity, Investment Banking, Asset Management, Venture Capital and Fixed Income, most of them recruiting for 2027.",
+    body: `Direct access to ${STATS.members} ESADE master's students targeting Private Equity, Investment Banking, Asset Management, Venture Capital and Fixed Income, most of them recruiting for 2027.`,
   },
   {
     title: "Brand Visibility",

@@ -1,38 +1,45 @@
-// Club statistics from the member form (64 answers, closed 1 November 2026), plus the two leaders
-// on the site who did not fill it in. Totals only, nothing about one person, and only figures that
-// help the club (Vasco's decision). Source: the content package statistics (club Drive).
+// Club statistics from the member form (72 answers by 5 November 2026), plus Paul Christian Abel, who
+// is on the site but did not fill it in. Totals only, nothing about one person, and only figures that
+// help the club (Vasco's decision). Source: the content package statistics (club Drive). When they
+// change, the homepage and page descriptions change with them.
 
 export const STATS = {
-  members: 66,
+  members: 73,
   departments: 6,
-  nationalities: 27,
-  internationalPct: 86,
+  desks: 15,
+  nationalities: 29,
+  internationalPct: 88,
   languages: 16,
-  universities: 49,
+  universities: 53,
   universityCountries: 22,
   programmes: 7,
-  experiencePct: 97,
-  internships: 158,
-  firms: 124,
-  countriesWorked: 21,
-  graduating2027Pct: 88,
+  experiencePct: 96,
+  internships: 179,
+  firms: 129,
+  countriesWorked: 22,
+  cems: 10,
+  graduating2027Pct: 85,
 } as const;
 
 /** What members aim for: share of members picking each area or city (up to three each). */
 export const TARGET_AREAS = [
   { name: "Private Equity", pct: 44 },
-  { name: "Investment Banking", pct: 42 },
-  { name: "Consulting", pct: 30 },
-  { name: "Asset Management", pct: 28 },
-  { name: "Venture Capital", pct: 27 },
-  { name: "Sales & Trading", pct: 22 },
+  { name: "Investment Banking", pct: 40 },
+  { name: "Consulting", pct: 31 },
+  { name: "Asset Management", pct: 29 },
+  { name: "Venture Capital", pct: 25 },
+  { name: "Sales & Trading", pct: 19 },
+  { name: "Fintech", pct: 14 },
+  { name: "Private Credit", pct: 11 },
 ] as const;
 
 export const TARGET_CITIES = [
-  { name: "London", pct: 70 },
-  { name: "Madrid", pct: 38 },
-  { name: "Barcelona", pct: 27 },
-  { name: "Zurich", pct: 27 },
-  { name: "Munich", pct: 20 },
-  { name: "Amsterdam", pct: 16 },
+  { name: "London", pct: 69 },
+  { name: "Madrid", pct: 35 },
+  { name: "Zurich", pct: 26 },
+  { name: "Barcelona", pct: 24 },
+  { name: "Munich", pct: 22 },
+  { name: "Frankfurt", pct: 17 },
+  { name: "Amsterdam", pct: 15 },
+  { name: "Paris", pct: 15 },
 ] as const;

@@ -36,7 +36,7 @@ const sections = [
   },
   {
     title: "Where it is kept",
-    body: "Sign-ups and enquiries are stored in the club's database, hosted by Supabase, and only the club's administrators can read them. Firm logos on this site are loaded from logo.dev. We use no advertising or tracking cookies; the site only remembers whether you chose light or dark mode, in your own browser.",
+    body: "Sign-ups and enquiries are stored in the club's database, hosted by Supabase, and only the club's administrators can read them. We use no advertising or tracking cookies; the site only remembers whether you chose light or dark mode, in your own browser.",
   },
   {
     title: "Your choices",

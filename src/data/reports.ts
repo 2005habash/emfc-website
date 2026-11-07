@@ -9,7 +9,8 @@ export type Report = {
   series: string;
   /** Issue or edition, as printed. */
   issue?: string;
-  /** For sorting: the month or day it came out. */
+  /** For sorting: the day or month it came out (a month alone counts as its last day). Empty for a
+   * standing document, such as a desk one-pager or the fund's policy, which is listed after the dated ones. */
   date: string;
   department: string;
   desk?: string;
@@ -21,6 +22,20 @@ export type Report = {
 };
 
 export const REPORTS: Report[] = [
+  {
+    id: "fintech-market-insight-2026-10",
+    title: "Fintech in October 2026: scale over disruption",
+    series: "FinTech Market Insight",
+    issue: "October 2026",
+    date: "2026-11-05",
+    department: "private-markets",
+    desk: "fintech",
+    authors: ["Margarida Loureiro", "Anastasia Murgida"],
+    pages: 5,
+    file: "/reports/fintech-market-insight-2026-10.pdf",
+    link: "https://www.linkedin.com/feed/update/urn:li:activity:7524133206770495488/",
+    status: "published",
+  },
   {
     id: "monthly-market-views-2026-10",
     title: "No Country for Cheap Money: Treasury Yields at Their Highest since 2007",
@@ -79,6 +94,7 @@ export const REPORTS: Report[] = [
     ],
     pages: 15,
     file: "/reports/fixed-income-market-monitor-2026-10.pdf",
+    link: "https://www.linkedin.com/feed/update/urn:li:activity:7521957921602285568/",
     status: "published",
   },
   {
@@ -104,14 +120,14 @@ export const REPORTS: Report[] = [
     authors: ["Jan Heibel", "Luca Flusche"],
     pages: 4,
     file: "/reports/real-assets-market-insight-2026-q3.pdf",
-    link: "https://lnkd.in/p/ebkynQ-q",
+    link: "https://www.linkedin.com/feed/update/urn:li:activity:7515488571969945600/",
     status: "published",
   },
   {
     id: "real-assets-one-pager",
     title: "The Real Assets desk: who we are and how to reach us",
     series: "Desk one-pager",
-    date: "2026-10",
+    date: "",
     department: "private-markets",
     desk: "real-assets",
     pages: 1,
@@ -123,7 +139,7 @@ export const REPORTS: Report[] = [
     title: "EMFC Global Equity Fund: Investment Policy Statement",
     series: "Fund documents",
     issue: "Version 1.0, October 2026",
-    date: "2026-10",
+    date: "",
     department: "asset-management",
     desk: "portfolio-management",
     pages: 14,
@@ -168,8 +184,14 @@ export const REPORTS: Report[] = [
   },
 ];
 
+/** A month alone ("2026-10") sorts as the end of that month, after the reports dated within it. */
+const sortDate = (r: Report) => (r.date.length === 7 ? `${r.date}-31` : r.date);
+
+/** Newest first; standing documents (no date) after the dated reports; reports in preparation last. */
 const newestFirst = (a: Report, b: Report) =>
-  Number(a.status === "coming") - Number(b.status === "coming") || b.date.localeCompare(a.date);
+  Number(a.status === "coming") - Number(b.status === "coming") ||
+  Number(!a.date) - Number(!b.date) ||
+  sortDate(b).localeCompare(sortDate(a));
 
 export const reportsFor = (reports: Report[], department: string, desk?: string) =>
   reports.filter((r) => r.department === department && (desk === undefined || r.desk === desk)).sort(newestFirst);

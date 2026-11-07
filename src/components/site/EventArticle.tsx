@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { ArrowLeft, ArrowRight, CalendarPlus, ChevronLeft, ChevronRight, MapPin, X } from "lucide-react";
+import { ArrowLeft, ArrowRight, CalendarPlus, ChevronLeft, ChevronRight, Linkedin, MapPin, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import { TypeDot } from "@/components/site/sections";
 import { Em, Eyebrow } from "@/components/site/ui";
@@ -7,7 +7,7 @@ import { Dialog, DialogClose, DialogContent, DialogTitle } from "@/components/ui
 import { clipPoster, type EventItem, type EventPhoto } from "@/data/events";
 import { getDepartment } from "@/lib/departments";
 import { icsHref } from "@/lib/ics";
-import { formatDay, IMAGES, todayInBarcelona } from "@/lib/site";
+import { formatDay, IMAGES, safeUrl, todayInBarcelona } from "@/lib/site";
 import { cn } from "@/lib/utils";
 
 // An event's page: text, place, departments, photos, clips and the recap. Used by the event route and
@@ -130,6 +130,19 @@ export function EventArticle({ event: e, older, newer }: { event: EventItem; old
                 ))}
               </ul>
             )}
+            {e.points && e.points.length > 0 && (
+              <div className="flex flex-col gap-3 border-t border-line pt-5">
+                <span className="caps text-[10px] tracking-[0.18em] text-mute">What members took away</span>
+                <ol className="flex flex-col gap-2.5">
+                  {e.points.map((p, i) => (
+                    <li key={p} className="grid grid-cols-[28px_1fr] text-[15px]/[1.55]">
+                      <span className="font-serif text-[17px] italic text-bull">{i + 1}.</span>
+                      {p}
+                    </li>
+                  ))}
+                </ol>
+              </div>
+            )}
             {tags.length > 0 && (
               <ul className="flex flex-wrap gap-2">
                 {tags.map((t) => (
@@ -149,6 +162,12 @@ export function EventArticle({ event: e, older, newer }: { event: EventItem; old
               <a href={icsHref(e)} download={`${e.id}.ics`} className="btn btn-ink self-start">
                 <CalendarPlus className="h-4 w-4" strokeWidth={1.75} />
                 Add to calendar
+              </a>
+            )}
+            {e.post && (
+              <a href={safeUrl(e.post)} target="_blank" rel="noreferrer" className="btn btn-outline-ink self-start">
+                <Linkedin className="h-4 w-4" strokeWidth={1.75} />
+                See the post
               </a>
             )}
           </div>

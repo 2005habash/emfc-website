@@ -186,17 +186,22 @@ function DeskPage() {
         {/* Next and previous desk */}
         {d.desks.length > 1 && (
           <nav aria-label="More desks" className="gutter grid gap-3 py-16 sm:grid-cols-2 lg:py-24">
-            {[
-              { x: prev, label: "Previous desk", Icon: ArrowLeft },
-              { x: next, label: "Next desk", Icon: ArrowRight },
-            ].map(({ x, label, Icon }) => (
+            {/* With two desks, previous and next are the same desk: show it once (Vasco, 5 November). */}
+            {(d.desks.length === 2
+              ? [{ x: next, label: "The other desk", Icon: ArrowRight }]
+              : [
+                  { x: prev, label: "Previous desk", Icon: ArrowLeft },
+                  { x: next, label: "Next desk", Icon: ArrowRight },
+                ]
+            ).map(({ x, label, Icon }) => (
               <Link
                 key={label}
                 to="/departments/$department/$desk"
                 params={{ department: d.slug, desk: x.slug }}
                 className={cn(
                   "group flex items-center justify-between gap-6 border border-ink p-6 transition-colors hover:bg-ink hover:text-paper",
-                  label === "Next desk" && "sm:flex-row-reverse sm:text-right",
+                  label !== "Previous desk" && "sm:flex-row-reverse sm:text-right",
+                  d.desks.length === 2 && "sm:col-start-2",
                 )}
               >
                 <Icon className="h-5 w-5 shrink-0" strokeWidth={1.5} />

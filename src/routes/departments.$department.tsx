@@ -100,20 +100,24 @@ function Desks({ d }: { d: Department }) {
 function DepartmentPage() {
   const { department } = Route.useParams();
   const d = getDepartment(department)!;
-  const leaders = leadershipOf(d.slug);
+  // The Head stands alone in the first row; the Chief Investment Officer or Vice-Presidents follow in
+  // pairs (Vasco, 5 November 2026), in the department's own order where it sets one.
+  const [head, ...others] = leadershipOf(d.slug);
+  const rank = (name: string) => (d.vpOrder?.includes(name) ? d.vpOrder.indexOf(name) : Number.MAX_SAFE_INTEGER);
+  const seconds = [...others].sort((a, b) => rank(a.name) - rank(b.name));
   const data = Route.useLoaderData();
   const reports = reportsFor(data.reports, d.slug);
   const events = eventsFor(data.events, d.slug);
-  const deskNames = Object.fromEntries(d.desks.map((k) => [k.slug, k.name]));
   const associates = associatesOf(d.slug);
-  // Associates by desk, then anyone in the department without a desk. Fixed Income shows its two
-  // groups instead of six small desks; each person's title names their desk.
+  // Associates by desk, then the associates without a desk as one group (in Investment Banking, all
+  // of them: one group, Vasco, 5 November 2026). Fixed Income shows its two groups instead of six
+  // small desks; each person's title names their desk.
   const byDesk = (
     d.groups
       ? d.groups.map((g) => ({ name: g.name, members: associates.filter((m) => m.group === g.name) }))
       : [
           ...d.desks.map((k) => ({ name: k.name, members: associatesOf(d.slug, k.slug) })),
-          { name: d.desks.length ? d.name : undefined, members: associates.filter((m) => !m.desk) },
+          { name: d.desks.length ? "Associates" : undefined, members: associates.filter((m) => !m.desk) },
         ]
   ).filter((g) => g.members.length > 0);
 
@@ -140,8 +144,15 @@ function DepartmentPage() {
             </div>
           </div>
           <div className="grid grid-cols-2 gap-5 lg:col-span-4 lg:col-start-9">
-            {leaders.map((p, i) => (
-              <PersonCard key={p.slug} member={p} index={i} />
+            {head && (
+              <div className="col-span-2 flex justify-center">
+                <div className="w-[calc(50%-10px)]">
+                  <PersonCard member={head} />
+                </div>
+              </div>
+            )}
+            {seconds.map((p, i) => (
+              <PersonCard key={p.slug} member={p} index={i + 1} />
             ))}
           </div>
         </section>
@@ -163,7 +174,7 @@ function DepartmentPage() {
               Target <Em>firms</Em>
             </SectionHeading>
             <div className="lg:col-span-9">
-              <FirmsGrid firms={d.targetFirms} deskNames={d.slug === "private-markets" ? deskNames : undefined} />
+              <FirmsGrid firms={d.targetFirms} />
             </div>
           </section>
         )}

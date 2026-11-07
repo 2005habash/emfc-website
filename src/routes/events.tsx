@@ -31,7 +31,8 @@ export const Route = createFileRoute("/events")({
 });
 
 const dateOf = (e: EventItem) => new Date(e.date + "T12:00:00");
-const fmt = (d: Date, o: Intl.DateTimeFormatOptions) => d.toLocaleDateString("en-GB", o);
+// Three-letter months everywhere: British English writes "Sept".
+const fmt = (d: Date, o: Intl.DateTimeFormatOptions) => d.toLocaleDateString("en-GB", o).replace(/\bSept\b/, "Sep");
 
 function EventsPage() {
   const [view, setView] = useState<"overview" | "calendar">("overview");
@@ -190,6 +191,17 @@ function EventFeature({ e, past = false }: { e: EventItem; past?: boolean }) {
               className="btn btn-outline-ink h-[46px] px-5 text-[11px]"
             >
               Register
+            </a>
+          )}
+          {e.post && (
+            <a
+              href={safeUrl(e.post)}
+              target="_blank"
+              rel="noreferrer"
+              className="btn btn-outline-ink h-[46px] px-5 text-[11px]"
+            >
+              <Linkedin className="h-3.5 w-3.5" strokeWidth={1.75} />
+              See the post
             </a>
           )}
         </div>

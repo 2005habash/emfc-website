@@ -47,33 +47,32 @@ export const safeUrl = (url: string | null | undefined) => {
 export const absoluteUrl = (path: string) => (/^https?:\/\//.test(path) ? path : `${SITE_URL}${path}`);
 
 /**
- * Logos come from logo.dev by domain, with the same publishable key the first (Lovable-built) site used.
- * The key is public by design (it is sent with every logo request).
+ * "Where our members have worked", the homepage strip: the best-known firms on members' profiles, 20 of
+ * them, ordered so that firms of the same kind are never side by side (Vasco, 6 November 2026; the
+ * content package statistics, club Drive). Each shows as its logo (src/data/logos.ts). Lazard Asset
+ * Management is on a member's profile; the strip shows the group's Lazard logo.
  */
-const LOGO_DEV_TOKEN = "pk_RUlFftUYS4eetzgWC4_DYA";
-export const logoUrl = (domain: string, size = 120) =>
-  `https://img.logo.dev/${domain}?token=${LOGO_DEV_TOKEN}&format=png&size=${size}&retina=true`;
-
-/** "Where our members have worked": firms from the member form (the content package statistics, club Drive). */
 export const MEMBER_FIRMS = [
-  { name: "J.P. Morgan", domain: "jpmorgan.com" },
-  { name: "UBS", domain: "ubs.com" },
-  { name: "BNP Paribas", domain: "bnpparibas.com" },
-  { name: "HSBC", domain: "hsbc.com" },
-  { name: "Santander", domain: "santander.com" },
-  { name: "Ardian", domain: "ardian.com" },
-  { name: "Lazard Asset Management", domain: "lazardassetmanagement.com" }, // lazard.com only has a black letter
-  { name: "Allianz Global Investors", domain: "allianzgi.com" },
-  { name: "William Blair", domain: "williamblair.com" },
-  { name: "Euronext", domain: "euronext.com" },
-  { name: "EY", domain: "ey.com" },
-  { name: "KPMG", domain: "kpmg.com" },
-  { name: "Crédit Agricole", domain: "credit-agricole.com" },
-  { name: "Natixis CIB", domain: "natixis.com" },
-  { name: "ING Group", domain: "ing.com" },
-  { name: "Deloitte", domain: "deloitte.com" },
-  { name: "PwC", domain: "pwc.com" },
-  { name: "Alantra", domain: "alantra.com" },
+  "J.P. Morgan",
+  "Ardian",
+  "Goldman Sachs",
+  "Deloitte",
+  "UBS",
+  "Lazard",
+  "BNP Paribas",
+  "Amundi",
+  "HSBC",
+  "PwC",
+  "Santander",
+  "Meridiam",
+  "Crédit Agricole",
+  "EY",
+  "Natixis CIB",
+  "Allianz Global Investors",
+  "UniCredit",
+  "KPMG",
+  "William Blair",
+  "Euronext",
 ] as const;
 
 export const NAV_LINKS = [
@@ -91,10 +90,14 @@ export const ROMAN = ["I", "II", "III", "IV", "V", "VI", "VII", "VIII"] as const
 export const CO_PRESIDENT_QUOTE =
   "EMFC was built for master's students who arrive at ESADE already close to recruiting and want a real community around it. The work and the people, in equal measure.";
 
+/** A day as "14 September 2026", or with short months as "14 Sep 2026": always three letters, where
+ * British English would write "Sept". */
 export const formatDay = (iso: string, opts: Intl.DateTimeFormatOptions = {}) =>
-  new Date(`${iso.length === 10 ? iso : `${iso}-01`}T12:00:00`).toLocaleDateString("en-GB", {
-    day: iso.length === 10 ? "numeric" : undefined,
-    month: "long",
-    year: "numeric",
-    ...opts,
-  });
+  new Date(`${iso.length === 10 ? iso : `${iso}-01`}T12:00:00`)
+    .toLocaleDateString("en-GB", {
+      day: iso.length === 10 ? "numeric" : undefined,
+      month: "long",
+      year: "numeric",
+      ...opts,
+    })
+    .replace(/\bSept\b/, "Sep");

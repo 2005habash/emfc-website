@@ -3,6 +3,7 @@ import { useEffect, useState, type ReactNode } from "react";
 import { cn } from "@/lib/utils";
 import { Linkedin } from "lucide-react";
 import { Dialog, DialogContent, DialogDescription, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { FirmLogo } from "@/components/site/FirmLogo";
 import { track } from "@/lib/analytics";
 import { safeUrl } from "@/lib/site";
 import { initialsOf, type Member } from "@/lib/team";
@@ -129,7 +130,7 @@ export function Portrait({
       {member.photo ? (
         <img
           src={member.photo}
-          alt={alt ?? `Portrait of ${member.name}`}
+          alt={alt ?? member.name}
           loading="lazy"
           className="h-full w-full object-cover object-top mix-blend-multiply grayscale contrast-[1.05] transition duration-500 group-hover:grayscale-0"
         />
@@ -172,7 +173,7 @@ export function PersonCard({
           "group flex cursor-pointer flex-col text-left outline-none focus-visible:ring-2 focus-visible:ring-bull focus-visible:ring-offset-4 focus-visible:ring-offset-paper",
           s.gap,
         )}
-        aria-label={`${member.name}, ${member.title}. Open profile`}
+        aria-label={`${member.displayName ?? member.name}, ${member.title}. Open profile`}
       >
         <Portrait member={member} alternate={index % 2 === 1} className="aspect-[5/6] w-full" />
         <span className="flex flex-col gap-1.5">
@@ -182,7 +183,7 @@ export function PersonCard({
               s.name,
             )}
           >
-            {member.name}
+            {member.displayName ?? member.name}
           </span>
           <span className={cn("caps tracking-[0.16em] text-mute", s.title)}>{member.title}</span>
         </span>
@@ -199,7 +200,7 @@ function ProfileDialog({ member }: { member: Member }) {
         <Portrait member={member} className="aspect-square w-full sm:aspect-auto sm:h-full" />
         <div className="flex flex-col gap-5 p-6 sm:p-8">
           <div className="flex flex-col gap-2">
-            <DialogTitle className="font-serif text-[34px]/[1.05] font-medium">{member.name}</DialogTitle>
+            <DialogTitle className="font-serif text-[34px]/[1.05] font-medium">{member.displayName ?? member.name}</DialogTitle>
             <DialogDescription className="caps text-[10.5px] tracking-[0.18em] text-mute">
               {member.title}
             </DialogDescription>
@@ -212,9 +213,15 @@ function ProfileDialog({ member }: { member: Member }) {
               </div>
             )}
             {member.firms.length > 0 && (
-              <div className="flex flex-col gap-1">
+              <div className="flex flex-col gap-2">
                 <dt className="caps text-[10px] tracking-[0.18em] text-mute">Experience</dt>
-                <dd>{member.firms.join(", ")}</dd>
+                <dd className="flex flex-wrap gap-2 [--logo-h:28px]">
+                  {member.firms.map((f) => (
+                    <span key={f} className="flex h-14 min-w-[96px] items-center justify-center border border-line bg-plate px-3.5">
+                      <FirmLogo name={f} />
+                    </span>
+                  ))}
+                </dd>
               </div>
             )}
           </dl>

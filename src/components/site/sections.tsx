@@ -2,9 +2,11 @@ import { Link } from "@tanstack/react-router";
 import { ArrowRight, ArrowUpRight, FileText, Linkedin } from "lucide-react";
 import { useEffect, useRef, type ReactNode } from "react";
 import { Reveal } from "@/components/Reveal";
+import { FirmLogo } from "@/components/site/FirmLogo";
 import { Em, Eyebrow, Numeral, PageHero, PersonCard } from "@/components/site/ui";
 import { EVENT_TYPE_COLORS, type EventItem, type EventType } from "@/data/events";
 import type { Report } from "@/data/reports";
+import { STATS } from "@/data/stats";
 import { departments, getDepartment, type Firm, type WorkItem } from "@/lib/departments";
 import { formatDay, IMAGES, ROMAN, SOCIAL, safeUrl } from "@/lib/site";
 import type { Member } from "@/lib/team";
@@ -24,7 +26,7 @@ export function DepartmentsHero({ titleAs = "h1" }: { titleAs?: "h1" | "p" }) {
         </>
       }
     >
-      Six departments and fifteen desks, run by 66 members. Choose a department to see what it
+      Six departments and fifteen desks, run by {STATS.members} members. Choose a department to see what it
       produces, where it aims and who is on it.
     </PageHero>
   );
@@ -121,27 +123,20 @@ export function WorkGrid({ items }: { items: WorkItem[] }) {
 }
 
 /** The grid of 12 target firms. On a department page each firm can carry its desks. */
-export function FirmsGrid({ firms, deskNames }: { firms: Firm[]; deskNames?: Record<string, string> }) {
+/** Target firms as their logos (or names, while a logo is still to come), on white tiles. */
+export function FirmsGrid({ firms }: { firms: Firm[] }) {
   return (
-    <ul className="grid grid-cols-2 gap-px border border-line bg-line sm:grid-cols-3 lg:grid-cols-4">
+    <ul className="grid grid-cols-2 gap-px border border-line bg-line [--logo-h:42px] sm:grid-cols-3 md:[--logo-h:54px] lg:grid-cols-4">
       {firms.map((f) => (
-        <li
-          key={f.name}
-          className="flex min-h-[72px] flex-col items-center justify-center gap-1.5 bg-paper px-3 py-3 text-center md:min-h-[84px]"
-        >
-          <span className="font-serif text-xl/[1.1] font-semibold md:text-[23px]/[1.1]">{f.name}</span>
-          {deskNames && f.desks && (
-            <span className="caps text-[10px] tracking-[0.16em] text-mute md:text-[10px]">
-              {f.desks.map((d) => deskNames[d] ?? d).join(", ")}
-            </span>
-          )}
+        <li key={f.name} className="flex min-h-[112px] items-center justify-center bg-plate px-5 py-7 md:min-h-[150px]">
+          <FirmLogo name={f.name} />
         </li>
       ))}
     </ul>
   );
 }
 
-const deskName = (department: string, desk?: string) =>
+export const deskName = (department: string, desk?: string) =>
   desk ? getDepartment(department)?.desks.find((k) => k.slug === desk)?.name : undefined;
 
 /** Reports as a list: title, series and issue, desk, and a PDF link or "coming". */

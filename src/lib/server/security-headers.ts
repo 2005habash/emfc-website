@@ -16,7 +16,7 @@ export function contentSecurityPolicy(nonce: string) {
     `script-src 'self' 'nonce-${nonce}' ${TURNSTILE}`,
     "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
     "font-src 'self' https://fonts.gstatic.com",
-    `img-src 'self' data: blob: https://img.logo.dev ${supabase}`,
+    `img-src 'self' data: blob: ${supabase}`,
     `media-src 'self' blob: ${supabase}`,
     `connect-src 'self' ${supabase} ${supabaseSocket}`,
     `frame-src ${TURNSTILE}`,

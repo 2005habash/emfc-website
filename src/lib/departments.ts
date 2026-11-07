@@ -5,8 +5,6 @@
 
 export type Firm = {
   name: string;
-  /** Desk slugs the firm is tagged with on the department page. */
-  desks?: string[];
   /** Added to fill the grid of 12; the desk can swap it. Not shown on the site. */
   proposed?: boolean;
 };
@@ -45,6 +43,8 @@ export type Department = {
   groups?: { name: string; lead: string; desks: string[] }[];
   /** Associates work across every desk (Investment Banking), so each desk page lists all of them. */
   associatesAcrossDesks?: boolean;
+  /** The order of the Vice-Presidents on the department page, when it differs from the desks' order. */
+  vpOrder?: string[];
 };
 
 const firms = (names: string[], proposed: string[] = []): Firm[] => [
@@ -165,7 +165,7 @@ export const departments: Department[] = [
         lead: "João Salgado",
         line: "How companies and private equity funds raise debt, from leveraged buyouts to refinancings and restructurings.",
         description:
-          "Every deal needs financing. We cover how companies and private equity funds raise debt, from leveraged buyouts and acquisition financing to refinancings and restructurings. Members follow live deals, build their credit and capital structure skills, and prepare for Leveraged Finance, DCM and debt advisory roles at bulge brackets and boutiques.",
+          "Every deal needs financing. We cover how companies and private equity funds raise debt, from leveraged buyouts and acquisition financing to refinancings and restructurings. Members follow live deals, build their credit and capital structure skills, and prepare for Leveraged Finance, debt capital markets (DCM) and debt advisory roles at bulge brackets and boutiques.",
         does: [
           "Live deals followed from leveraged buyouts and acquisition financing to refinancings and restructurings.",
           "Credit and capital structure skills.",
@@ -205,26 +205,27 @@ export const departments: Department[] = [
       },
       {
         title: "Study Tours & Outreach",
-        body: "Working toward Barcelona, Madrid and London trips, buddy systems, alumni dinners, company visits and IC competitions.",
+        body: "Working toward Barcelona, Madrid and London trips, buddy systems, alumni dinners, company visits and investment committee (IC) competitions.",
       },
       {
         title: "Research & Reports",
         body: "Deal notes and sector reports across the four verticals, such as the quarterly Real Assets Market Insight, with the annual Spanish Mid-Market PE Review and Industry Profiles on our speakers in preparation.",
       },
     ],
+    vpOrder: ["Fabian Luis Seher", "Luca Flusche", "Zaid Habash", "Anastasia Murgida"],
     targetFirms: [
-      { name: "Blackstone", desks: ["private-equity"] },
-      { name: "KKR", desks: ["private-equity"] },
-      { name: "CVC", desks: ["private-equity"] },
-      { name: "Warburg Pincus", desks: ["private-equity"] },
-      { name: "Ardian", desks: ["private-equity", "real-assets"] },
-      { name: "Index Ventures", desks: ["vc-and-growth"] },
-      { name: "Atomico", desks: ["vc-and-growth"] },
-      { name: "Sequoia Capital", desks: ["vc-and-growth"] },
-      { name: "General Atlantic", desks: ["vc-and-growth"] },
-      { name: "EQT", desks: ["private-equity", "real-assets"] },
-      { name: "Brookfield", desks: ["real-assets"] },
-      { name: "Hg", desks: ["private-equity"] },
+      { name: "Blackstone" },
+      { name: "KKR" },
+      { name: "CVC" },
+      { name: "Warburg Pincus" },
+      { name: "Ardian" },
+      { name: "Index Ventures" },
+      { name: "Atomico" },
+      { name: "Sequoia Capital" },
+      { name: "General Atlantic" },
+      { name: "EQT" },
+      { name: "Brookfield" },
+      { name: "Hg" },
     ],
     desks: [
       {
@@ -239,7 +240,7 @@ export const departments: Department[] = [
           "Technical training: accounting and valuation fundamentals for PE interviews, three-statement links, EV to equity bridge and LBO mechanics.",
           "Paper LBO workshops: building a paper LBO under time pressure, as tested in PE interviews.",
           "CV screening and mock interviews for PE and IB recruiting.",
-          "Roundtables and coffee chats with PE professionals and alumni, with Industry Profiles documenting them planned.",
+          "Roundtables and coffee chats with PE professionals and alumni. An Industry Profile of each speaker to follow.",
           "The Spanish Mid-Market PE Review, an annual report.",
           "A PE Case Competition: teams analyse a buyout case and pitch to a jury of PE professionals.",
         ],
@@ -284,10 +285,11 @@ export const departments: Department[] = [
         slug: "fintech",
         name: "Fintech",
         lead: "Anastasia Murgida",
-        line: "Payments, digital banking and the technology changing financial services, from early-stage startups to the fintech teams of banks and investors.",
+        line: "Payments, digital banking and the technology changing financial services, from early-stage startups to the fintech teams of banks and investors, with a monthly FinTech Market Insight.",
         description:
-          "Payments, digital banking and the technology changing financial services, from early-stage startups to the fintech teams of banks and investors.",
+          "Payments, digital banking and the technology changing financial services, from early-stage startups to the fintech teams of banks and investors, with a monthly FinTech Market Insight.",
         does: [
+          "A monthly FinTech Market Insight on funding, IPOs, AI in banking, payments and Spain's fintech ecosystem (the October 2026 issue by Margarida Loureiro and Anastasia Murgida).",
           "Speaker sessions on fintech and payments, such as the equity research session with a former UBS FinTech & Payments analyst.",
           "The Fintech table at the alumni roundtables, with Martin Nicholls of Frekuent.",
         ],
@@ -335,7 +337,7 @@ export const departments: Department[] = [
             "Patrizia",
             "Hines",
             "Nuveen Real Estate",
-            "AXA IM Alts",
+            "BNP Paribas Asset Management",
           ],
         ),
         planned: ["A team deal teardown and industry insights."],
@@ -372,7 +374,7 @@ export const departments: Department[] = [
       },
       {
         title: "Training & Industry Access",
-        body: "Bloomberg training sessions, trading and investment challenges, London and Luxembourg business trips, plus speaker events with AM, WM and ER professionals.",
+        body: "Bloomberg training sessions, trading and investment challenges, London and Luxembourg business trips, plus speaker events with asset management, wealth management and equity research professionals.",
       },
     ],
     targetFirms: AM_FIRMS,
