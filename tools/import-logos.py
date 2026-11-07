@@ -1,6 +1,8 @@
 # Builds the site's firm logos from a logo pack (Vasco's, in the club Drive) and writes src/data/logos.ts.
 # Usage:
-#   python3 tools/import-logos.py "<pack>/logos"
+#   python3 tools/import-logos.py "<pack>/logos" [<more logo folders>...]
+# Each further folder (for example logos downloaded later, club Drive content/2026-11-05/logos-added)
+# has its own logos.json in the same format and adds to the pack, or replaces a logo of the same name.
 # The pack holds each logo as a 2400 px transparent PNG (plus an SVG) and logos.json, which maps each firm's
 # name, exactly as members.ts and departments.ts spell it, to its file. Each PNG is trimmed to the logo
 # (the pack adds an even margin, which would make wide wordmarks look smaller than square marks at the same
@@ -12,17 +14,23 @@ import sys
 
 from PIL import Image
 
-if len(sys.argv) != 2:
-    sys.exit('Usage: python3 tools/import-logos.py "<pack>/logos"')
-pack = sys.argv[1]
+if len(sys.argv) < 2:
+    sys.exit('Usage: python3 tools/import-logos.py "<pack>/logos" [<more logo folders>...]')
 OUT_DIR = "public/images/logos"
 LONGEST = 640
-index = json.load(open(os.path.join(pack, "logos.json"), encoding="utf-8"))
 os.makedirs(OUT_DIR, exist_ok=True)
 
+# Every logo by firm name (a later folder's replaces an earlier one's), and every firm listed as still to come.
+logos, to_come = {}, set()
+for folder in sys.argv[1:]:
+    index = json.load(open(os.path.join(folder, "logos.json"), encoding="utf-8"))
+    for logo in index["logos"]:
+        logos[logo["name"]] = (folder, logo)
+    to_come |= {f["name"] for f in index.get("not_in_pack", [])}
+
 entries = []
-for logo in index["logos"]:
-    image = Image.open(os.path.join(pack, logo["file"])).convert("RGBA")
+for folder, logo in logos.values():
+    image = Image.open(os.path.join(folder, logo["file"])).convert("RGBA")
     box = image.getchannel("A").getbbox()
     if box:
         image = image.crop(box)
@@ -48,7 +56,7 @@ lines = []
 for e in entries:
     extra = ("mark: true, " if e["mark"] else "") + ("white: true, " if e["white"] else "")
     lines.append(f'  {json.dumps(e["name"], ensure_ascii=False)}: {{ src: "{e["src"]}", w: {e["w"]}, h: {e["h"]}, {extra}}},')
-missing = sorted(f["name"] for f in index.get("not_in_pack", []))
+missing = sorted(to_come - set(logos))
 
 with open("src/data/logos.ts", "w", encoding="utf-8") as out:
     out.write(

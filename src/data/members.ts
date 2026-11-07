@@ -129,6 +129,7 @@ export const MEMBERS: Member[] = [
   },
   {
     "name": "Kian Chirani",
+    "displayName": "Kian Chirani, CFA",
     "slug": "kian-chirani",
     "title": "Associate, Investment Banking",
     "department": "investment-banking",
