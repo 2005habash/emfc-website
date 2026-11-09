@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { EventsChart } from "@/components/fun/EventsChart";
 import { ArrowLeft, ArrowRight, ArrowUpRight, CalendarPlus, Images, Linkedin, MapPin } from "lucide-react";
 import { useState } from "react";
 import { SiteLayout } from "@/components/layout/SiteLayout";
@@ -36,6 +37,7 @@ const fmt = (d: Date, o: Intl.DateTimeFormatOptions) => d.toLocaleDateString("en
 
 function EventsPage() {
   const [view, setView] = useState<"overview" | "calendar">("overview");
+  const events = Route.useLoaderData();
 
   return (
     <SiteLayout>
@@ -54,6 +56,8 @@ function EventsPage() {
         Our events bring members together with industry, peers and ideas. Many sessions are open to
         the wider ESADE community.
       </PageHero>
+
+      <EventsChart events={events} />
 
       <div className="gutter flex flex-col gap-6 pt-10 lg:flex-row lg:items-center lg:justify-between lg:gap-8">
         <div

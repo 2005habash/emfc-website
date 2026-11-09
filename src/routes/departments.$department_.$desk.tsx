@@ -13,6 +13,7 @@ import {
   SectionHeading,
 } from "@/components/site/sections";
 import { Em, Eyebrow, PersonCard } from "@/components/site/ui";
+import { PaperLbo } from "@/components/fun/PaperLbo";
 import { eventsFor } from "@/data/events";
 import { reportsFor } from "@/data/reports";
 import { loadEvents, loadReports } from "@/lib/content";
@@ -138,6 +139,9 @@ function DeskPage() {
             {lead && lead.name !== head?.name && <PersonCard member={lead} index={1} />}
           </div>
         </section>
+
+        {/* The Private Equity desk's toy: a paper LBO to play with. */}
+        {d.slug === "private-markets" && k.slug === "private-equity" && <PaperLbo />}
 
         {/* Target firms */}
         <section className="gutter grid items-start gap-8 lg:grid-cols-12">

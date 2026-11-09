@@ -6,6 +6,7 @@ import { SiteLayout } from "@/components/layout/SiteLayout";
 import { Reveal } from "@/components/Reveal";
 import { NewsletterForm } from "@/components/site/NewsletterForm";
 import { FirmLogo } from "@/components/site/FirmLogo";
+import { Ticker } from "@/components/fun/Ticker";
 import { CountUp, Em, Eyebrow, Numeral, PhotoCaption, Portrait } from "@/components/site/ui";
 import { loadEvents } from "@/lib/content";
 import { STATS } from "@/data/stats";
@@ -66,9 +67,11 @@ const benefits = [
 ];
 
 function Home() {
+  const events = Route.useLoaderData();
   return (
     <SiteLayout overlayNav>
       <Hero />
+      <Ticker events={events} />
       <FirmsBand />
       <Intro />
       <People />

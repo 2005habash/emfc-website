@@ -40,7 +40,7 @@ export function NewsletterForm({
       toast.error(res.reason === "limit" ? "You've signed up a few times already. Try again later." : "Could not subscribe. Try again.");
       return;
     }
-    toast.success("Subscribed. Thank you.");
+    toast.success("Order filled", { description: "1 EMFC newsletter, at a price of €0.00. Thank you for subscribing." });
     setEmail("");
     setConsent(false);
   }

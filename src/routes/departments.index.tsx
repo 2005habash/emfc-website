@@ -4,6 +4,7 @@ import { SiteLayout } from "@/components/layout/SiteLayout";
 import { Reveal } from "@/components/Reveal";
 import { DepartmentSelector, DepartmentsHero, RecruitingBand } from "@/components/site/sections";
 import { Eyebrow, Numeral } from "@/components/site/ui";
+import { DeskQuiz } from "@/components/fun/DeskQuiz";
 import { departments, getDepartment } from "@/lib/departments";
 import { ROMAN } from "@/lib/site";
 import { leadershipOf, membersOf } from "@/lib/team";
@@ -97,6 +98,8 @@ function DepartmentsOverview() {
           );
         })}
       </section>
+
+      <DeskQuiz />
 
       <RecruitingBand />
     </SiteLayout>

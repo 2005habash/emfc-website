@@ -1,7 +1,6 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import {
   Outlet,
-  Link,
   createRootRouteWithContext,
   useRouter,
   HeadContent,
@@ -12,27 +11,13 @@ import { useEffect, type ReactNode } from "react";
 
 import appCss from "../styles.css?url";
 import { Toaster } from "@/components/ui/sonner";
+import { FunLayer } from "@/components/fun/FunLayer";
+import { Delisted } from "@/components/fun/Delisted";
 import { takeReferrer, track } from "@/lib/analytics";
 import { absoluteUrl, IMAGES } from "@/lib/site";
 
 function NotFoundComponent() {
-  return (
-    <div className="flex min-h-screen items-center justify-center bg-background px-6">
-      <div className="max-w-md text-center">
-        <p className="eyebrow">404</p>
-        <h1 className="mt-3 font-serif text-4xl text-navy">Page not found</h1>
-        <p className="mt-3 text-sm text-muted-foreground">
-          The page you're looking for doesn't exist or has been moved.
-        </p>
-        <Link
-          to="/"
-          className="mt-6 inline-flex h-10 items-center rounded-md bg-navy px-5 text-sm font-medium text-primary-foreground"
-        >
-          Back to EMFC
-        </Link>
-      </div>
-    </div>
-  );
+  return <Delisted />;
 }
 
 function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
@@ -89,7 +74,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
       {
         rel: "stylesheet",
-        href: "https://fonts.googleapis.com/css2?family=Geist:wght@300..700&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&display=swap",
+        href: "https://fonts.googleapis.com/css2?family=Geist:wght@300..700&family=Geist+Mono:wght@400;500&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&display=swap",
       },
     ],
   }),
@@ -147,6 +132,7 @@ function useAnalytics() {
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
   useAnalytics();
   useEffect(() => {
     // Links in the admin emails (new password, confirm your email) belong on the admin page. If the
@@ -160,6 +146,8 @@ function RootComponent() {
   return (
     <QueryClientProvider client={queryClient}>
       <Outlet />
+      {/* The terminal, bull run and other easter eggs, everywhere but the admin page. */}
+      {pathname !== "/club-office" && <FunLayer />}
       <Toaster />
     </QueryClientProvider>
   );

@@ -1,4 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { Flashcards } from "@/components/fun/Flashcards";
+import { TECHNICALS } from "@/components/fun/technicals";
 import { ArrowDown, ArrowRight, ArrowUpRight, FileText, Linkedin } from "lucide-react";
 import { useState, type CSSProperties } from "react";
 import { SiteLayout } from "@/components/layout/SiteLayout";
@@ -171,6 +173,7 @@ function ResourcesPage() {
         items={[
           { href: "#partners", count: PARTNERS.length, label: "Partners", note: PARTNERS.map((p) => p.name).join(" and ") },
           { href: "#research", count: published.length, label: "Reports", note: "Published by the desks" },
+          { href: "#technicals", count: TECHNICALS.length, label: "Technicals", note: "Interview questions to practise" },
           { href: "#databases", count: esadeResources.length, label: "Databases", note: "Through the ESADE library" },
         ]}
       />
@@ -233,6 +236,8 @@ function ResourcesPage() {
         </div>
       </section>
 
+      <Flashcards />
+
       {/* ESADE databases */}
       <section id="databases" className="gutter flex scroll-mt-24 flex-col gap-10 py-16 lg:gap-14 lg:py-24">
         <Reveal className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between lg:gap-16">
@@ -283,12 +288,21 @@ function ResourcesPage() {
 function PageIndex({ items }: { items: { href: string; count: number; label: string; note: string }[] }) {
   return (
     <nav aria-label="On this page" className="border-b border-line">
-      <ul className="gutter grid sm:grid-cols-3">
+      {/* Two to a row on tablets, all in one row on wide screens, with lines between them. */}
+      <ul className={cn("gutter grid sm:grid-cols-2", items.length > 3 ? "lg:grid-cols-4" : "lg:grid-cols-3")}>
         {items.map((it, i) => (
-          <li key={it.href} className={cn("border-line", i > 0 && "border-t sm:border-t-0 sm:border-l")}>
+          <li
+            key={it.href}
+            className={cn(
+              "border-line",
+              i > 0 && "border-t lg:border-t-0 lg:border-l",
+              i < 2 && "sm:border-t-0",
+              i % 2 === 1 && "sm:border-l",
+            )}
+          >
             <a
               href={it.href}
-              className={cn("group flex items-center gap-5 py-6 sm:py-8", i > 0 && "sm:pl-8")}
+              className={cn("group flex items-center gap-5 py-6 sm:py-8", i % 2 === 1 && "sm:pl-8", i > 0 && "lg:pl-8")}
             >
               <span className="font-serif text-[52px]/none font-medium tabular-nums md:text-[64px]/none">
                 {String(it.count).padStart(2, "0")}
