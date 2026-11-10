@@ -58,6 +58,9 @@ export function Footer() {
               <Link to="/play" className="hover:text-white hover:underline">
                 Off the clock
               </Link>
+              <Link to="/glossary" className="hover:text-white hover:underline">
+                Glossary
+              </Link>
               <Link to="/sponsorship" className="hover:text-white hover:underline">
                 Sponsorship
               </Link>

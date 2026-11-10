@@ -1,6 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { SiteLayout } from "@/components/layout/SiteLayout";
 import { ActivityCard, CareerLadder } from "@/components/fun/OffTheClock";
+import { MouseFree } from "@/components/fun/MouseFree";
+import { TombstoneMaker } from "@/components/fun/TombstoneMaker";
 import { useCareer } from "@/components/fun/career";
 import { ACTIVITIES } from "@/components/fun/playground";
 import { Em, Eyebrow } from "@/components/site/ui";
@@ -21,7 +23,8 @@ export const Route = createFileRoute("/play")({
 
 const GROUPS = [
   { kind: "game", title: "Games", note: "A few minutes each, and you learn something." },
-  { kind: "people", title: "People", note: "The club is its members. Meet one, or wear the bull." },
+  { kind: "people", title: "People", note: "The club is its members. Meet one over coffee." },
+  { kind: "make", title: "Make your own", note: "Keepsakes to post: a framed photo, a tombstone." },
   {
     kind: "toy",
     title: "Desk toys",
@@ -69,6 +72,8 @@ function PlayPage() {
           </div>
         </section>
       ))}
+      <MouseFree />
+      <TombstoneMaker />
     </SiteLayout>
   );
 }

@@ -13,6 +13,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as ClubOfficeRouteImport } from './routes/club-office'
 import { Route as EventsRouteImport } from './routes/events'
 import { Route as FundRouteImport } from './routes/fund'
+import { Route as GlossaryRouteImport } from './routes/glossary'
 import { Route as KostyaRouteImport } from './routes/kostya'
 import { Route as PlayRouteImport } from './routes/play'
 import { Route as PrivacyRouteImport } from './routes/privacy'
@@ -44,6 +45,11 @@ const EventsRoute = EventsRouteImport.update({
 const FundRoute = FundRouteImport.update({
   id: '/fund',
   path: '/fund',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const GlossaryRoute = GlossaryRouteImport.update({
+  id: '/glossary',
+  path: '/glossary',
   getParentRoute: () => rootRouteImport,
 } as any)
 const KostyaRoute = KostyaRouteImport.update({
@@ -113,6 +119,7 @@ export interface FileRoutesByFullPath {
   '/club-office': typeof ClubOfficeRoute
   '/events': typeof EventsRoute
   '/fund': typeof FundRoute
+  '/glossary': typeof GlossaryRoute
   '/kostya': typeof KostyaRoute
   '/play': typeof PlayRoute
   '/privacy': typeof PrivacyRoute
@@ -131,6 +138,7 @@ export interface FileRoutesByTo {
   '/club-office': typeof ClubOfficeRoute
   '/events': typeof EventsRoute
   '/fund': typeof FundRoute
+  '/glossary': typeof GlossaryRoute
   '/kostya': typeof KostyaRoute
   '/play': typeof PlayRoute
   '/privacy': typeof PrivacyRoute
@@ -150,6 +158,7 @@ export interface FileRoutesById {
   '/club-office': typeof ClubOfficeRoute
   '/events': typeof EventsRoute
   '/fund': typeof FundRoute
+  '/glossary': typeof GlossaryRoute
   '/kostya': typeof KostyaRoute
   '/play': typeof PlayRoute
   '/privacy': typeof PrivacyRoute
@@ -170,6 +179,7 @@ export interface FileRouteTypes {
     | '/club-office'
     | '/events'
     | '/fund'
+    | '/glossary'
     | '/kostya'
     | '/play'
     | '/privacy'
@@ -188,6 +198,7 @@ export interface FileRouteTypes {
     | '/club-office'
     | '/events'
     | '/fund'
+    | '/glossary'
     | '/kostya'
     | '/play'
     | '/privacy'
@@ -206,6 +217,7 @@ export interface FileRouteTypes {
     | '/club-office'
     | '/events'
     | '/fund'
+    | '/glossary'
     | '/kostya'
     | '/play'
     | '/privacy'
@@ -225,6 +237,7 @@ export interface RootRouteChildren {
   ClubOfficeRoute: typeof ClubOfficeRoute
   EventsRoute: typeof EventsRoute
   FundRoute: typeof FundRoute
+  GlossaryRoute: typeof GlossaryRoute
   KostyaRoute: typeof KostyaRoute
   PlayRoute: typeof PlayRoute
   PrivacyRoute: typeof PrivacyRoute
@@ -267,6 +280,13 @@ declare module '@tanstack/react-router' {
       path: '/fund'
       fullPath: '/fund'
       preLoaderRoute: typeof FundRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/glossary': {
+      id: '/glossary'
+      path: '/glossary'
+      fullPath: '/glossary'
+      preLoaderRoute: typeof GlossaryRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/kostya': {
@@ -361,6 +381,7 @@ const rootRouteChildren: RootRouteChildren = {
   ClubOfficeRoute: ClubOfficeRoute,
   EventsRoute: EventsRoute,
   FundRoute: FundRoute,
+  GlossaryRoute: GlossaryRoute,
   KostyaRoute: KostyaRoute,
   PlayRoute: PlayRoute,
   PrivacyRoute: PrivacyRoute,

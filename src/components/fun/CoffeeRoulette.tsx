@@ -9,6 +9,20 @@ import { useHashTarget } from "./useHashTarget";
 
 const POOL = MEMBERS.filter((m) => m.photo);
 
+// Openers for a first coffee chat: questions that start a real conversation, not a CV recital.
+const OPENERS = [
+  "What surprised you most in your first year in finance?",
+  "Which deal or trade taught you the most, and why?",
+  "What does a good week look like on your desk?",
+  "If you were starting your master's again, what would you do differently?",
+  "Which firm on your CV would you go back to, and why?",
+  "What is a skill nobody tells you that you will need?",
+  "What are you reading or following to stay sharp right now?",
+  "How did you choose between the offers or paths you had?",
+  "What question do you wish people asked you more often?",
+  "Who in the club should I meet next?",
+];
+
 /** "Coffee chat roulette" on the Team page: spin, meet a member, say hello on LinkedIn. */
 export function CoffeeRoulette() {
   useHashTarget("roulette");
@@ -43,6 +57,8 @@ export function CoffeeRoulette() {
   };
 
   const m = index === null ? null : POOL[index];
+  // A different opener with each member, chosen by their position so it stays put while shown.
+  const opener = index === null ? null : OPENERS[index % OPENERS.length];
   const linkedin = m ? safeUrl(m.linkedin) : undefined;
 
   return (
@@ -113,6 +129,14 @@ export function CoffeeRoulette() {
                       <Linkedin className="h-3.5 w-3.5" strokeWidth={1.75} />
                       Say hello on LinkedIn
                     </a>
+                  )}
+                  {!spinning && opener && (
+                    <p className="mt-2 border-l-2 border-bull pl-4 font-serif text-[19px]/[1.35] italic">
+                      <span className="caps mb-1 block font-sans text-[10px] not-italic tracking-[0.2em] text-mute">
+                        An opener
+                      </span>
+                      &ldquo;{opener}&rdquo;
+                    </p>
                   )}
                 </>
               ) : (

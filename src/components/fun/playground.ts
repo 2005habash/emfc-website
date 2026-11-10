@@ -7,7 +7,7 @@ export type Activity = {
   hook: string;
   /** Where it lives, as shown on cards. */
   where: string;
-  kind: "game" | "toy" | "people";
+  kind: "game" | "toy" | "people" | "make";
   to: string;
   params?: Record<string, string>;
   hash?: string;
@@ -69,9 +69,27 @@ export const ACTIVITIES: Activity[] = [
     title: "Wear the bull",
     hook: "An EMFC frame for your LinkedIn photo.",
     where: "Team",
-    kind: "people",
+    kind: "make",
     to: "/team",
     hash: "frame",
+  },
+  {
+    id: "mouse-free",
+    title: "Mouse-free",
+    hook: "Name the Excel shortcut. The MD is watching.",
+    where: "Off the clock",
+    kind: "game",
+    to: "/play",
+    hash: "mouse-free",
+  },
+  {
+    id: "tombstone",
+    title: "Tombstone maker",
+    hook: "Announce a deal of your own, banker style.",
+    where: "Off the clock",
+    kind: "make",
+    to: "/play",
+    hash: "tombstone",
   },
   {
     id: "paper-lbo",
