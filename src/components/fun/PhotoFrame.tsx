@@ -93,7 +93,7 @@ async function drawFrame(
   }
 }
 
-/** "Wear the bull" on the Team page: an EMFC frame for a LinkedIn photo, made on the device. */
+/** "Wear the bull" in the Arcade: an EMFC frame for a LinkedIn photo, made on the device. */
 export function PhotoFrame() {
   useHashTarget("frame");
   const canvas = useRef<HTMLCanvasElement>(null);

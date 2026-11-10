@@ -1,148 +1,124 @@
-// Everything a visitor can play with on the site, in one list: the homepage's coffee break section,
-// the career ladder and the lab page all read it. `to` and `params` are router links.
+// Everything in the Arcade (src/routes/arcade.tsx), in one list: its shelf of games and the career
+// ladder both read it. Each activity is played on the Arcade page at /arcade#<id>. The desk toys are
+// also on their desk's page, and the desk quiz on the Departments page.
+
+import { TOYS } from "./toys/catalog";
+
+export type Kind = "game" | "puzzle" | "make" | "toy";
 
 export type Activity = {
   id: string;
   title: string;
   hook: string;
-  /** Where it lives, as shown on cards. */
-  where: string;
-  kind: "game" | "toy" | "people" | "make";
-  to: string;
-  params?: Record<string, string>;
-  hash?: string;
+  kind: Kind;
+  /** Roughly how long one go takes. */
+  time: string;
+  /** "department/desk" for a desk toy, which also sits on that desk's page. */
+  desk?: string;
 };
 
-const desk = (department: string, desk: string) => ({
-  to: "/departments/$department/$desk",
-  params: { department, desk },
-});
+export const SHELVES: { kind: Kind; title: string; note: string }[] = [
+  { kind: "game", title: "Games", note: "A few minutes each, and you learn something on the way." },
+  { kind: "puzzle", title: "Puzzles", note: "For the analyst who checks every footnote." },
+  { kind: "make", title: "Make and meet", note: "Something to post, and someone to meet." },
+  {
+    kind: "toy",
+    title: "Desk toys",
+    note: "Each desk's craft in four levers. Also on the desk's own page.",
+  },
+];
 
 export const ACTIVITIES: Activity[] = [
   {
-    id: "quiz",
-    title: "Which desk are you?",
-    hook: "Five questions, fifteen desks, one answer.",
-    where: "Departments",
+    id: "closing-bell",
+    title: "Closing bell",
+    hook: "Sixty seconds to the close. Trade the headlines and finish green.",
     kind: "game",
-    to: "/departments",
-    hash: "quiz",
+    time: "1 min",
   },
   {
     id: "superday",
     title: "The Superday",
     hook: "Six questions, sixty seconds, one offer letter.",
-    where: "Resources",
     kind: "game",
-    to: "/resources",
-    hash: "superday",
+    time: "2 min",
   },
   {
     id: "bull-or-bear",
     title: "Bull or bear?",
     hook: "Eight days that moved markets. Call each one.",
-    where: "The Fund",
     kind: "game",
-    to: "/fund",
-    hash: "bull-or-bear",
+    time: "3 min",
+  },
+  {
+    id: "quick-turn",
+    title: "Quick turn",
+    hook: "Friday, 18:47. The MD has one small request. Choose your weekend.",
+    kind: "game",
+    time: "2 min",
+  },
+  {
+    id: "quiz",
+    title: "Which desk are you?",
+    hook: "Five questions, fifteen desks, one answer.",
+    kind: "game",
+    time: "1 min",
   },
   {
     id: "real-or-made-up",
     title: "Real or made up?",
     hook: "Matador bonds, Pac-Man defences, paella defences. Which are real?",
-    where: "Resources",
     kind: "game",
-    to: "/resources",
-    hash: "real-or-made-up",
-  },
-  {
-    id: "roulette",
-    title: "Coffee chat roulette",
-    hook: "Spin, meet a member, say hello on LinkedIn.",
-    where: "Team",
-    kind: "people",
-    to: "/team",
-    hash: "roulette",
-  },
-  {
-    id: "frame",
-    title: "Wear the bull",
-    hook: "An EMFC frame for your LinkedIn photo.",
-    where: "Team",
-    kind: "make",
-    to: "/team",
-    hash: "frame",
+    time: "3 min",
   },
   {
     id: "mouse-free",
     title: "Mouse-free",
     hook: "Name the Excel shortcut. The MD is watching.",
-    where: "Off the clock",
     kind: "game",
-    to: "/play",
-    hash: "mouse-free",
+    time: "2 min",
+  },
+  {
+    id: "find-the-plug",
+    title: "Find the plug",
+    hook: "The model doesn't tie. Find the wrong cell before the MD does.",
+    kind: "puzzle",
+    time: "3 min",
+  },
+  {
+    id: "brainteasers",
+    title: "Brainteasers",
+    hook: "The puzzles trading desks love to ask. No calculator needed.",
+    kind: "puzzle",
+    time: "5 min",
+  },
+  {
+    id: "frame",
+    title: "Wear the bull",
+    hook: "An EMFC frame for your LinkedIn photo.",
+    kind: "make",
+    time: "1 min",
   },
   {
     id: "tombstone",
     title: "Tombstone maker",
     hook: "Announce a deal of your own, banker style.",
-    where: "Off the clock",
     kind: "make",
-    to: "/play",
-    hash: "tombstone",
+    time: "1 min",
   },
   {
-    id: "paper-lbo",
-    title: "Run a paper LBO",
-    hook: "Four levers, one IRR. Can you clear 20%?",
-    where: "Private Equity",
-    kind: "toy",
-    ...desk("private-markets", "private-equity"),
-    hash: "paper-lbo",
+    id: "roulette",
+    title: "Coffee chat roulette",
+    hook: "Spin, meet a member, say hello on LinkedIn.",
+    kind: "make",
+    time: "1 min",
   },
-  {
-    id: "accretion",
-    title: "Accretive or dilutive?",
-    hook: "Price a deal, watch the buyer's EPS.",
-    where: "M&A",
-    kind: "toy",
-    ...desk("investment-banking", "m-and-a"),
-    hash: "accretion",
-  },
-  {
-    id: "return-the-fund",
-    title: "Return the fund",
-    hook: "Can one startup pay back a venture fund?",
-    where: "VC & Growth",
-    kind: "toy",
-    ...desk("private-markets", "vc-and-growth"),
-    hash: "return-the-fund",
-  },
-  {
-    id: "dcf",
-    title: "What's it worth?",
-    hook: "A DCF in four levers.",
-    where: "Equity Research",
-    kind: "toy",
-    ...desk("asset-management", "equity-research"),
-    hash: "dcf",
-  },
-  {
-    id: "bond-yield",
-    title: "Move the yield",
-    hook: "Watch a bond's price fall as yields rise.",
-    where: "Rates & Government Bonds",
-    kind: "toy",
-    ...desk("fixed-income", "rates-and-government-bonds"),
-    hash: "bond-yield",
-  },
-  {
-    id: "cap-rate",
-    title: "The cap rate seesaw",
-    hook: "Half a point on the cap rate, millions on the value.",
-    where: "Real Assets",
-    kind: "toy",
-    ...desk("private-markets", "real-assets"),
-    hash: "cap-rate",
-  },
+  ...TOYS.map((t) => ({
+    id: t.id,
+    title: t.title,
+    hook: t.hook,
+    kind: "toy" as const,
+    time: "2 min",
+    desk: t.desk,
+  })),
 ];

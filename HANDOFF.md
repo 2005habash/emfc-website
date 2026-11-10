@@ -66,8 +66,11 @@ The security headers only apply to production builds: to test them locally, `npm
 | An event's page, also used for the admin page's preview | `src/components/site/EventArticle.tsx` |
 | The picture shown when a link to the site is shared | `public/images/share/emfc.jpg`, made from `tools/share-card.html` (instructions inside) |
 | The full fund page, hidden until `FUND_PAGE_LIVE` is true | `src/components/fund/FundFull.tsx` |
-| Pages | `src/routes/`: `index`, `departments.index` (overview), `departments.$department`, `departments.$department_.$desk` (the `_` stops it nesting), `team`, `events`, `events_.$eventId`, `resources`, `fund`, `sponsorship`, `privacy`, `club-office` (admin) |
-| Extra pages for fun, not in the menus and kept out of search engines | `src/routes/zaid.tsx` (a tribute to the site owner), `src/routes/puzzle.tsx` with `src/components/puzzle/` (the team photo as a jigsaw), `src/routes/kostya.tsx` with `src/components/kostya/` (a joke tribute to Constantin Molineus, which he agreed to) |
+| The Board page: the Co-Presidents and their sentence (`CO_PRESIDENT_QUOTE` in `src/lib/site.ts`), the org chart of the six Heads and their desks, and the club's story | `src/routes/board.tsx` |
+| The Arcade, the last tab: every game, puzzle and desk toy on one shelf, each played on the page at `/arcade#<id>`; the list and the career ladder | `src/routes/arcade.tsx`, `src/components/fun/playground.ts`, the games in `src/components/fun/` (the desk toys also sit on their desk pages, and the desk quiz on the Departments page) |
+| The live market ticker above the menu (TradingView's widget in a sandboxed frame, allowed by the Content Security Policy's `frame-src`) | `src/components/fun/MarketTicker.tsx` |
+| Pages | `src/routes/`: `index`, `board`, `departments.index` (overview), `departments.$department`, `departments.$department_.$desk` (the `_` stops it nesting), `team`, `events`, `events_.$eventId`, `resources`, `fund`, `sponsorship`, `arcade`, `glossary`, `privacy`, `club-office` (admin) |
+| Retired code, kept but not built, served or maintained: the old application flow, and the hidden `/zaid`, `/kostya` and `/puzzle` pages (archived 10 November 2026). Leave it out of site-wide changes | `archive/` (its README says how to restore something) |
 | Database: every change, in the order they were run (section 8) | `supabase/migrations/` |
 | The content packages from Vasco (2 Nov, and 5 Nov merged into it with the addition as received in `addition/`) | the club Drive, `content/2026-11-02/` and `content/2026-11-05/` (private; not in this repository) |
 | Images, clips, report PDFs | `public/images/{team,events,barcelona,logo}`, `public/videos/events`, `public/reports` |
@@ -144,7 +147,7 @@ Each September, at the handover: give the new admins and editors their levels an
 - Renaming or moving a route file while `npm run dev` runs can leave a stale error in the browser; reload the page.
 - Firm and resource logos are served from the site itself (`public/images/logos/`), no longer from logo.dev. They sit on white (`bg-plate`) in both themes, because most logos are dark and may not be recoloured. Each is sized from one height (`--logo-h`) and balanced for its proportions, so wordmarks and square marks look the same size.
 - Link previews (LinkedIn, WhatsApp) need full addresses, so pictures in page tags go through `absoluteUrl()` with `SITE_URL` (`src/lib/site.ts`). Pages without their own picture use the share image.
-- Between about 1024 and 1280px wide, the logo's subtitle and the social icons are hidden so the menu fits.
+- Between about 1024 and 1536px wide, the logo's subtitle and the social icons are hidden so the menu, with Board and Arcade, fits.
 - `vite.config.ts` lists the build plugins itself (Tailwind, paths, TanStack Start, Nitro, React); it no longer uses Lovable's config package.
 - On Vercel previews the Content Security Policy blocks Vercel's own feedback toolbar. That is expected and harmless.
 - Adding an event and a report on the admin page, with uploads, has not yet been tested end to end on the live site.

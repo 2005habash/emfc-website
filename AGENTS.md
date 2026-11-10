@@ -7,3 +7,6 @@
 >
 > The site was first built in Lovable and left it in November 2026; nothing here syncs to Lovable
 > any more.
+
+`archive/` holds retired pages and code. It is not built or served, and ESLint and Prettier skip it:
+leave it out of site-wide changes (renames, copy rules, design, searches).

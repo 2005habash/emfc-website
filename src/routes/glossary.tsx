@@ -109,7 +109,7 @@ function GlossaryPage() {
             </div>
           ))}
         </div>
-        <Link to="/resources" hash="real-or-made-up" className="btn btn-sm btn-outline-ink mt-6">
+        <Link to="/arcade" hash="real-or-made-up" className="btn btn-sm btn-outline-ink mt-6">
           Test yourself: real or made up?
           <ArrowRight className="h-3.5 w-3.5" strokeWidth={1.75} />
         </Link>

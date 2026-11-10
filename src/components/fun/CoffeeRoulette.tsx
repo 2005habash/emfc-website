@@ -23,7 +23,7 @@ const OPENERS = [
   "Who in the club should I meet next?",
 ];
 
-/** "Coffee chat roulette" on the Team page: spin, meet a member, say hello on LinkedIn. */
+/** "Coffee chat roulette" in the Arcade: spin, meet a member, say hello on LinkedIn. */
 export function CoffeeRoulette() {
   useHashTarget("roulette");
   const [index, setIndex] = useState<number | null>(null);

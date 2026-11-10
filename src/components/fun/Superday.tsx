@@ -179,7 +179,7 @@ function pick() {
     });
 }
 
-/** "The Superday" on the Resources page: a timed mock interview that ends with a letter. */
+/** "The Superday" in the Arcade: a timed mock interview that ends with a letter. */
 export function Superday() {
   useHashTarget("superday");
   const [questions, setQuestions] = useState<Question[] | null>(null);
@@ -346,7 +346,7 @@ function Result({
       await shareImage(
         blob,
         "emfc-superday-letter.png",
-        `My EMFC Superday: ${o.title}. Try it at emfc.es/resources`,
+        `My EMFC Superday: ${o.title}. Try it at emfc.es/arcade`,
       );
     } finally {
       setBusy(false);
@@ -469,6 +469,6 @@ async function drawLetter(name: string, score: number, took: number, body: strin
     ctx.stroke();
     ctx.font = `400 24px ${SANS}`;
     ctx.fillStyle = INK.mute;
-    ctx.fillText("Not a real offer, sadly. Practise at emfc.es/resources", 96, 1268);
+    ctx.fillText("Not a real offer, sadly. Practise at emfc.es/arcade", 96, 1268);
   });
 }
