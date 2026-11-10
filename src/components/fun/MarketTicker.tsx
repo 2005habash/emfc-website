@@ -38,7 +38,8 @@ function frameSrc() {
     showSymbolLogo: true,
     colorTheme: "dark",
     isTransparent: true,
-    displayMode: "adaptive",
+    // One line at every width: "adaptive" turns into two lines on phones, taller than the strip.
+    displayMode: "regular",
     width: "100%",
     height: HEIGHT,
     utm_source: window.location.hostname,
