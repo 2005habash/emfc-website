@@ -99,7 +99,7 @@ Every branch pushed to GitHub other than `main` gets a private preview on Vercel
 | --- | --- |
 | Zaid | The VC & Growth desk text (the site shows a draft from the 20 October call) and its 8 proposed firms |
 | Fabian, Anastasia | Confirm the drafted Private Equity and Fintech lines (the Fintech line now mentions the monthly FinTech Market Insight) |
-| Cosimo, Luka | Confirm the drafted desk texts for Asset Management (3) and Fixed Income (6) |
+| Cosimo, Luka | Confirm the drafted desk texts for Asset Management (3) and Fixed Income (2: Public Credit and Private Credit), and whether Public Credit has a lead of its own (until then Luka, as Head of Fixed Income, leads it) |
 | Lara Koch | A larger photo (hers is 241 x 288 pixels, so her portrait is soft) |
 | Lili Anna Paczolay-Nagy, Hunter Crawford, Kateryna Mohylevska, Henri de Canecaude | A photo with more space around the head and shoulders: theirs are tight close-ups, so their portraits show a larger head than everyone else's (Vasco's site review H6) |
 | Luís Laboreiro | Confirm Pol Bonet Malgà's desk (Equity Research assumed) |
