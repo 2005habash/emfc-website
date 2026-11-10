@@ -14,25 +14,34 @@ import { z } from "zod";
 
 export const FORMATS = ["Talent events", "Workshops", "Sponsored content", "Full-year partnership"] as const;
 
-const Enquiry = z.object({
-  name: z.string().trim().min(2).max(120),
-  firm: z.string().trim().min(2).max(160),
-  email: z.string().trim().email().max(200),
-  format: z.enum(FORMATS),
-  message: z.string().trim().min(10).max(4000),
-  /** Honeypot: hidden from people, filled in by bots. */
-  website: z.string().max(300).default(""),
-  /** How long the form was open, in milliseconds. People take longer than a few seconds. */
-  elapsed: z.number().int().nonnegative().max(86_400_000 * 7),
-  /** Cloudflare Turnstile's token, when the bot check is set up. */
-  turnstile: z.string().max(2048).optional(),
-});
+// Built when first needed rather than as the file loads: the browser imports this file for the form's
+// options and the function below, and would otherwise carry the whole validation library for nothing.
+const buildEnquiry = () =>
+  z.object({
+    name: z.string().trim().min(2).max(120),
+    firm: z.string().trim().min(2).max(160),
+    email: z.string().trim().email().max(200),
+    format: z.enum(FORMATS),
+    message: z.string().trim().min(10).max(4000),
+    /** Honeypot: hidden from people, filled in by bots. */
+    website: z.string().max(300).default(""),
+    /** How long the form was open, in milliseconds. People take longer than a few seconds. */
+    elapsed: z
+      .number()
+      .int()
+      .nonnegative()
+      .max(86_400_000 * 7),
+    /** Cloudflare Turnstile's token, when the bot check is set up. */
+    turnstile: z.string().max(2048).optional(),
+  });
+type EnquirySchema = ReturnType<typeof buildEnquiry>;
+let enquirySchema: EnquirySchema | undefined;
 
 const PER_VISITOR_PER_HOUR = 3;
 const EMAILS_PER_DAY = 40;
 
-export type EnquiryInput = z.input<typeof Enquiry>;
-type Valid = z.output<typeof Enquiry>;
+export type EnquiryInput = z.input<EnquirySchema>;
+type Valid = z.output<EnquirySchema>;
 
 async function email(d: Valid, suspected: boolean) {
   const key = process.env.RESEND_API_KEY;
@@ -84,7 +93,7 @@ async function email(d: Valid, suspected: boolean) {
 export type EnquiryResult = { ok: boolean; reason?: "limit" | "check" };
 
 export const sendSponsorshipEnquiry = createServerFn({ method: "POST" })
-  .validator((data: unknown) => Enquiry.parse(data))
+  .validator((data: unknown) => (enquirySchema ??= buildEnquiry()).parse(data))
   .handler(async ({ data }): Promise<EnquiryResult> => {
     const guard = await import("@/lib/server/guard");
     const { ip } = guard.requestInfo();

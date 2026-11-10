@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowRight } from "lucide-react";
-import { motion, useReducedMotion } from "framer-motion";
+import type { CSSProperties } from "react";
 import { SiteLayout } from "@/components/layout/SiteLayout";
 import { Reveal } from "@/components/Reveal";
 import { Em, Eyebrow, Numeral, PageHero, PersonCard } from "@/components/site/ui";
@@ -270,7 +270,6 @@ function Structure() {
 
 /** The club's short history, from the first kick-off to what comes next. */
 function Story() {
-  const reduce = useReducedMotion();
   const done = story.filter((s) => s.done).length;
   return (
     <section className="bg-night text-white">
@@ -286,14 +285,16 @@ function Story() {
             aria-hidden
             className="absolute bottom-2 left-1.5 top-2 w-px bg-[#2A3576] md:hidden xl:bottom-auto xl:left-0 xl:right-0 xl:top-1.5 xl:block xl:h-px xl:w-auto"
           />
-          <motion.div
+          <div
             aria-hidden
-            className="absolute left-0 top-1.5 hidden h-px origin-left bg-bull-light xl:block"
-            style={{ width: `${(done / story.length) * 100}%` }}
-            initial={reduce ? false : { scaleX: 0 }}
-            whileInView={{ scaleX: 1 }}
-            viewport={{ once: true }}
-            transition={{ duration: 1.4, delay: 0.3, ease: "easeOut" }}
+            className="grow-x absolute left-0 top-1.5 hidden h-px origin-left bg-bull-light xl:block"
+            style={
+              {
+                width: `${(done / story.length) * 100}%`,
+                "--grow-time": "1.4s",
+                "--grow-delay": "0.3s",
+              } as CSSProperties
+            }
           />
           {story.map((s) => (
             <div key={s.title} className="relative flex gap-5 md:flex-col md:gap-3.5">

@@ -1,7 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import { Loader2 } from "lucide-react";
 import { useId, useState } from "react";
-import { toast } from "sonner";
+import { toast } from "@/lib/toast";
 import { subscribe } from "@/lib/newsletter";
 import { cn } from "@/lib/utils";
 

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { toast } from "sonner";
+import { toast } from "@/lib/toast";
 import { ACTIVITIES } from "./playground";
 
 // The playful layer's running joke: each game or toy a visitor plays moves them up a finance career

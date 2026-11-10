@@ -1,33 +1,16 @@
 import { createFileRoute, Link, useNavigate, useRouterState } from "@tanstack/react-router";
 import { ArrowDown, ArrowUp, ArrowUpRight, Check } from "lucide-react";
-import { useEffect, useState, type ComponentType } from "react";
+import { lazy, Suspense, useEffect, useRef, useState, type ComponentType } from "react";
 import { SiteLayout } from "@/components/layout/SiteLayout";
-import { BullOrBear } from "@/components/fun/BullOrBear";
-import { Brainteasers } from "@/components/fun/Brainteasers";
 import { CareerLadder } from "@/components/fun/CareerLadder";
-import { ClosingBell } from "@/components/fun/ClosingBell";
-import { CoffeeRoulette } from "@/components/fun/CoffeeRoulette";
-import { DeskQuiz } from "@/components/fun/DeskQuiz";
-import { FindThePlug } from "@/components/fun/FindThePlug";
 import { Giggle } from "@/components/fun/Giggle";
-import { MouseFree } from "@/components/fun/MouseFree";
-import { PhotoFrame } from "@/components/fun/PhotoFrame";
-import { QuickTurn } from "@/components/fun/QuickTurn";
-import { RealOrMadeUp } from "@/components/fun/RealOrMadeUp";
-import { Superday } from "@/components/fun/Superday";
-import { TombstoneMaker } from "@/components/fun/TombstoneMaker";
-import { Accretion } from "@/components/fun/toys/Accretion";
-import { BondYield } from "@/components/fun/toys/BondYield";
-import { CapRate } from "@/components/fun/toys/CapRate";
-import { Dcf } from "@/components/fun/toys/Dcf";
-import { PaperLbo } from "@/components/fun/toys/PaperLbo";
-import { ReturnTheFund } from "@/components/fun/toys/ReturnTheFund";
 import { useCareer } from "@/components/fun/career";
 import { ACTIVITIES, SHELVES, type Activity } from "@/components/fun/playground";
 import { Em, Eyebrow } from "@/components/site/ui";
 import { getDepartment } from "@/lib/departments";
 import { IMAGES } from "@/lib/site";
 import { cn } from "@/lib/utils";
+import { sized } from "@/lib/images";
 
 export const Route = createFileRoute("/arcade")({
   head: () => ({
@@ -48,26 +31,32 @@ export const Route = createFileRoute("/arcade")({
   component: ArcadePage,
 });
 
-/** Every activity's game, by its id in playground.ts. */
+/**
+ * Every activity's game, by its id in playground.ts. Each game's code is fetched when it is first
+ * picked, so the shelf opens without carrying all eighteen.
+ */
+const game = <T extends Record<string, ComponentType>>(load: () => Promise<T>, name: keyof T) =>
+  lazy(() => load().then((m) => ({ default: m[name] })));
+
 const GAMES: Record<string, ComponentType> = {
-  "closing-bell": ClosingBell,
-  superday: Superday,
-  "bull-or-bear": BullOrBear,
-  "quick-turn": QuickTurn,
-  quiz: DeskQuiz,
-  "real-or-made-up": RealOrMadeUp,
-  "mouse-free": MouseFree,
-  "find-the-plug": FindThePlug,
-  brainteasers: Brainteasers,
-  frame: PhotoFrame,
-  tombstone: TombstoneMaker,
-  roulette: CoffeeRoulette,
-  "paper-lbo": PaperLbo,
-  accretion: Accretion,
-  "return-the-fund": ReturnTheFund,
-  dcf: Dcf,
-  "bond-yield": BondYield,
-  "cap-rate": CapRate,
+  "closing-bell": game(() => import("@/components/fun/ClosingBell"), "ClosingBell"),
+  superday: game(() => import("@/components/fun/Superday"), "Superday"),
+  "bull-or-bear": game(() => import("@/components/fun/BullOrBear"), "BullOrBear"),
+  "quick-turn": game(() => import("@/components/fun/QuickTurn"), "QuickTurn"),
+  quiz: game(() => import("@/components/fun/DeskQuiz"), "DeskQuiz"),
+  "real-or-made-up": game(() => import("@/components/fun/RealOrMadeUp"), "RealOrMadeUp"),
+  "mouse-free": game(() => import("@/components/fun/MouseFree"), "MouseFree"),
+  "find-the-plug": game(() => import("@/components/fun/FindThePlug"), "FindThePlug"),
+  brainteasers: game(() => import("@/components/fun/Brainteasers"), "Brainteasers"),
+  frame: game(() => import("@/components/fun/PhotoFrame"), "PhotoFrame"),
+  tombstone: game(() => import("@/components/fun/TombstoneMaker"), "TombstoneMaker"),
+  roulette: game(() => import("@/components/fun/CoffeeRoulette"), "CoffeeRoulette"),
+  "paper-lbo": game(() => import("@/components/fun/toys/PaperLbo"), "PaperLbo"),
+  accretion: game(() => import("@/components/fun/toys/Accretion"), "Accretion"),
+  "return-the-fund": game(() => import("@/components/fun/toys/ReturnTheFund"), "ReturnTheFund"),
+  dcf: game(() => import("@/components/fun/toys/Dcf"), "Dcf"),
+  "bond-yield": game(() => import("@/components/fun/toys/BondYield"), "BondYield"),
+  "cap-rate": game(() => import("@/components/fun/toys/CapRate"), "CapRate"),
 };
 
 /** "Private Equity" for "private-markets/private-equity". */
@@ -105,9 +94,11 @@ function ArcadePage() {
   return (
     <SiteLayout>
       <section className="relative overflow-hidden bg-night text-white">
+        {/* Lazy, so a phone, where it is hidden, never downloads it. */}
         <img
-          src={IMAGES.bullMark}
+          {...sized(IMAGES.bullMark, "620px")}
           alt=""
+          loading="lazy"
           className="pointer-events-none absolute -right-28 top-1/2 hidden w-[620px] -translate-y-1/2 -rotate-12 opacity-[0.06] lg:block"
         />
         <div className="gutter relative grid items-end gap-10 pb-14 pt-20 lg:grid-cols-12 lg:gap-8 lg:pb-18 lg:pt-24">
@@ -166,12 +157,24 @@ function ArcadePage() {
 
       {current && Game && (
         <>
-          <Game key={current.id} />
+          <Suspense fallback={<Loading id={current.id} />}>
+            <Game key={current.id} />
+          </Suspense>
           <UpNext current={current} played={played} />
         </>
       )}
     </SiteLayout>
   );
+}
+
+/** A game's place for the moment its code is on its way: the page moves there at once. */
+function Loading({ id }: { id: string }) {
+  const ref = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    // In braces: scrollIntoView now returns a promise in some browsers, and an effect must return nothing.
+    ref.current?.scrollIntoView({ block: "start", behavior: "instant" });
+  }, []);
+  return <div ref={ref} id={id} aria-busy className="min-h-[70vh] scroll-mt-24 bg-stone" />;
 }
 
 /** A game on the shelf. Picking it plays it below; the one playing is shown in navy. */

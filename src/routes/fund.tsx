@@ -7,6 +7,7 @@ import { ReportList } from "@/components/site/sections";
 import { Em, Eyebrow } from "@/components/site/ui";
 import { loadReports } from "@/lib/content";
 import { FUND_PAGE_LIVE, IMAGES } from "@/lib/site";
+import { sized } from "@/lib/images";
 
 export const Route = createFileRoute("/fund")({
   head: () => ({
@@ -35,8 +36,10 @@ function FundComingSoon() {
     <SiteLayout>
       <section className="relative overflow-hidden bg-[#000B3D] text-white">
         <img
-          src={IMAGES.bullMark}
+          {...sized(IMAGES.bullMark, "(min-width: 1024px) 440px, (min-width: 768px) 375px, 265px")}
           alt=""
+          width={560}
+          height={510}
           className="absolute -right-10 bottom-0 h-[240px] w-auto animate-rise opacity-40 [animation-delay:320ms] md:right-10 md:h-[340px] md:opacity-100 lg:right-18 lg:h-[400px]"
         />
         <div className="gutter relative flex min-h-[460px] flex-col items-start justify-end gap-6 pb-14 pt-20 lg:min-h-[520px] lg:pb-16">

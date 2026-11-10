@@ -1,16 +1,20 @@
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import {
   Outlet,
-  createRootRouteWithContext,
+  createRootRoute,
   useRouter,
   HeadContent,
   Scripts,
   useRouterState,
+  type ErrorComponentProps,
 } from "@tanstack/react-router";
 import { useEffect, type ReactNode } from "react";
 
 import appCss from "../styles.css?url";
-import { Toaster } from "@/components/ui/sonner";
+// The three font files nearly every page needs, preloaded below (the rest are in src/styles.css).
+import geist from "@fontsource-variable/geist/files/geist-latin-wght-normal.woff2?url";
+import cormorant from "@fontsource-variable/cormorant-garamond/files/cormorant-garamond-latin-wght-normal.woff2?url";
+import cormorantItalic from "@fontsource-variable/cormorant-garamond/files/cormorant-garamond-latin-wght-italic.woff2?url";
+import { Toasts } from "@/components/site/Toasts";
 import { Delisted } from "@/components/fun/Delisted";
 import { MarketTicker } from "@/components/fun/MarketTicker";
 import { takeReferrer, track } from "@/lib/analytics";
@@ -20,7 +24,7 @@ function NotFoundComponent() {
   return <Delisted />;
 }
 
-function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
+function ErrorComponent({ error, reset }: ErrorComponentProps) {
   console.error(error);
   const router = useRouter();
   // The 404 page is "Delisted."; when a page fails to load, trading is halted.
@@ -40,7 +44,10 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
         <div className="flex flex-col gap-3 sm:flex-row">
           <button
             type="button"
-            onClick={() => { router.invalidate(); reset(); }}
+            onClick={() => {
+              router.invalidate();
+              reset();
+            }}
             aria-label="Resume trading: try again"
             className="btn btn-white"
           >
@@ -55,40 +62,58 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
   );
 }
 
-export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()({
-  head: () => ({
-    meta: [
-      { charSet: "utf-8" },
-      { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "EMFC, ESADE Master's Finance Club" },
-      {
-        name: "description",
-        content:
-          "EMFC is the finance club at ESADE Business School in Barcelona, turning ambition into careers.",
-      },
-      { property: "og:title", content: "EMFC, ESADE Master's Finance Club" },
-      {
-        property: "og:description",
-        content: "The finance club at ESADE. A community built around careers, companies and the people you meet along the way.",
-      },
-      { property: "og:type", content: "website" },
-      { property: "og:site_name", content: "EMFC" },
-      // Pages can set their own picture; the rest use this one. X reads the og: tags when there are no twitter: ones.
-      { property: "og:image", content: absoluteUrl(IMAGES.share) },
-      { property: "og:image:alt", content: "The EMFC bull and name over the club's group photo" },
-      { name: "twitter:card", content: "summary_large_image" },
-    ],
-    links: [
-      { rel: "stylesheet", href: appCss },
-      { rel: "icon", type: "image/png", href: "/images/logo/bull-tile.png" },
-      { rel: "preconnect", href: "https://fonts.googleapis.com" },
-      { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
-      {
-        rel: "stylesheet",
-        href: "https://fonts.googleapis.com/css2?family=Geist:wght@300..700&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&display=swap",
-      },
-    ],
-  }),
+export const Route = createRootRoute({
+  head: ({ matches }) => {
+    // The page's one true address (www, no trailing slash, nothing after "?"), so search engines and
+    // link previews treat every way of reaching it as the same page.
+    const path = matches[matches.length - 1]?.pathname ?? "/";
+    const url = absoluteUrl(path === "/" ? "/" : path.replace(/\/$/, ""));
+    return {
+      meta: [
+        { charSet: "utf-8" },
+        { name: "viewport", content: "width=device-width, initial-scale=1" },
+        { title: "EMFC, ESADE Master's Finance Club" },
+        {
+          name: "description",
+          content:
+            "EMFC is the finance club at ESADE Business School in Barcelona, turning ambition into careers.",
+        },
+        { property: "og:title", content: "EMFC, ESADE Master's Finance Club" },
+        {
+          property: "og:description",
+          content:
+            "The finance club at ESADE. A community built around careers, companies and the people you meet along the way.",
+        },
+        { property: "og:type", content: "website" },
+        { property: "og:url", content: url },
+        { property: "og:site_name", content: "EMFC" },
+        // Pages can set their own picture; the rest use this one. X reads the og: tags when there are no twitter: ones.
+        { property: "og:image", content: absoluteUrl(IMAGES.share) },
+        { property: "og:image:alt", content: "The EMFC bull and name over the club's group photo" },
+        { name: "twitter:card", content: "summary_large_image" },
+      ],
+      links: [
+        { rel: "stylesheet", href: appCss },
+        { rel: "canonical", href: url },
+        // Made from the bull tile by tools/size-images.py.
+        { rel: "icon", type: "image/png", sizes: "48x48", href: "/images/sized/logo/icon-48.png" },
+        {
+          rel: "icon",
+          type: "image/png",
+          sizes: "192x192",
+          href: "/images/sized/logo/icon-192.png",
+        },
+        { rel: "apple-touch-icon", href: "/images/sized/logo/apple-touch-icon.png" },
+        ...[geist, cormorant, cormorantItalic].map((href) => ({
+          rel: "preload",
+          as: "font",
+          type: "font/woff2",
+          href,
+          crossOrigin: "anonymous" as const,
+        })),
+      ],
+    };
+  },
   shellComponent: RootShell,
   component: RootComponent,
   notFoundComponent: NotFoundComponent,
@@ -107,7 +132,11 @@ function RootShell({ children }: { children: ReactNode }) {
     <html lang="en" suppressHydrationWarning>
       <head>
         <HeadContent />
-        <script nonce={nonce} suppressHydrationWarning dangerouslySetInnerHTML={{ __html: THEME_SCRIPT }} />
+        <script
+          nonce={nonce}
+          suppressHydrationWarning
+          dangerouslySetInnerHTML={{ __html: THEME_SCRIPT }}
+        />
       </head>
       <body>
         {children}
@@ -142,7 +171,6 @@ function useAnalytics() {
 }
 
 function RootComponent() {
-  const { queryClient } = Route.useRouteContext();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   useAnalytics();
   useEffect(() => {
@@ -151,16 +179,18 @@ function RootComponent() {
     const hash = window.location.hash;
     if (window.location.pathname === "/club-office") return;
     if (/[#&](type=(recovery|signup|invite|magiclink|email_change)|error_code=)/.test(hash)) {
-      window.location.replace(`/club-office${hash.includes("type=recovery") ? "?reset=1" : ""}${hash}`);
+      window.location.replace(
+        `/club-office${hash.includes("type=recovery") ? "?reset=1" : ""}${hash}`,
+      );
     }
   }, []);
   return (
-    <QueryClientProvider client={queryClient}>
+    <>
       {/* Market prices above the menu bar on every page but the admin page. Mounted here, not in
           SiteLayout, so it keeps running from page to page instead of reloading. */}
       {pathname !== "/club-office" && <MarketTicker />}
       <Outlet />
-      <Toaster />
-    </QueryClientProvider>
+      <Toasts />
+    </>
   );
 }

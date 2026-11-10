@@ -18,6 +18,7 @@ import { Route as FundRouteImport } from './routes/fund'
 import { Route as GlossaryRouteImport } from './routes/glossary'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as ResourcesRouteImport } from './routes/resources'
+import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as SponsorshipRouteImport } from './routes/sponsorship'
 import { Route as TeamRouteImport } from './routes/team'
 import { Route as DepartmentsIndexRouteImport } from './routes/departments.index'
@@ -70,6 +71,11 @@ const ResourcesRoute = ResourcesRouteImport.update({
   path: '/resources',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
+  id: '/sitemap.xml',
+  path: '/sitemap.xml',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SponsorshipRoute = SponsorshipRouteImport.update({
   id: '/sponsorship',
   path: '/sponsorship',
@@ -112,6 +118,7 @@ export interface FileRoutesByFullPath {
   '/glossary': typeof GlossaryRoute
   '/privacy': typeof PrivacyRoute
   '/resources': typeof ResourcesRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/sponsorship': typeof SponsorshipRoute
   '/team': typeof TeamRoute
   '/departments/$department': typeof DepartmentsDepartmentRoute
@@ -129,6 +136,7 @@ export interface FileRoutesByTo {
   '/glossary': typeof GlossaryRoute
   '/privacy': typeof PrivacyRoute
   '/resources': typeof ResourcesRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/sponsorship': typeof SponsorshipRoute
   '/team': typeof TeamRoute
   '/departments/$department': typeof DepartmentsDepartmentRoute
@@ -147,6 +155,7 @@ export interface FileRoutesById {
   '/glossary': typeof GlossaryRoute
   '/privacy': typeof PrivacyRoute
   '/resources': typeof ResourcesRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/sponsorship': typeof SponsorshipRoute
   '/team': typeof TeamRoute
   '/departments/$department': typeof DepartmentsDepartmentRoute
@@ -166,6 +175,7 @@ export interface FileRouteTypes {
     | '/glossary'
     | '/privacy'
     | '/resources'
+    | '/sitemap.xml'
     | '/sponsorship'
     | '/team'
     | '/departments/$department'
@@ -183,6 +193,7 @@ export interface FileRouteTypes {
     | '/glossary'
     | '/privacy'
     | '/resources'
+    | '/sitemap.xml'
     | '/sponsorship'
     | '/team'
     | '/departments/$department'
@@ -200,6 +211,7 @@ export interface FileRouteTypes {
     | '/glossary'
     | '/privacy'
     | '/resources'
+    | '/sitemap.xml'
     | '/sponsorship'
     | '/team'
     | '/departments/$department'
@@ -218,6 +230,7 @@ export interface RootRouteChildren {
   GlossaryRoute: typeof GlossaryRoute
   PrivacyRoute: typeof PrivacyRoute
   ResourcesRoute: typeof ResourcesRoute
+  SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   SponsorshipRoute: typeof SponsorshipRoute
   TeamRoute: typeof TeamRoute
   DepartmentsDepartmentRoute: typeof DepartmentsDepartmentRoute
@@ -291,6 +304,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ResourcesRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/sitemap.xml': {
+      id: '/sitemap.xml'
+      path: '/sitemap.xml'
+      fullPath: '/sitemap.xml'
+      preLoaderRoute: typeof SitemapDotxmlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/sponsorship': {
       id: '/sponsorship'
       path: '/sponsorship'
@@ -346,6 +366,7 @@ const rootRouteChildren: RootRouteChildren = {
   GlossaryRoute: GlossaryRoute,
   PrivacyRoute: PrivacyRoute,
   ResourcesRoute: ResourcesRoute,
+  SitemapDotxmlRoute: SitemapDotxmlRoute,
   SponsorshipRoute: SponsorshipRoute,
   TeamRoute: TeamRoute,
   DepartmentsDepartmentRoute: DepartmentsDepartmentRoute,

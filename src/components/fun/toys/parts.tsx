@@ -1,6 +1,6 @@
 import { Share2 } from "lucide-react";
 import { useId, type ReactNode } from "react";
-import { toast } from "sonner";
+import { toast } from "@/lib/toast";
 import { Eyebrow } from "@/components/site/ui";
 import { SITE_URL } from "@/lib/site";
 import { cn } from "@/lib/utils";

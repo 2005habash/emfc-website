@@ -2,6 +2,7 @@ import { Link } from "@tanstack/react-router";
 import { Instagram, Linkedin } from "lucide-react";
 import { NewsletterForm } from "@/components/site/NewsletterForm";
 import { IMAGES, SOCIAL } from "@/lib/site";
+import { sized } from "@/lib/images";
 
 export function Footer() {
   return (
@@ -10,7 +11,7 @@ export function Footer() {
         <div className="grid gap-10 md:grid-cols-2 lg:grid-cols-12 lg:gap-8">
           <div className="flex flex-col gap-5 lg:col-span-4">
             <div className="flex items-center gap-3.5">
-              <img src={IMAGES.bullMark} alt="" className="h-[52px] w-auto transition-transform duration-500 hover:-translate-y-0.5 hover:-rotate-6" />
+              <img {...sized(IMAGES.bullMark, "58px")} alt="" width={560} height={510} loading="lazy" className="h-[52px] w-auto transition-transform duration-500 hover:-translate-y-0.5 hover:-rotate-6" />
               <span className="font-serif text-[40px]/none font-semibold tracking-[0.08em] text-white">
                 EMFC
               </span>

@@ -90,6 +90,7 @@ export function CoffeeRoulette() {
               <Portrait
                 member={m}
                 className={spinning ? "aspect-square w-full blur-[1px]" : "aspect-square w-full"}
+                sizes="(min-width: 640px) 200px, 88vw"
               />
             ) : (
               <span className="grid aspect-square w-full place-items-center bg-tile font-serif text-[64px] italic text-mute">

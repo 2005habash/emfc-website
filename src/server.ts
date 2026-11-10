@@ -55,10 +55,12 @@ export default {
       return import.meta.env.PROD ? withSecurityHeaders(checked, nonce) : checked;
     } catch (error) {
       console.error(error);
-      return new Response(renderErrorPage(), {
+      const failed = new Response(renderErrorPage(), {
         status: 500,
         headers: { "content-type": "text/html; charset=utf-8" },
       });
+      // The error page gets the same security headers as every other page.
+      return import.meta.env.PROD ? withSecurityHeaders(failed, nonce) : failed;
     }
   },
 };

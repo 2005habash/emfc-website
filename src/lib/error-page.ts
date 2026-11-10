@@ -1,3 +1,5 @@
+// The plain page shown when the server itself fails. No scripts: the site's Content Security Policy
+// blocks inline ones, so "Try again" is a link to the same address, which reloads the page.
 export function renderErrorPage(): string {
   return `<!doctype html>
 <html lang="en">
@@ -21,7 +23,7 @@ export function renderErrorPage(): string {
       <h1>This page didn't load</h1>
       <p>Something went wrong on our end. You can try refreshing or head back home.</p>
       <div class="actions">
-        <button class="primary" onclick="location.reload()">Try again</button>
+        <a class="primary" href="">Try again</a>
         <a class="secondary" href="/">Go home</a>
       </div>
     </div>

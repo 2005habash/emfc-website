@@ -1,4 +1,3 @@
-import { motion, useReducedMotion, type Variants } from "framer-motion";
 import { useEffect, useRef, type CSSProperties, type ReactNode } from "react";
 
 type RevealProps = {
@@ -6,6 +5,12 @@ type RevealProps = {
   className?: string;
   delay?: number;
   as?: "div" | "section" | "header" | "article";
+  /**
+   * Stays in place and visible: only the lines inside it (the classes grow-x, grow-y and wipe-in,
+   * styles.css) wait for it to scroll into view.
+   */
+  still?: boolean;
+  "aria-hidden"?: boolean;
 };
 
 /**
@@ -16,7 +21,7 @@ type RevealProps = {
 function armReveals() {
   const root = document.documentElement;
   if (root.classList.contains("reveal-ready")) return;
-  document.querySelectorAll<HTMLElement>("[data-reveal]:not([data-shown])").forEach((el) => {
+  document.querySelectorAll<HTMLElement>('[data-reveal=""]:not([data-shown])').forEach((el) => {
     if (getComputedStyle(el).opacity === "1") el.setAttribute("data-shown", "");
   });
   root.classList.add("reveal-ready");
@@ -26,9 +31,17 @@ function armReveals() {
  * Fades its content up once it scrolls into view. The content is in the page from the start: it is only
  * hidden while the page is marked as allowed to animate (the "motion" class, set before paint), so it
  * stays visible with reduced motion and without JavaScript, and if the scripts never run, styles.css
- * shows anything still hidden after three seconds.
+ * shows anything still hidden after three seconds. Lines inside it with the classes grow-x, grow-y or
+ * wipe-in grow in at the same moment.
  */
-export function Reveal({ children, className, delay = 0, as: Tag = "div" }: RevealProps) {
+export function Reveal({
+  children,
+  className,
+  delay = 0,
+  as: Tag = "div",
+  still = false,
+  ...rest
+}: RevealProps) {
   const ref = useRef<HTMLElement>(null);
   useEffect(() => {
     const el = ref.current;
@@ -50,51 +63,12 @@ export function Reveal({ children, className, delay = 0, as: Tag = "div" }: Reve
   return (
     <Tag
       ref={ref as never}
-      data-reveal=""
+      data-reveal={still ? "still" : ""}
       className={className}
       style={delay ? ({ "--reveal-delay": `${delay}s` } as CSSProperties) : undefined}
+      {...rest}
     >
       {children}
     </Tag>
-  );
-}
-
-const parentVariants: Variants = {
-  hidden: {},
-  visible: { transition: { staggerChildren: 0.08 } },
-};
-
-const itemVariants: Variants = {
-  hidden: { opacity: 0, y: 20 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.4, ease: "easeOut" } },
-};
-
-export function StaggerGrid({ children, className }: { children: ReactNode; className?: string }) {
-  const reduce = useReducedMotion();
-  if (reduce) {
-    return <div className={className}>{children}</div>;
-  }
-  return (
-    <motion.div
-      className={className}
-      variants={parentVariants}
-      initial="hidden"
-      whileInView="visible"
-      viewport={{ once: true, amount: 0.15 }}
-    >
-      {children}
-    </motion.div>
-  );
-}
-
-export function StaggerItem({ children, className }: { children: ReactNode; className?: string }) {
-  const reduce = useReducedMotion();
-  if (reduce) {
-    return <div className={className}>{children}</div>;
-  }
-  return (
-    <motion.div className={className} variants={itemVariants}>
-      {children}
-    </motion.div>
   );
 }

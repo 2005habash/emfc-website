@@ -9,6 +9,7 @@ import { IMAGES, SOCIAL, todayInBarcelona, safeUrl } from "@/lib/site";
 import { cn } from "@/lib/utils";
 import { icsHref } from "@/lib/ics";
 import { TypeDot } from "@/components/site/sections";
+import { sized } from "@/lib/images";
 
 export const Route = createFileRoute("/events")({
   head: () => ({
@@ -149,9 +150,10 @@ function EventFeature({ e, past = false }: { e: EventItem; past?: boolean }) {
             {e.photos.slice(0, 4).map((ph, i) => (
               <img
                 key={ph.src}
-                src={ph.src}
+                {...sized(ph.src, "170px")}
                 alt=""
                 loading="lazy"
+                decoding="async"
                 className={cn(
                   "h-24 w-full min-w-0 flex-1 object-cover transition duration-500 group-hover:brightness-90 md:h-32",
                   i > 1 && "max-sm:hidden",

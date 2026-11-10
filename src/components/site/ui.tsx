@@ -1,12 +1,18 @@
-import { useReducedMotion } from "framer-motion";
 import { useEffect, useState, type ReactNode } from "react";
 import { cn } from "@/lib/utils";
 import { Linkedin } from "lucide-react";
-import { Dialog, DialogContent, DialogDescription, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { FirmLogo } from "@/components/site/FirmLogo";
 import { track } from "@/lib/analytics";
 import { safeUrl } from "@/lib/site";
 import { initialsOf, type Member } from "@/lib/team";
+import { sized } from "@/lib/images";
 
 type Tone = "ink" | "light" | "hero";
 
@@ -80,9 +86,11 @@ export function PageHero({
 }) {
   return (
     <section className="relative overflow-hidden bg-[#000B3D] text-white">
+      {/* On a phone the photo is cut to the header's height, so it is shown wider than the screen. */}
       <img
-        src={image}
+        {...sized(image, "(max-width: 767px) 160vw, 100vw")}
         alt={alt}
+        fetchPriority="high"
         className="absolute inset-0 h-full w-full animate-kenburns object-cover"
         style={{ objectPosition: position }}
       />
@@ -113,11 +121,14 @@ export function Portrait({
   alt,
   alternate = false,
   className,
+  sizes = "(min-width: 768px) 280px, 56vw",
 }: {
   member: Pick<Member, "name" | "photo">;
   alt?: string;
   alternate?: boolean;
   className?: string;
+  /** How wide the photo is shown (the HTML sizes attribute), so the browser fetches a fitting copy. */
+  sizes?: string;
 }) {
   return (
     <span
@@ -129,9 +140,10 @@ export function Portrait({
     >
       {member.photo ? (
         <img
-          src={member.photo}
+          {...sized(member.photo, sizes)}
           alt={alt ?? member.name}
           loading="lazy"
+          decoding="async"
           className="h-full w-full object-cover object-top mix-blend-multiply grayscale contrast-[1.05] transition duration-500 group-hover:grayscale-0"
         />
       ) : (
@@ -146,10 +158,27 @@ export function Portrait({
   );
 }
 
+// `photo` is how wide each card's portrait is shown: the square photo fills a taller frame, so it is
+// drawn a little wider than the card.
 const sizes = {
-  lg: { name: "text-3xl/[1.05]", title: "text-[10px]", gap: "gap-3.5" },
-  md: { name: "text-2xl/[1.1]", title: "text-[10px]", gap: "gap-3.5" },
-  sm: { name: "text-lg/[1.15] md:text-xl/[1.15]", title: "text-[10px]", gap: "gap-2.5" },
+  lg: {
+    name: "text-3xl/[1.05]",
+    title: "text-[10px]",
+    gap: "gap-3.5",
+    photo: "(min-width: 768px) 350px, 56vw",
+  },
+  md: {
+    name: "text-2xl/[1.1]",
+    title: "text-[10px]",
+    gap: "gap-3.5",
+    photo: "(min-width: 768px) 280px, 56vw",
+  },
+  sm: {
+    name: "text-lg/[1.15] md:text-xl/[1.15]",
+    title: "text-[10px]",
+    gap: "gap-2.5",
+    photo: "(min-width: 768px) 230px, 40vw",
+  },
 };
 
 /**
@@ -167,7 +196,11 @@ export function PersonCard({
 }) {
   const s = sizes[size];
   return (
-    <Dialog onOpenChange={(open) => open && track({ kind: "profile_open", path: window.location.pathname, target: member.name })}>
+    <Dialog
+      onOpenChange={(open) =>
+        open && track({ kind: "profile_open", path: window.location.pathname, target: member.name })
+      }
+    >
       <DialogTrigger
         className={cn(
           "group flex cursor-pointer flex-col text-left outline-none focus-visible:ring-2 focus-visible:ring-bull focus-visible:ring-offset-4 focus-visible:ring-offset-paper",
@@ -175,7 +208,12 @@ export function PersonCard({
         )}
         aria-label={`${member.displayName ?? member.name}, ${member.title}. Open profile`}
       >
-        <Portrait member={member} alternate={index % 2 === 1} className="aspect-[5/6] w-full" />
+        <Portrait
+          member={member}
+          alternate={index % 2 === 1}
+          className="aspect-[5/6] w-full"
+          sizes={s.photo}
+        />
         <span className="flex flex-col gap-1.5">
           <span
             className={cn(
@@ -197,10 +235,16 @@ function ProfileDialog({ member }: { member: Member }) {
   return (
     <DialogContent className="max-w-[640px] gap-0 rounded-none border-line bg-paper p-0 text-ink sm:rounded-none">
       <div className="grid sm:grid-cols-[220px_1fr]">
-        <Portrait member={member} className="aspect-square w-full sm:aspect-auto sm:h-full" />
+        <Portrait
+          member={member}
+          className="aspect-square w-full sm:aspect-auto sm:h-full"
+          sizes="(min-width: 640px) 460px, 92vw"
+        />
         <div className="flex flex-col gap-5 p-6 sm:p-8">
           <div className="flex flex-col gap-2">
-            <DialogTitle className="font-serif text-[34px]/[1.05] font-medium">{member.displayName ?? member.name}</DialogTitle>
+            <DialogTitle className="font-serif text-[34px]/[1.05] font-medium">
+              {member.displayName ?? member.name}
+            </DialogTitle>
             <DialogDescription className="caps text-[10.5px] tracking-[0.18em] text-mute">
               {member.title}
             </DialogDescription>
@@ -217,7 +261,10 @@ function ProfileDialog({ member }: { member: Member }) {
                 <dt className="caps text-[10px] tracking-[0.18em] text-mute">Experience</dt>
                 <dd className="flex flex-wrap gap-2 [--logo-h:28px]">
                   {member.firms.map((f) => (
-                    <span key={f} className="flex h-14 min-w-[96px] items-center justify-center border border-line bg-plate px-3.5">
+                    <span
+                      key={f}
+                      className="flex h-14 min-w-[96px] items-center justify-center border border-line bg-plate px-3.5"
+                    >
                       <FirmLogo name={f} />
                     </span>
                   ))}
@@ -257,10 +304,10 @@ export function CountUp({
   suffix?: string;
   duration?: number;
 }) {
-  const reduce = useReducedMotion();
   const [value, setValue] = useState(to);
   useEffect(() => {
-    if (reduce) return;
+    // Only where the page may animate (the "motion" class, absent with reduced motion).
+    if (!document.documentElement.classList.contains("motion")) return;
     let raf = 0;
     const start = performance.now();
     setValue(from);
@@ -272,7 +319,7 @@ export function CountUp({
     };
     raf = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(raf);
-  }, [to, from, duration, reduce]);
+  }, [to, from, duration]);
   return (
     <>
       {String(value).padStart(pad, "0")}

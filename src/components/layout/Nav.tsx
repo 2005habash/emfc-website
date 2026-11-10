@@ -2,11 +2,12 @@ import { Link, useRouterState } from "@tanstack/react-router";
 import { ChevronDown, Instagram, Linkedin, Menu, Moon, Sun, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { flushSync } from "react-dom";
-import { toast } from "sonner";
+import { toast } from "@/lib/toast";
 import { cn } from "@/lib/utils";
 import { Giggle } from "@/components/fun/Giggle";
 import { departments, type Department } from "@/lib/departments";
 import { IMAGES, NAV_LINKS, SOCIAL } from "@/lib/site";
+import { sized } from "@/lib/images";
 
 /** Light and dark mode, or as the toggle calls them, a bull market and a bear market. */
 function ThemeToggle() {
@@ -204,8 +205,10 @@ export function Nav({ overlay = false }: { overlay?: boolean }) {
           className="group/logo flex animate-logo-in items-center gap-3 lg:gap-3.5"
         >
           <img
-            src={IMAGES.bullMark}
+            {...sized(IMAGES.bullMark, "52px")}
             alt=""
+            width={560}
+            height={510}
             className="h-10 w-auto transition-transform duration-500 ease-out lg:h-[46px] group-hover/logo:-translate-y-0.5 group-hover/logo:-rotate-6 group-hover/logo:scale-105"
           />
           <span className="font-serif text-[28px]/none font-semibold tracking-[0.08em] lg:text-[34px]/none">

@@ -2,7 +2,7 @@
 // photo): drawn on a canvas in the site's fonts and colours, then shared or downloaded. Nothing is
 // uploaded anywhere.
 
-import { toast } from "sonner";
+import { toast } from "@/lib/toast";
 
 export const INK = {
   night: "#000b3d",

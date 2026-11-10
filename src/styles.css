@@ -2,6 +2,71 @@
 @source "../src";
 @import "tw-animate-css";
 
+/* The site's two typefaces, served from the site itself rather than from Google (the files come with
+   the @fontsource-variable packages): Geist for text, Cormorant Garamond for headings. Only the Latin
+   ranges, each fetched when a page uses a character from it; the root layout preloads the three files
+   nearly every page needs (src/routes/__root.tsx). */
+@font-face {
+  font-family: "Geist";
+  font-style: normal;
+  font-display: swap;
+  font-weight: 300 700;
+  src: url("@fontsource-variable/geist/files/geist-latin-wght-normal.woff2") format("woff2");
+  unicode-range:
+    U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F,
+    U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: "Geist";
+  font-style: normal;
+  font-display: swap;
+  font-weight: 300 700;
+  src: url("@fontsource-variable/geist/files/geist-latin-ext-wght-normal.woff2") format("woff2");
+  unicode-range:
+    U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF,
+    U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: "Cormorant Garamond";
+  font-style: normal;
+  font-display: swap;
+  font-weight: 300 700;
+  src: url("@fontsource-variable/cormorant-garamond/files/cormorant-garamond-latin-wght-normal.woff2") format("woff2");
+  unicode-range:
+    U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F,
+    U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: "Cormorant Garamond";
+  font-style: normal;
+  font-display: swap;
+  font-weight: 300 700;
+  src: url("@fontsource-variable/cormorant-garamond/files/cormorant-garamond-latin-ext-wght-normal.woff2") format("woff2");
+  unicode-range:
+    U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF,
+    U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: "Cormorant Garamond";
+  font-style: italic;
+  font-display: swap;
+  font-weight: 300 700;
+  src: url("@fontsource-variable/cormorant-garamond/files/cormorant-garamond-latin-wght-italic.woff2") format("woff2");
+  unicode-range:
+    U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F,
+    U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: "Cormorant Garamond";
+  font-style: italic;
+  font-display: swap;
+  font-weight: 300 700;
+  src: url("@fontsource-variable/cormorant-garamond/files/cormorant-garamond-latin-ext-wght-italic.woff2") format("woff2");
+  unicode-range:
+    U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF,
+    U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
@@ -283,6 +348,39 @@ html.motion:not(.reveal-ready) [data-reveal]:not([data-shown]) {
   to {
     opacity: 1;
     transform: none;
+  }
+}
+
+/* A "still" reveal keeps its place and stays visible: only the lines inside it wait for it. */
+html.motion [data-reveal="still"]:not([data-shown]) {
+  opacity: 1;
+  transform: none;
+}
+/* Lines that grow in with the reveal around them: grow-x and grow-y scale up from nothing, wipe-in
+   uncovers its element from the left (a chart's line). Timing: --grow-time and --grow-delay. */
+html.motion [data-reveal] :is(.grow-x, .grow-y) {
+  transition: transform var(--grow-time, 0.45s) ease-out var(--grow-delay, 0s);
+}
+html.motion [data-reveal]:not([data-shown]) .grow-x {
+  transform: scaleX(0);
+}
+html.motion [data-reveal]:not([data-shown]) .grow-y {
+  transform: scaleY(0);
+}
+html.motion [data-reveal] .wipe-in {
+  clip-path: inset(0 0 0 0);
+  transition: clip-path var(--grow-time, 2s) ease-out var(--grow-delay, 0.3s);
+}
+html.motion [data-reveal]:not([data-shown]) .wipe-in {
+  clip-path: inset(0 100% 0 0);
+}
+html.motion:not(.reveal-ready) [data-reveal]:not([data-shown]) :is(.grow-x, .grow-y, .wipe-in) {
+  animation: grow-fallback 0s linear 3s forwards;
+}
+@keyframes grow-fallback {
+  to {
+    transform: none;
+    clip-path: inset(0 0 0 0);
   }
 }
 
