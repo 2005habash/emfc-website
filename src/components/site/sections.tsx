@@ -7,8 +7,14 @@ import { Em, Eyebrow, Numeral, PageHero, PersonCard } from "@/components/site/ui
 import { EVENT_TYPE_COLORS, type EventItem, type EventType } from "@/data/events";
 import type { Report } from "@/data/reports";
 import { STATS } from "@/data/stats";
-import { departments, getDepartment, type Firm, type WorkItem } from "@/lib/departments";
-import { formatDay, IMAGES, ROMAN, SOCIAL, safeUrl } from "@/lib/site";
+import {
+  departments,
+  DESK_COUNT,
+  getDepartment,
+  type Firm,
+  type WorkItem,
+} from "@/lib/departments";
+import { formatDay, IMAGES, InWords, inWords, ROMAN, SOCIAL, safeUrl } from "@/lib/site";
 import type { Member } from "@/lib/team";
 import { cn } from "@/lib/utils";
 
@@ -26,8 +32,9 @@ export function DepartmentsHero({ titleAs = "h1" }: { titleAs?: "h1" | "p" }) {
         </>
       }
     >
-      Six departments and fifteen desks, run by {STATS.members} members. Choose a department to see what it
-      produces, where it aims and who is on it.
+      {InWords(departments.length)} departments and {inWords(DESK_COUNT)} desks, run by{" "}
+      {STATS.members} members. Choose a department to see what it produces, where it aims and who is
+      on it.
     </PageHero>
   );
 }
@@ -60,7 +67,9 @@ export function DepartmentSelector({ current }: { current?: string }) {
                 aria-current={on ? "page" : undefined}
                 className={cn(
                   "group flex h-16 items-center gap-3 border-b-2 pr-6 transition-colors lg:h-[84px] lg:pr-2",
-                  on ? "border-ink text-ink" : "border-transparent text-mute hover:border-line hover:text-ink",
+                  on
+                    ? "border-ink text-ink"
+                    : "border-transparent text-mute hover:border-line hover:text-ink",
                 )}
               >
                 <span className="font-serif text-xl italic text-bull">{ROMAN[i]}</span>
@@ -97,7 +106,9 @@ export function SectionHeading({
   return (
     <div className={cn("flex flex-col gap-5", className)}>
       <Eyebrow>{eyebrow}</Eyebrow>
-      <h2 className="font-serif text-[44px]/none tracking-[-0.01em] md:text-[56px]/none">{children}</h2>
+      <h2 className="font-serif text-[44px]/none tracking-[-0.01em] md:text-[56px]/none">
+        {children}
+      </h2>
     </div>
   );
 }
@@ -111,7 +122,9 @@ export function WorkGrid({ items }: { items: WorkItem[] }) {
           <div className="flex items-baseline justify-between gap-4">
             <Numeral className="text-[26px]/none">{ROMAN[i]}.</Numeral>
             {it.frequency && (
-              <span className="caps text-right text-[10px] tracking-[0.16em] text-bull">{it.frequency}</span>
+              <span className="caps text-right text-[10px] tracking-[0.16em] text-bull">
+                {it.frequency}
+              </span>
             )}
           </div>
           <h3 className="font-serif text-[26px]/[1.08] md:text-3xl/[1.08]">{it.title}</h3>
@@ -128,7 +141,10 @@ export function FirmsGrid({ firms }: { firms: Firm[] }) {
   return (
     <ul className="grid grid-cols-2 gap-px border border-line bg-line [--logo-h:42px] sm:grid-cols-3 md:[--logo-h:54px] lg:grid-cols-4">
       {firms.map((f) => (
-        <li key={f.name} className="flex min-h-[112px] items-center justify-center bg-plate px-5 py-7 md:min-h-[150px]">
+        <li
+          key={f.name}
+          className="flex min-h-[112px] items-center justify-center bg-plate px-5 py-7 md:min-h-[150px]"
+        >
           <FirmLogo name={f.name} />
         </li>
       ))}
@@ -140,21 +156,35 @@ export const deskName = (department: string, desk?: string) =>
   desk ? getDepartment(department)?.desks.find((k) => k.slug === desk)?.name : undefined;
 
 /** Reports as a list: title, series and issue, desk, and a PDF link or "coming". */
-export function ReportList({ reports, showDepartment = false }: { reports: Report[]; showDepartment?: boolean }) {
+export function ReportList({
+  reports,
+  showDepartment = false,
+}: {
+  reports: Report[];
+  showDepartment?: boolean;
+}) {
   return (
     <ul className="flex flex-col border-t border-ink">
       {reports.map((r) => {
         const dept = getDepartment(r.department);
         const desk = deskName(r.department, r.desk);
         const where = [showDepartment ? dept?.name : undefined, desk].filter(Boolean).join(", ");
-        const meta = [r.series, r.issue, r.pages ? `${r.pages} ${r.pages === 1 ? "page" : "pages"}` : undefined].filter(Boolean).join(", ");
+        const meta = [
+          r.series,
+          r.issue,
+          r.pages ? `${r.pages} ${r.pages === 1 ? "page" : "pages"}` : undefined,
+        ]
+          .filter(Boolean)
+          .join(", ");
         return (
           <li
             key={r.id}
             className="grid gap-3 border-b border-line py-6 md:grid-cols-[1fr_auto] md:items-center md:gap-8"
           >
             <div className="flex flex-col gap-2">
-              <span className="caps text-[10px] tracking-[0.18em] text-bull">{where || dept?.name}</span>
+              <span className="caps text-[10px] tracking-[0.18em] text-bull">
+                {where || dept?.name}
+              </span>
               <span className="font-serif text-[26px]/[1.1] md:text-[30px]/[1.1]">{r.title}</span>
               <span className="text-[14px]/[1.5] text-mute">{meta}</span>
               {r.authors && r.authors.length > 0 && (
@@ -163,12 +193,22 @@ export function ReportList({ reports, showDepartment = false }: { reports: Repor
             </div>
             {r.status === "published" && r.file ? (
               <div className="flex flex-wrap gap-2.5">
-                <a href={safeUrl(r.file)} target="_blank" rel="noreferrer" className="btn btn-sm btn-ink">
+                <a
+                  href={safeUrl(r.file)}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="btn btn-sm btn-ink"
+                >
                   <FileText className="h-3.5 w-3.5" strokeWidth={1.75} />
                   Read PDF
                 </a>
                 {r.link && (
-                  <a href={safeUrl(r.link)} target="_blank" rel="noreferrer" className="btn btn-sm btn-outline-ink">
+                  <a
+                    href={safeUrl(r.link)}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="btn btn-sm btn-outline-ink"
+                  >
                     <Linkedin className="h-3.5 w-3.5" strokeWidth={1.75} />
                     On LinkedIn
                   </a>
@@ -190,10 +230,12 @@ export function ReportList({ reports, showDepartment = false }: { reports: Repor
 export function ResearchComingSoon({ desk = false }: { desk?: boolean }) {
   return (
     <div className="flex flex-col gap-2 border-t border-ink bg-stone p-7 md:p-9">
-      <p className="font-serif text-[28px]/[1.15] italic md:text-[32px]/[1.15]">Research coming soon.</p>
+      <p className="font-serif text-[28px]/[1.15] italic md:text-[32px]/[1.15]">
+        Research coming soon.
+      </p>
       <p className="text-[15px]/[1.65] text-mute">
-        The first reports from this {desk ? "desk" : "department"} will appear here, and in the library on the
-        Resources page.
+        The first reports from this {desk ? "desk" : "department"} will appear here, and in the
+        library on the Resources page.
       </p>
     </div>
   );
@@ -220,7 +262,9 @@ export function EventRows({ events }: { events: EventItem[] }) {
             params={{ eventId: e.id }}
             className="group grid gap-2 py-5 md:grid-cols-[180px_1fr_auto] md:items-center md:gap-8"
           >
-            <span className="caps text-[10.5px] tracking-[0.18em] text-mute">{formatDay(e.date)}</span>
+            <span className="caps text-[10.5px] tracking-[0.18em] text-mute">
+              {formatDay(e.date)}
+            </span>
             <span className="font-serif text-[24px]/[1.15] underline-offset-4 group-hover:underline md:text-[26px]/[1.15]">
               {e.title}
             </span>

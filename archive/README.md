@@ -11,3 +11,4 @@ up to date at that point.
 | --- | --- | --- |
 | `apply/` | The application flow (department one-pagers and the application form) | September 2026, after applications closed |
 | `extra-pages/` | The hidden fun pages: `/zaid`, `/kostya` and `/puzzle` | 10 November 2026, no longer needed |
+| `market-ticker/` | The live market prices along the top of every page | 10 November 2026, at Vasco's review |

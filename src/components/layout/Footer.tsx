@@ -36,9 +36,6 @@ export function Footer() {
               <Link to="/" className="hover:text-white hover:underline">
                 Home
               </Link>
-              <Link to="/board" className="hover:text-white hover:underline">
-                Board
-              </Link>
               <Link to="/departments" className="hover:text-white hover:underline">
                 Departments
               </Link>

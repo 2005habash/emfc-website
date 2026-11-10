@@ -1,5 +1,6 @@
-// The desk toys, by "department/desk": which desks have one, where it sits on the desk's page, and
-// how the quiz and the Departments page describe it. The toys themselves are in DeskToy.tsx.
+// The desk toys, played in the Arcade (src/routes/arcade.tsx), each tied to the desk whose craft it
+// shows, as "department/desk": the Arcade names the desk on the toy's tile and links to its page,
+// and the quiz's result suggests the toy. The toys themselves are the other files in this folder.
 
 export type ToyInfo = { desk: string; id: string; title: string; hook: string };
 
@@ -29,7 +30,7 @@ export const TOYS: ToyInfo[] = [
     hook: "A DCF in four levers, and where the value really sits.",
   },
   {
-    desk: "fixed-income/rates-and-government-bonds",
+    desk: "fixed-income/public-credit",
     id: "bond-yield",
     title: "Move the yield",
     hook: "Watch a bond's price fall as yields rise.",

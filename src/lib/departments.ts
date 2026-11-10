@@ -14,8 +14,6 @@ export type WorkItem = { title: string; body: string; frequency?: string };
 export type Desk = {
   slug: string;
   name: string;
-  /** Fixed Income only: the group the desk belongs to. */
-  group?: string;
   /** Shown next to the Head on the desk page. */
   lead?: string;
   /** One line on the department page. */
@@ -39,8 +37,6 @@ export type Department = {
   produces: WorkItem[];
   targetFirms: Firm[];
   desks: Desk[];
-  /** Fixed Income: desks shown in two groups. */
-  groups?: { name: string; lead: string; desks: string[] }[];
   /** Associates work across every desk (Investment Banking), so each desk page lists all of them. */
   associatesAcrossDesks?: boolean;
   /** The order of the Vice-Presidents on the department page, when it differs from the desks' order. */
@@ -68,8 +64,22 @@ const IB_FIRMS = firms([
 ]);
 
 const AM_FIRMS = firms(
-  ["BlackRock", "Fidelity", "Capital Group", "Vanguard", "State Street", "Schroders", "Amundi", "PIMCO"],
-  ["J.P. Morgan Asset Management", "Goldman Sachs Asset Management", "Wellington Management", "T. Rowe Price"],
+  [
+    "BlackRock",
+    "Fidelity",
+    "Capital Group",
+    "Vanguard",
+    "State Street",
+    "Schroders",
+    "Amundi",
+    "PIMCO",
+  ],
+  [
+    "J.P. Morgan Asset Management",
+    "Goldman Sachs Asset Management",
+    "Wellington Management",
+    "T. Rowe Price",
+  ],
 );
 
 const FI_FIRMS = firms(
@@ -88,18 +98,26 @@ const FI_FIRMS = firms(
   ["Apollo", "Oaktree Capital Management"],
 );
 
-/** A Fixed Income desk: the department's own work, applied to one market. */
-const fiDesk = (slug: string, name: string, group: string, line: string, lead?: string): Desk => ({
+/**
+ * A Fixed Income desk, one of its two groups (Zaid, 10 November 2026): the markets it covers, and
+ * the department's own work applied to them. Each member's title names the market they cover.
+ */
+const fiDesk = (
+  slug: string,
+  name: string,
+  line: string,
+  markets: string[],
+  lead?: string,
+): Desk => ({
   slug,
   name,
-  group,
   lead,
   line,
-  description: `${line} Members cover this market in the monthly Fixed Income Market Monitor, work through debt capital markets case studies, and present their findings in desk meetings.`,
+  description: `${line} Members each cover one of its markets in the monthly Fixed Income Market Monitor, work through debt capital markets case studies, and present their findings in desk meetings.`,
   does: [
-    `Their section of the monthly Fixed Income Market Monitor`,
-    "Debt capital markets case studies across public and private debt markets",
-    "Findings presented in desk meetings",
+    ...markets,
+    "Each market's section of the monthly Fixed Income Market Monitor",
+    "Debt capital markets case studies, and findings presented in desk meetings",
   ],
   targetFirms: FI_FIRMS,
   drafted: true,
@@ -454,56 +472,25 @@ export const departments: Department[] = [
       },
     ],
     targetFirms: FI_FIRMS,
-    groups: [
-      {
-        name: "Public credit",
-        lead: "Luka Thomson",
-        desks: [
-          "rates-and-government-bonds",
-          "investment-grade-credit",
-          "high-yield-credit",
-          "mortgage-backed-securities",
-        ],
-      },
-      { name: "Private credit", lead: "Tim Constantin Ziegler", desks: ["private-credit", "direct-lending"] },
-    ],
     desks: [
       fiDesk(
-        "rates-and-government-bonds",
-        "Rates & Government Bonds",
-        "Public credit",
-        "Government bond markets, central bank policy and the shape of the yield curve.",
-      ),
-      fiDesk(
-        "investment-grade-credit",
-        "Investment Grade Credit",
-        "Public credit",
-        "Investment grade corporate bonds: spreads, new issuance and the credit quality of large issuers.",
-      ),
-      fiDesk(
-        "high-yield-credit",
-        "High Yield Credit",
-        "Public credit",
-        "High yield bonds and leveraged credit: spreads, defaults and the riskier end of corporate debt.",
-      ),
-      fiDesk(
-        "mortgage-backed-securities",
-        "Mortgage-Backed Securities",
-        "Public credit",
-        "Mortgage-backed securities and the housing and securitisation markets behind them.",
+        "public-credit",
+        "Public Credit",
+        "The public debt markets: government bonds and rates, investment grade and high yield corporate credit, and mortgage-backed securities.",
+        [
+          "Government bond markets, central bank policy and the shape of the yield curve",
+          "Investment grade and high yield corporate bonds: spreads, new issuance, defaults and credit quality",
+          "Mortgage-backed securities and the housing and securitisation markets behind them",
+        ],
       ),
       fiDesk(
         "private-credit",
         "Private Credit",
-        "Private credit",
-        "Private credit funds and the lending they do outside the public bond markets.",
-        "Tim Constantin Ziegler",
-      ),
-      fiDesk(
-        "direct-lending",
-        "Direct Lending",
-        "Private credit",
-        "Direct lending to mid-market companies, often alongside private equity buyouts.",
+        "Private credit funds and direct lending: the lending done outside the public bond markets, often to mid-market companies alongside private equity buyouts.",
+        [
+          "Private credit funds and the lending they do outside the public bond markets",
+          "Direct lending to mid-market companies, often alongside private equity buyouts",
+        ],
         "Tim Constantin Ziegler",
       ),
     ],
@@ -511,7 +498,8 @@ export const departments: Department[] = [
   {
     slug: "corporate-relations",
     name: "Corporate Relations",
-    short: "Build EMFC's relationships with firms. Sponsorships, partnerships and the people behind both.",
+    short:
+      "Build EMFC's relationships with firms. Sponsorships, partnerships and the people behind both.",
     long: "Open to all master's students. Own outreach to partner firms, structure sponsorship conversations, and run logistics for corporate events and company visits with every department.",
     function: "Partnerships, sponsorship and long-term relationships with partner firms.",
     associate:
@@ -571,13 +559,34 @@ export const DEPARTMENT_ALIASES: Record<string, string> = {
   brand: "marketing",
 };
 
+/** Desks that moved, as "department/desk": Fixed Income's six desks became its two groups. */
+export const DESK_MOVES: Record<string, string> = {
+  "fixed-income/rates-and-government-bonds": "fixed-income/public-credit",
+  "fixed-income/investment-grade-credit": "fixed-income/public-credit",
+  "fixed-income/high-yield-credit": "fixed-income/public-credit",
+  "fixed-income/mortgage-backed-securities": "fixed-income/public-credit",
+  "fixed-income/direct-lending": "fixed-income/private-credit",
+};
+
 /** The current slug for a department, also given an old one. */
 export const departmentSlug = (slug: string) => DEPARTMENT_ALIASES[slug] ?? slug;
 
-export const getDepartment = (slug: string) => departments.find((d) => d.slug === departmentSlug(slug));
+export const getDepartment = (slug: string) =>
+  departments.find((d) => d.slug === departmentSlug(slug));
 
 export const getDesk = (department: string, desk: string) =>
   getDepartment(department)?.desks.find((k) => k.slug === desk);
 
+/** A desk's current "department/desk", also given an old name of the department or of the desk. */
+export const currentDesk = (department: string, desk: string) => {
+  const path = `${departmentSlug(department)}/${desk}`;
+  return DESK_MOVES[path] ?? path;
+};
+
+/** How many desks the club has, in all. */
+export const DESK_COUNT = departments.reduce((n, d) => n + d.desks.length, 0);
+
 /** Every desk with its department, in site order. */
-export const ALL_DESKS = departments.flatMap((d) => d.desks.map((desk) => ({ department: d, desk })));
+export const ALL_DESKS = departments.flatMap((d) =>
+  d.desks.map((desk) => ({ department: d, desk })),
+);

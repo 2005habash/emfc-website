@@ -28,7 +28,7 @@ export function Delisted() {
                 Buy the dip
                 <ArrowRight className="h-4 w-4" strokeWidth={1.75} />
               </Link>
-              <Link to="/departments" hash="quiz" className="btn btn-outline-white">
+              <Link to="/arcade" hash="quiz" className="btn btn-outline-white">
                 Find your desk instead
               </Link>
             </div>

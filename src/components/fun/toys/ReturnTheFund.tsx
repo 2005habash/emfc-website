@@ -119,7 +119,7 @@ export function ReturnTheFund() {
       <div>
         <ShareResult
           text={`My startup returned the fund ${multiple.toFixed(1)}x on EMFC's site. Venture is a power law.`}
-          path="/departments/private-markets/vc-and-growth#return-the-fund"
+          path="/arcade#return-the-fund"
         />
       </div>
     </ToyShell>

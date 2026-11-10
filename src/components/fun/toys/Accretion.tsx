@@ -130,7 +130,7 @@ export function Accretion() {
       <div>
         <ShareResult
           text={`My deal on EMFC's site came out ${signedPct(r.change)} on EPS. Accretive or dilutive, can you do better?`}
-          path="/departments/investment-banking/m-and-a#accretion"
+          path="/arcade#accretion"
         />
       </div>
     </ToyShell>

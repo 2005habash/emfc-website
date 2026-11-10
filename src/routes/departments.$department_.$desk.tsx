@@ -13,23 +13,23 @@ import {
   SectionHeading,
 } from "@/components/site/sections";
 import { Em, Eyebrow, PersonCard } from "@/components/site/ui";
-import { DeskToy } from "@/components/fun/toys/DeskToy";
 import { Jargon } from "@/components/fun/Jargon";
 import { eventsFor } from "@/data/events";
 import { reportsFor } from "@/data/reports";
 import { loadEvents, loadReports } from "@/lib/content";
-import { getDepartment, getDesk } from "@/lib/departments";
+import { currentDesk, getDepartment, getDesk } from "@/lib/departments";
 import { ROMAN } from "@/lib/site";
 import { deskTeam, leadershipOf, memberByName } from "@/lib/team";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/departments/$department_/$desk")({
   beforeLoad: ({ params }) => {
-    if (!getDesk(params.department, params.desk)) throw notFound();
-    // Old department names (before November 2026) go to the current address.
-    const d = getDepartment(params.department)!;
-    if (d.slug !== params.department) {
-      throw redirect({ to: "/departments/$department/$desk", params: { department: d.slug, desk: params.desk } });
+    // Old department names (before November 2026) and Fixed Income's six old desks (before 10
+    // November 2026) go to the current address.
+    const [department, desk] = currentDesk(params.department, params.desk).split("/");
+    if (!getDesk(department, desk)) throw notFound();
+    if (department !== params.department || desk !== params.desk) {
+      throw redirect({ to: "/departments/$department/$desk", params: { department, desk }, statusCode: 301 });
     }
   },
   loader: async () => {
@@ -104,9 +104,7 @@ function DeskPage() {
         {/* Overview */}
         <section className="gutter grid items-start gap-12 py-16 lg:grid-cols-12 lg:gap-8 lg:py-24">
           <div className="flex flex-col gap-6 lg:col-span-7">
-            <Eyebrow>
-              {k.group ? `${d.name}, ${k.group}` : d.name} desk
-            </Eyebrow>
+            <Eyebrow>{d.name} desk</Eyebrow>
             <h1 className="font-serif text-[56px]/[0.95] tracking-[-0.015em] md:text-8xl/[0.95]">{k.name}</h1>
             <p className="max-w-[680px] text-base/[1.65] text-mute md:text-[19px]/[1.65]">
               <Jargon>{k.description}</Jargon>
@@ -144,9 +142,6 @@ function DeskPage() {
             {lead && lead.name !== head?.name && <PersonCard member={lead} index={1} />}
           </div>
         </section>
-
-        {/* The desk's toy, for the desks that have one (src/components/fun/toys). */}
-        <DeskToy desk={`${d.slug}/${k.slug}`} />
 
         {/* Target firms */}
         <section className="gutter grid items-start gap-8 lg:grid-cols-12">

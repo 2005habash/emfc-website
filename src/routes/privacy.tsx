@@ -39,10 +39,6 @@ const sections = [
     body: "Sign-ups and enquiries are stored in the club's database, hosted by Supabase, and only the club's administrators can read them. We set no advertising or tracking cookies; the site only remembers whether you chose light or dark mode, in your own browser.",
   },
   {
-    title: "Market prices",
-    body: "The prices running along the top of each page come from TradingView, in a frame loaded from TradingView's own servers. Like any website, TradingView sees your IP address when the frame loads, and it may set its own cookies inside the frame under its own privacy policy. EMFC receives nothing from it.",
-  },
-  {
     title: "Your choices",
     body: "To see, correct or delete what we hold about you, or to withdraw your consent, message EMFC on LinkedIn and we will act on it within a month.",
   },

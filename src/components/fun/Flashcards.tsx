@@ -2,7 +2,9 @@ import { ArrowLeft, ArrowRight, Shuffle, Timer } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { Em, Eyebrow } from "@/components/site/ui";
 import { cn } from "@/lib/utils";
+import { markPlayed } from "./career";
 import { TECHNICAL_AREAS, TECHNICALS } from "./technicals";
+import { useHashTarget } from "./useHashTarget";
 
 const SECONDS = 60;
 
@@ -16,10 +18,11 @@ function shuffled(n: number) {
 }
 
 /**
- * "Sixty-second technicals" on the Resources page: interview questions on cards that flip to a model
+ * "Sixty-second technicals" in the Arcade: interview questions on cards that flip to a model
  * answer. With the clock on, each card gives you a minute before it turns over by itself.
  */
 export function Flashcards() {
+  useHashTarget("technicals");
   const [area, setArea] = useState<string | null>(null);
   const [order, setOrder] = useState<number[] | null>(null);
   const [at, setAt] = useState(0);
@@ -38,6 +41,11 @@ export function Flashcards() {
     setFlipped(false);
     setLeft(SECONDS);
   };
+
+  // Turning a card over counts it as played on the career ladder.
+  useEffect(() => {
+    if (flipped) markPlayed("technicals");
+  }, [flipped]);
 
   // The clock: a minute per card, then the answer turns over by itself.
   useEffect(() => {

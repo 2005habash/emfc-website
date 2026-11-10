@@ -1,6 +1,8 @@
-// "Which desk are you?" (the Departments page). Each answer gives points to the desks it sounds like,
-// as "department/desk". The weights were tuned by trying all 1,024 ways through the quiz: every one of
-// the 15 desks can come out, each for between about 6 and 8 percent of the ways.
+// "Which desk are you?" (the Arcade). Each answer gives points to the desks it sounds like, as
+// "department/desk". The weights were tuned by trying all 1,024 ways through the quiz: every one of
+// the 11 desks can come out, each for between about 6 and 10 percent of the ways. When Fixed Income's
+// six desks became its two groups (10 November 2026), its points were retuned within bounds that keep
+// each answer's meaning (a yield to maturity still says Public Credit).
 
 export type QuizAnswer = { text: string; points: Record<string, number> };
 export type QuizQuestion = { question: string; answers: QuizAnswer[] };
@@ -14,15 +16,11 @@ const RA = "private-markets/real-assets";
 const MS = "asset-management/macro-and-strategy";
 const ER = "asset-management/equity-research";
 const PM = "asset-management/portfolio-management";
-const RATES = "fixed-income/rates-and-government-bonds";
-const IG = "fixed-income/investment-grade-credit";
-const HY = "fixed-income/high-yield-credit";
-const MBS = "fixed-income/mortgage-backed-securities";
-const PC = "fixed-income/private-credit";
-const DL = "fixed-income/direct-lending";
+const PUB = "fixed-income/public-credit";
+const PRIV = "fixed-income/private-credit";
 
 /** When two desks tie, the one earlier in this list wins. */
-export const TIE_ORDER = [PE, MA, VC, FT, RA, ER, MS, PM, DA, HY, IG, RATES, MBS, PC, DL];
+export const TIE_ORDER = [PE, MA, VC, FT, RA, ER, MS, PM, DA, PUB, PRIV];
 
 export const QUIZ: QuizQuestion[] = [
   {
@@ -30,56 +28,56 @@ export const QUIZ: QuizQuestion[] = [
     answers: [
       {
         text: "In the office, turning comments on a pitch book",
-        points: { [MA]: 3, [DA]: 3, [PE]: 1 },
+        points: { [PE]: 1, [MA]: 3, [DA]: 3 },
       },
       { text: "At a founders' meetup, collecting LinkedIn requests", points: { [VC]: 3, [FT]: 3 } },
       {
         text: "Reading tomorrow's market wrap before anyone else",
-        points: { [MS]: 3, [RATES]: 3, [ER]: 1, [PM]: 2 },
+        points: { [ER]: 1, [MS]: 3, [PM]: 2, [PUB]: 1 },
       },
       {
         text: "Touring a building I could buy, in my head",
-        points: { [RA]: 4, [DL]: 1, [PC]: 3, [MBS]: 3 },
+        points: { [RA]: 4, [PUB]: 3 },
       },
     ],
   },
   {
     question: "Pick your favourite number.",
     answers: [
-      { text: "IRR", points: { [PE]: 3, [VC]: 1, [RA]: 3, [DL]: 1, [PC]: 2 } },
-      { text: "EV/EBITDA", points: { [MA]: 3, [ER]: 3, [PE]: 2 } },
-      { text: "Yield to maturity", points: { [IG]: 4, [HY]: 3, [RATES]: 2, [MBS]: 2, [DA]: 2 } },
-      { text: "Sharpe ratio", points: { [PM]: 4, [MS]: 3, [FT]: 1 } },
+      { text: "IRR", points: { [PE]: 3, [VC]: 1, [RA]: 3, [PRIV]: 1 } },
+      { text: "EV/EBITDA", points: { [PE]: 2, [MA]: 3, [ER]: 3 } },
+      { text: "Yield to maturity", points: { [DA]: 2, [PUB]: 4 } },
+      { text: "Sharpe ratio", points: { [FT]: 1, [MS]: 3, [PM]: 4 } },
     ],
   },
   {
     question: "Your weekend reading?",
     answers: [
-      { text: "An annual report, cover to cover", points: { [ER]: 4, [MA]: 1, [IG]: 3 } },
-      { text: "A central bank's meeting minutes", points: { [RATES]: 3, [MS]: 1, [MBS]: 1 } },
-      { text: "A 300-page credit agreement", points: { [DL]: 4, [PC]: 1, [DA]: 3, [HY]: 3 } },
-      { text: "A fintech founder's pitch deck", points: { [FT]: 4, [VC]: 2 } },
+      { text: "An annual report, cover to cover", points: { [MA]: 1, [ER]: 4 } },
+      { text: "A central bank's meeting minutes", points: { [MS]: 1, [PUB]: 3 } },
+      { text: "A 300-page credit agreement", points: { [DA]: 3, [PRIV]: 3 } },
+      { text: "A fintech founder's pitch deck", points: { [VC]: 2, [FT]: 4 } },
     ],
   },
   {
     question: "How much risk do you like?",
     answers: [
-      { text: "Senior secured, thank you", points: { [DL]: 3, [PC]: 2, [IG]: 3, [MBS]: 1 } },
-      { text: "Leverage it, then leverage it again", points: { [PE]: 3, [HY]: 3, [DA]: 2 } },
+      { text: "Senior secured, thank you", points: { [PRIV]: 4 } },
+      { text: "Leverage it, then leverage it again", points: { [PE]: 3, [DA]: 2 } },
       { text: "A hundred bets for one unicorn", points: { [VC]: 4, [FT]: 2 } },
       {
         text: "Diversified, rebalanced, sleeping well",
-        points: { [PM]: 1, [RA]: 1, [MBS]: 1, [IG]: 1 },
+        points: { [RA]: 1, [PM]: 1 },
       },
     ],
   },
   {
     question: "What do you bring to a team?",
     answers: [
-      { text: "The model nobody can break", points: { [MBS]: 4, [ER]: 1, [PE]: 2 } },
+      { text: "The model nobody can break", points: { [PE]: 2, [ER]: 1 } },
       { text: "The story, told in ten slides", points: { [MA]: 2, [VC]: 1, [FT]: 1, [RA]: 2 } },
-      { text: "The big picture, before anyone else", points: { [MS]: 4, [RATES]: 3, [PM]: 4 } },
-      { text: "The fine print nobody else read", points: { [PC]: 4, [DA]: 2, [HY]: 3, [DL]: 4 } },
+      { text: "The big picture, before anyone else", points: { [MS]: 4, [PM]: 4 } },
+      { text: "The fine print nobody else read", points: { [DA]: 2, [PRIV]: 3 } },
     ],
   },
 ];

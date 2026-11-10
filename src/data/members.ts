@@ -12,10 +12,8 @@ export type Member = {
   /** Department slug, or "co-presidents" / "advisory-board". */
   department: string;
   position: Position;
-  /** Desk slug inside the department, when the member has one. */
+  /** Desk slug inside the department, when the member has one (in Fixed Income, its group). */
   desk?: string;
-  /** Fixed Income only: "Public credit" or "Private credit". */
-  group?: string;
   programme?: string;
   linkedin?: string;
   /** Up to three firms, most important first, as the member listed them. */
@@ -47,7 +45,7 @@ export const MEMBERS: Member[] = [
     "programme": "Master in Finance, CEMS MIM",
     "linkedin": "https://www.linkedin.com/in/vascobarahona",
     "firms": [
-      "Santander Corporate and Investment Banking",
+      "Santander",
       "Athos Partners",
       "CoRe Capital"
     ],
@@ -745,8 +743,7 @@ export const MEMBERS: Member[] = [
     "title": "Associate, Rates & Government Bonds",
     "department": "fixed-income",
     "position": "associate",
-    "desk": "rates-and-government-bonds",
-    "group": "Public credit",
+    "desk": "public-credit",
     "programme": "Global Master in Finance",
     "linkedin": "https://www.linkedin.com/in/nin-sacristan",
     "firms": [
@@ -761,8 +758,7 @@ export const MEMBERS: Member[] = [
     "title": "Associate, Rates & Government Bonds",
     "department": "fixed-income",
     "position": "associate",
-    "desk": "rates-and-government-bonds",
-    "group": "Public credit",
+    "desk": "public-credit",
     "programme": "Master in Finance, CEMS MIM",
     "linkedin": "https://www.linkedin.com/in/joan-brugada-mestre-a84a1731b",
     "firms": [
@@ -777,8 +773,7 @@ export const MEMBERS: Member[] = [
     "title": "Associate, Investment Grade Credit",
     "department": "fixed-income",
     "position": "associate",
-    "desk": "investment-grade-credit",
-    "group": "Public credit",
+    "desk": "public-credit",
     "programme": "Master in Finance, CEMS MIM",
     "linkedin": "https://www.linkedin.com/in/paul-manner-33a80b229",
     "firms": [
@@ -793,8 +788,7 @@ export const MEMBERS: Member[] = [
     "title": "Associate, High Yield Credit",
     "department": "fixed-income",
     "position": "associate",
-    "desk": "high-yield-credit",
-    "group": "Public credit",
+    "desk": "public-credit",
     "programme": "Global Master in Finance",
     "linkedin": "https://www.linkedin.com/in/jules-coppens-466150158",
     "firms": [
@@ -808,8 +802,7 @@ export const MEMBERS: Member[] = [
     "title": "Associate, Mortgage-Backed Securities",
     "department": "fixed-income",
     "position": "associate",
-    "desk": "mortgage-backed-securities",
-    "group": "Public credit",
+    "desk": "public-credit",
     "programme": "Master in International Management",
     "linkedin": "https://www.linkedin.com/in/hugo-victor-heise",
     "firms": [
@@ -824,7 +817,6 @@ export const MEMBERS: Member[] = [
     "department": "fixed-income",
     "position": "vice-president",
     "desk": "private-credit",
-    "group": "Private credit",
     "programme": "Master in International Management",
     "linkedin": "https://www.linkedin.com/in/tim-ziegler-61739a235",
     "firms": [
@@ -840,8 +832,7 @@ export const MEMBERS: Member[] = [
     "title": "Associate, Direct Lending",
     "department": "fixed-income",
     "position": "associate",
-    "desk": "direct-lending",
-    "group": "Private credit",
+    "desk": "private-credit",
     "programme": "Master in Finance",
     "linkedin": "https://www.linkedin.com/in/giulia-weber-colussi",
     "firms": [
@@ -857,8 +848,7 @@ export const MEMBERS: Member[] = [
     "title": "Associate, Direct Lending",
     "department": "fixed-income",
     "position": "associate",
-    "desk": "direct-lending",
-    "group": "Private credit",
+    "desk": "private-credit",
     "programme": "Global Master in Finance",
     "linkedin": "https://www.linkedin.com/in/liam-thiele",
     "firms": [
