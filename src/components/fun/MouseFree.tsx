@@ -64,7 +64,7 @@ function Keys({ keys, className }: { keys: string; className?: string }) {
   );
 }
 
-/** "Mouse-free" on the Off the clock page: name the Excel shortcut every analyst uses. */
+/** "Mouse-free" in the Arcade: name the Excel shortcut every analyst uses. */
 export function MouseFree() {
   useHashTarget("mouse-free");
   const [seed, setSeed] = useState(0);
@@ -111,7 +111,7 @@ export function MouseFree() {
               <div className="flex flex-wrap gap-3">
                 <ShareResult
                   text={`I knew ${score} of ${rounds.length} Excel shortcuts on EMFC's Mouse-free. Can you go mouse-free?`}
-                  path="/play#mouse-free"
+                  path="/arcade#mouse-free"
                 />
                 <button
                   type="button"

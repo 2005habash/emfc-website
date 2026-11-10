@@ -81,7 +81,7 @@ async function draw(canvas: HTMLCanvasElement, deal: Deal) {
   ctx.fillText("Made at emfc.es, not a real deal", W / 2, H - 112);
 }
 
-/** "Tombstone maker" on the Off the clock page: announce a deal of your own, banker style. */
+/** "Tombstone maker" in the Arcade: announce a deal of your own, banker style. */
 export function TombstoneMaker() {
   useHashTarget("tombstone");
   const canvas = useRef<HTMLCanvasElement>(null);
@@ -107,7 +107,7 @@ export function TombstoneMaker() {
       void shareImage(
         blob,
         "emfc-tombstone.png",
-        "Deal closed. Made my own tombstone at emfc.es/play",
+        "Deal closed. Made my own tombstone at emfc.es/arcade",
       );
     }, "image/png");
 

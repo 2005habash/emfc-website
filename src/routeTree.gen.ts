@@ -10,18 +10,16 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ArcadeRouteImport } from './routes/arcade'
+import { Route as BoardRouteImport } from './routes/board'
 import { Route as ClubOfficeRouteImport } from './routes/club-office'
 import { Route as EventsRouteImport } from './routes/events'
 import { Route as FundRouteImport } from './routes/fund'
 import { Route as GlossaryRouteImport } from './routes/glossary'
-import { Route as KostyaRouteImport } from './routes/kostya'
-import { Route as PlayRouteImport } from './routes/play'
 import { Route as PrivacyRouteImport } from './routes/privacy'
-import { Route as PuzzleRouteImport } from './routes/puzzle'
 import { Route as ResourcesRouteImport } from './routes/resources'
 import { Route as SponsorshipRouteImport } from './routes/sponsorship'
 import { Route as TeamRouteImport } from './routes/team'
-import { Route as ZaidRouteImport } from './routes/zaid'
 import { Route as DepartmentsIndexRouteImport } from './routes/departments.index'
 import { Route as DepartmentsDepartmentRouteImport } from './routes/departments.$department'
 import { Route as EventsEventIdRouteImport } from './routes/events_.$eventId'
@@ -30,6 +28,16 @@ import { Route as DepartmentsDepartmentDeskRouteImport } from './routes/departme
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ArcadeRoute = ArcadeRouteImport.update({
+  id: '/arcade',
+  path: '/arcade',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BoardRoute = BoardRouteImport.update({
+  id: '/board',
+  path: '/board',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ClubOfficeRoute = ClubOfficeRouteImport.update({
@@ -52,24 +60,9 @@ const GlossaryRoute = GlossaryRouteImport.update({
   path: '/glossary',
   getParentRoute: () => rootRouteImport,
 } as any)
-const KostyaRoute = KostyaRouteImport.update({
-  id: '/kostya',
-  path: '/kostya',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const PlayRoute = PlayRouteImport.update({
-  id: '/play',
-  path: '/play',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const PrivacyRoute = PrivacyRouteImport.update({
   id: '/privacy',
   path: '/privacy',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const PuzzleRoute = PuzzleRouteImport.update({
-  id: '/puzzle',
-  path: '/puzzle',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ResourcesRoute = ResourcesRouteImport.update({
@@ -85,11 +78,6 @@ const SponsorshipRoute = SponsorshipRouteImport.update({
 const TeamRoute = TeamRouteImport.update({
   id: '/team',
   path: '/team',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ZaidRoute = ZaidRouteImport.update({
-  id: '/zaid',
-  path: '/zaid',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DepartmentsIndexRoute = DepartmentsIndexRouteImport.update({
@@ -116,18 +104,16 @@ const DepartmentsDepartmentDeskRoute =
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/arcade': typeof ArcadeRoute
+  '/board': typeof BoardRoute
   '/club-office': typeof ClubOfficeRoute
   '/events': typeof EventsRoute
   '/fund': typeof FundRoute
   '/glossary': typeof GlossaryRoute
-  '/kostya': typeof KostyaRoute
-  '/play': typeof PlayRoute
   '/privacy': typeof PrivacyRoute
-  '/puzzle': typeof PuzzleRoute
   '/resources': typeof ResourcesRoute
   '/sponsorship': typeof SponsorshipRoute
   '/team': typeof TeamRoute
-  '/zaid': typeof ZaidRoute
   '/departments/$department': typeof DepartmentsDepartmentRoute
   '/events/$eventId': typeof EventsEventIdRoute
   '/departments/': typeof DepartmentsIndexRoute
@@ -135,18 +121,16 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/arcade': typeof ArcadeRoute
+  '/board': typeof BoardRoute
   '/club-office': typeof ClubOfficeRoute
   '/events': typeof EventsRoute
   '/fund': typeof FundRoute
   '/glossary': typeof GlossaryRoute
-  '/kostya': typeof KostyaRoute
-  '/play': typeof PlayRoute
   '/privacy': typeof PrivacyRoute
-  '/puzzle': typeof PuzzleRoute
   '/resources': typeof ResourcesRoute
   '/sponsorship': typeof SponsorshipRoute
   '/team': typeof TeamRoute
-  '/zaid': typeof ZaidRoute
   '/departments/$department': typeof DepartmentsDepartmentRoute
   '/events/$eventId': typeof EventsEventIdRoute
   '/departments': typeof DepartmentsIndexRoute
@@ -155,18 +139,16 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/arcade': typeof ArcadeRoute
+  '/board': typeof BoardRoute
   '/club-office': typeof ClubOfficeRoute
   '/events': typeof EventsRoute
   '/fund': typeof FundRoute
   '/glossary': typeof GlossaryRoute
-  '/kostya': typeof KostyaRoute
-  '/play': typeof PlayRoute
   '/privacy': typeof PrivacyRoute
-  '/puzzle': typeof PuzzleRoute
   '/resources': typeof ResourcesRoute
   '/sponsorship': typeof SponsorshipRoute
   '/team': typeof TeamRoute
-  '/zaid': typeof ZaidRoute
   '/departments/$department': typeof DepartmentsDepartmentRoute
   '/events_/$eventId': typeof EventsEventIdRoute
   '/departments/': typeof DepartmentsIndexRoute
@@ -176,18 +158,16 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/arcade'
+    | '/board'
     | '/club-office'
     | '/events'
     | '/fund'
     | '/glossary'
-    | '/kostya'
-    | '/play'
     | '/privacy'
-    | '/puzzle'
     | '/resources'
     | '/sponsorship'
     | '/team'
-    | '/zaid'
     | '/departments/$department'
     | '/events/$eventId'
     | '/departments/'
@@ -195,18 +175,16 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/arcade'
+    | '/board'
     | '/club-office'
     | '/events'
     | '/fund'
     | '/glossary'
-    | '/kostya'
-    | '/play'
     | '/privacy'
-    | '/puzzle'
     | '/resources'
     | '/sponsorship'
     | '/team'
-    | '/zaid'
     | '/departments/$department'
     | '/events/$eventId'
     | '/departments'
@@ -214,18 +192,16 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
+    | '/arcade'
+    | '/board'
     | '/club-office'
     | '/events'
     | '/fund'
     | '/glossary'
-    | '/kostya'
-    | '/play'
     | '/privacy'
-    | '/puzzle'
     | '/resources'
     | '/sponsorship'
     | '/team'
-    | '/zaid'
     | '/departments/$department'
     | '/events_/$eventId'
     | '/departments/'
@@ -234,18 +210,16 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  ArcadeRoute: typeof ArcadeRoute
+  BoardRoute: typeof BoardRoute
   ClubOfficeRoute: typeof ClubOfficeRoute
   EventsRoute: typeof EventsRoute
   FundRoute: typeof FundRoute
   GlossaryRoute: typeof GlossaryRoute
-  KostyaRoute: typeof KostyaRoute
-  PlayRoute: typeof PlayRoute
   PrivacyRoute: typeof PrivacyRoute
-  PuzzleRoute: typeof PuzzleRoute
   ResourcesRoute: typeof ResourcesRoute
   SponsorshipRoute: typeof SponsorshipRoute
   TeamRoute: typeof TeamRoute
-  ZaidRoute: typeof ZaidRoute
   DepartmentsDepartmentRoute: typeof DepartmentsDepartmentRoute
   EventsEventIdRoute: typeof EventsEventIdRoute
   DepartmentsIndexRoute: typeof DepartmentsIndexRoute
@@ -259,6 +233,20 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/arcade': {
+      id: '/arcade'
+      path: '/arcade'
+      fullPath: '/arcade'
+      preLoaderRoute: typeof ArcadeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/board': {
+      id: '/board'
+      path: '/board'
+      fullPath: '/board'
+      preLoaderRoute: typeof BoardRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/club-office': {
@@ -289,32 +277,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof GlossaryRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/kostya': {
-      id: '/kostya'
-      path: '/kostya'
-      fullPath: '/kostya'
-      preLoaderRoute: typeof KostyaRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/play': {
-      id: '/play'
-      path: '/play'
-      fullPath: '/play'
-      preLoaderRoute: typeof PlayRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/privacy': {
       id: '/privacy'
       path: '/privacy'
       fullPath: '/privacy'
       preLoaderRoute: typeof PrivacyRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/puzzle': {
-      id: '/puzzle'
-      path: '/puzzle'
-      fullPath: '/puzzle'
-      preLoaderRoute: typeof PuzzleRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/resources': {
@@ -336,13 +303,6 @@ declare module '@tanstack/react-router' {
       path: '/team'
       fullPath: '/team'
       preLoaderRoute: typeof TeamRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/zaid': {
-      id: '/zaid'
-      path: '/zaid'
-      fullPath: '/zaid'
-      preLoaderRoute: typeof ZaidRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/departments/': {
@@ -378,18 +338,16 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  ArcadeRoute: ArcadeRoute,
+  BoardRoute: BoardRoute,
   ClubOfficeRoute: ClubOfficeRoute,
   EventsRoute: EventsRoute,
   FundRoute: FundRoute,
   GlossaryRoute: GlossaryRoute,
-  KostyaRoute: KostyaRoute,
-  PlayRoute: PlayRoute,
   PrivacyRoute: PrivacyRoute,
-  PuzzleRoute: PuzzleRoute,
   ResourcesRoute: ResourcesRoute,
   SponsorshipRoute: SponsorshipRoute,
   TeamRoute: TeamRoute,
-  ZaidRoute: ZaidRoute,
   DepartmentsDepartmentRoute: DepartmentsDepartmentRoute,
   EventsEventIdRoute: EventsEventIdRoute,
   DepartmentsIndexRoute: DepartmentsIndexRoute,

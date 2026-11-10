@@ -1,7 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Flashcards } from "@/components/fun/Flashcards";
-import { RealOrMadeUp } from "@/components/fun/RealOrMadeUp";
-import { Superday } from "@/components/fun/Superday";
 import { TECHNICALS } from "@/components/fun/technicals";
 import { ArrowDown, ArrowRight, ArrowUpRight, FileText, Linkedin } from "lucide-react";
 import { useState, type CSSProperties } from "react";
@@ -21,16 +19,16 @@ import { cn } from "@/lib/utils";
 export const Route = createFileRoute("/resources")({
   head: () => ({
     meta: [
-      { title: "Partners and resources, EMFC" },
+      { title: "Research and resources, EMFC" },
       {
         name: "description",
         content:
-          "EMFC's partners, Trakvia and Greenroom, the reports the club's desks publish, and the databases ESADE students can use for finance recruiting.",
+          "The reports EMFC's desks publish, the club's partners Trakvia and Greenroom, and the databases ESADE students can use for finance recruiting.",
       },
-      { property: "og:title", content: "Partners and resources, EMFC" },
+      { property: "og:title", content: "Research and resources, EMFC" },
       {
         property: "og:description",
-        content: "Trakvia, Greenroom and the research of the EMFC desks.",
+        content: "The research of the EMFC desks, Trakvia and Greenroom.",
       },
     ],
   }),
@@ -158,7 +156,7 @@ function ResourcesPage() {
       <PageHero
         image={IMAGES.placaEspanya}
         alt="Plaça d'Espanya at dusk with the Venetian Towers and MNAC in the distance"
-        eyebrow="Partners and resources"
+        eyebrow="Research and resources"
         position="50% 35%"
         title={
           <>
@@ -167,53 +165,18 @@ function ResourcesPage() {
           </>
         }
       >
-        The companies we partner with, the research our desks publish, and the databases ESADE
+        The research our desks publish, the companies we partner with, and the databases ESADE
         students can use to prepare for finance recruiting in Europe.
       </PageHero>
 
       <PageIndex
         items={[
-          { href: "#partners", count: PARTNERS.length, label: "Partners", note: PARTNERS.map((p) => p.name).join(" and ") },
           { href: "#research", count: published.length, label: "Reports", note: "Published by the desks" },
+          { href: "#partners", count: PARTNERS.length, label: "Partners", note: PARTNERS.map((p) => p.name).join(" and ") },
           { href: "#technicals", count: TECHNICALS.length, label: "Technicals", note: "Interview questions to practise" },
           { href: "#databases", count: esadeResources.length, label: "Databases", note: "Through the ESADE library" },
         ]}
       />
-
-      {/* Partners */}
-      <section id="partners" className="scroll-mt-24">
-        <div className="gutter flex flex-col gap-10 py-16 lg:gap-14 lg:py-24">
-          <Reveal className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between lg:gap-16">
-            <div className="flex flex-col gap-5">
-              <Eyebrow>Our partners</Eyebrow>
-              <h2 className="font-serif text-[44px]/none tracking-[-0.01em] md:text-[72px]/none">
-                Companies we <Em>work with</Em>
-              </h2>
-            </div>
-            <p className="max-w-[440px] text-[15px]/[1.7] text-mute md:text-base/[1.7]">
-              Partners give EMFC members the tools to find roles and prepare for interviews. Every member
-              can use them.
-            </p>
-          </Reveal>
-          <div className="flex flex-col gap-8 lg:gap-10">
-            {PARTNERS.map((p, i) => (
-              <PartnerBlock key={p.name} partner={p} flip={i % 2 === 1} />
-            ))}
-          </div>
-          <Link
-            to="/sponsorship"
-            className="group flex flex-col gap-3 border-t border-ink pt-6 sm:flex-row sm:items-center sm:justify-between"
-          >
-            <span className="font-serif text-[26px]/[1.15] md:text-[32px]/[1.15]">
-              A firm that wants to work with EMFC? <Em>Partner with us.</Em>
-            </span>
-            <span className="caps inline-flex items-center gap-2 text-[10.5px] tracking-[0.18em]">
-              Sponsorship
-              <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-1" strokeWidth={1.75} />
-            </span>
-          </Link>
-        </div>
-      </section>
 
       {/* Research, the newest few first */}
       <section id="research" className="scroll-mt-24 bg-stone">
@@ -238,11 +201,35 @@ function ResourcesPage() {
         </div>
       </section>
 
-      <Superday />
+      {/* Partners, side by side and small */}
+      <section id="partners" className="scroll-mt-24">
+        <div className="gutter grid gap-10 py-16 lg:grid-cols-12 lg:gap-8 lg:py-20">
+          <Reveal className="flex flex-col gap-5 lg:col-span-4">
+            <Eyebrow>Our partners</Eyebrow>
+            <h2 className="font-serif text-[40px]/none tracking-[-0.01em] md:text-[56px]/none">
+              Companies we <Em>work with</Em>
+            </h2>
+            <p className="max-w-[380px] text-[15px]/[1.7] text-mute">
+              Partners give EMFC members the tools to find roles and prepare for interviews. Every
+              member can use them.
+            </p>
+            <Link
+              to="/sponsorship"
+              className="group caps mt-2 inline-flex items-center gap-2 self-start text-[10.5px] tracking-[0.18em] underline-offset-4 hover:underline"
+            >
+              Partner with us
+              <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-1" strokeWidth={1.75} />
+            </Link>
+          </Reveal>
+          <Reveal className="grid gap-px border border-line bg-line sm:grid-cols-2 lg:col-span-8">
+            {PARTNERS.map((p) => (
+              <PartnerCard key={p.name} partner={p} />
+            ))}
+          </Reveal>
+        </div>
+      </section>
 
       <Flashcards />
-
-      <RealOrMadeUp />
 
       {/* ESADE databases */}
       <section id="databases" className="gutter flex scroll-mt-24 flex-col gap-10 py-16 lg:gap-14 lg:py-24">
@@ -290,7 +277,7 @@ function ResourcesPage() {
   );
 }
 
-/** What the page holds, under the hero: partners first, so they are seen before the reports. */
+/** What the page holds, under the hero, in the order of the page: the reports first. */
 function PageIndex({ items }: { items: { href: string; count: number; label: string; note: string }[] }) {
   return (
     <nav aria-label="On this page" className="border-b border-line">
@@ -328,54 +315,31 @@ function PageIndex({ items }: { items: { href: string; count: number; label: str
   );
 }
 
-/** A partner: its name large in its own colour beside what it does for members. Alternate blocks swap sides. */
-function PartnerBlock({ partner: p, flip }: { partner: Partner; flip: boolean }) {
+/** A partner as a square: its name in its own colour, what it is, and the way in. */
+function PartnerCard({ partner: p }: { partner: Partner }) {
   const colour = { "--brand": p.colour, "--brand-dark": p.colourDark } as CSSProperties;
   return (
-    <Reveal className={cn("grid border border-line bg-panel lg:grid-cols-[5fr_7fr]", flip && "lg:grid-cols-[7fr_5fr]")}>
-      <div
-        style={colour}
-        className={cn(
-          "flex min-w-0 flex-col justify-center gap-4 border-b border-line p-6 sm:p-8 md:p-12 lg:border-b-0",
-          flip ? "lg:order-2 lg:border-l" : "lg:border-r",
+    <div style={colour} className="flex min-w-0 flex-col gap-4 bg-panel p-6 md:p-8 xl:aspect-square">
+      <span className="caps text-[10px] tracking-[0.24em] text-[var(--brand)] dark:text-[var(--brand-dark)]">
+        {p.role}
+      </span>
+      <span className="font-serif text-[44px]/[0.95] font-semibold tracking-[-0.01em] text-[var(--brand)] md:text-[52px]/[0.95] dark:text-[var(--brand-dark)]">
+        {p.name}
+      </span>
+      <p className="font-serif text-[20px]/[1.25] italic">“{p.tagline}”</p>
+      <p className="text-[14px]/[1.65] text-mute">{p.summary}</p>
+      <div className="mt-auto flex flex-wrap items-center gap-x-5 gap-y-3 pt-2">
+        <a href={p.link} target="_blank" rel="noreferrer" className="btn btn-sm btn-ink">
+          {p.cta}
+          <ArrowUpRight className="h-3.5 w-3.5" strokeWidth={1.75} />
+        </a>
+        {p.code && (
+          <span className="caps text-[10px] tracking-[0.18em] text-mute">
+            EMFC code <span className="text-ink">{p.code}</span>
+          </span>
         )}
-      >
-        <span className="font-serif text-[44px]/[0.95] font-semibold tracking-[-0.01em] text-[var(--brand)] sm:text-6xl/[0.95] md:text-[84px]/[0.95] dark:text-[var(--brand-dark)]">
-          {p.name}
-        </span>
-        <span className="caps text-[10px] tracking-[0.24em] text-[var(--brand)] md:text-[11px] dark:text-[var(--brand-dark)]">
-          {p.role}
-        </span>
-        <p className="mt-3 font-serif text-[22px]/[1.25] italic md:text-[26px]/[1.25]">“{p.tagline}”</p>
       </div>
-      <div className="flex min-w-0 flex-col gap-5 p-6 sm:p-8 md:p-12">
-        <h3 className="font-serif text-4xl/none md:text-[44px]/none">{p.heading}</h3>
-        {p.body.map((para) => (
-          <p key={para.slice(0, 24)} className="text-[15px]/[1.75] text-mute md:text-[15.5px]/[1.75]">
-            {para}
-          </p>
-        ))}
-        <div className="mt-2 grid gap-6 sm:grid-cols-3">
-          {p.features.map((f) => (
-            <div key={f.title} className="flex flex-col gap-2 border-t border-ink pt-4">
-              <h4 className="font-serif text-[22px]/[1.1] font-semibold">{f.title}</h4>
-              <p className="text-[13.5px]/[1.6] text-mute">{f.body}</p>
-            </div>
-          ))}
-        </div>
-        <div className="mt-3 flex flex-col gap-4 sm:flex-row sm:items-center sm:gap-6">
-          <a href={p.link} target="_blank" rel="noreferrer" className="btn btn-ink h-[52px] px-[26px] text-[11.5px] sm:self-start">
-            {p.cta}
-            <ArrowUpRight className="h-[15px] w-[15px]" strokeWidth={1.75} />
-          </a>
-          {p.code && (
-            <span className="caps text-[10px] tracking-[0.18em] text-mute">
-              EMFC code <span className="text-ink">{p.code}</span>
-            </span>
-          )}
-        </div>
-      </div>
-    </Reveal>
+    </div>
   );
 }
 

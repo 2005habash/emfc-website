@@ -333,6 +333,70 @@ html.motion:not(.reveal-ready) [data-reveal]:not([data-shown]) {
   }
 }
 
+/* Words that giggle (components/fun/Giggle.tsx): the letters hop in a wave when hovered, or on cue.
+   Two names for the same hop, so a giggle on cue and one on hover can each start afresh. */
+@keyframes giggle {
+  0%,
+  100% {
+    transform: none;
+  }
+  30% {
+    transform: translateY(-0.14em) rotate(-8deg);
+  }
+  60% {
+    transform: translateY(0.02em) rotate(6deg);
+  }
+  85% {
+    transform: translateY(-0.03em) rotate(-2deg);
+  }
+}
+@keyframes giggle-wave {
+  0%,
+  100% {
+    transform: none;
+  }
+  30% {
+    transform: translateY(-0.14em) rotate(-8deg);
+  }
+  60% {
+    transform: translateY(0.02em) rotate(6deg);
+  }
+  85% {
+    transform: translateY(-0.03em) rotate(-2deg);
+  }
+}
+.giggle-letter {
+  display: inline-block;
+  transform-origin: 50% 80%;
+}
+html.motion .giggle-wave .giggle-letter {
+  animation: giggle-wave 0.7s ease-in-out calc(var(--i) * 55ms) both;
+}
+html.motion .giggle:hover .giggle-letter,
+html.motion .group:hover .giggle .giggle-letter,
+html.motion .group:focus-visible .giggle .giggle-letter {
+  animation: giggle 0.6s ease-in-out calc(var(--i) * 40ms) both;
+}
+
+/* The Arcade's "Insert coin" (src/routes/arcade.tsx): the coin flips and drops into the slot. */
+@keyframes coin-drop {
+  0% {
+    transform: none;
+    opacity: 1;
+  }
+  40% {
+    transform: translateY(-10px) rotateY(200deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(26px) rotateY(540deg);
+    opacity: 0;
+  }
+}
+html.motion .coin-drop {
+  animation: coin-drop 0.65s cubic-bezier(0.5, 0, 0.75, 0) both;
+}
+
 /* Kept for the admin dashboard. */
 @keyframes fade-up {
   from {

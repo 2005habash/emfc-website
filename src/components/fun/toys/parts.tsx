@@ -133,10 +133,13 @@ export function ShareResult({
   text,
   path,
   label = "Share your result",
+  onLight = false,
 }: {
   text: string;
   path: string;
   label?: string;
+  /** On a light background the button is drawn in ink instead of white. */
+  onLight?: boolean;
 }) {
   const share = async () => {
     const url = `${SITE_URL}${path}`;
@@ -152,7 +155,11 @@ export function ShareResult({
     }
   };
   return (
-    <button type="button" onClick={share} className="btn btn-sm btn-outline-white">
+    <button
+      type="button"
+      onClick={share}
+      className={cn("btn btn-sm", onLight ? "btn-outline-ink" : "btn-outline-white")}
+    >
       <Share2 className="h-3.5 w-3.5" strokeWidth={1.75} />
       {label}
     </button>

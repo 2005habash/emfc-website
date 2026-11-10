@@ -1,5 +1,4 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { CoffeeBreak } from "@/components/fun/OffTheClock";
 import { ArrowRight, ArrowUpRight, Linkedin } from "lucide-react";
 import { motion, useReducedMotion } from "framer-motion";
 import { useEffect, useState } from "react";
@@ -74,7 +73,6 @@ function Home() {
       <Intro />
       <People />
       <Departments />
-      <CoffeeBreak />
       <Membership />
       <Panorama />
       {FUND_PAGE_LIVE && <FundTeaser />}

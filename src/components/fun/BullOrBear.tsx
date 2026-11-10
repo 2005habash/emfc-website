@@ -125,7 +125,7 @@ function onThisDay() {
   return { day, exact: Boolean(exact), years };
 }
 
-/** "Bull or bear?" on the Fund page: famous market days, and whether you'd have called them. */
+/** "Bull or bear?" in the Arcade: famous market days, and whether you'd have called them. */
 export function BullOrBear() {
   useHashTarget("bull-or-bear");
   const [seed, setSeed] = useState(0);
@@ -199,7 +199,7 @@ export function BullOrBear() {
               <div className="flex flex-wrap gap-3">
                 <ShareResult
                   text={`I called ${score} of ${days.length} market days on EMFC's Bull or bear. Can you beat it?`}
-                  path="/fund#bull-or-bear"
+                  path="/arcade#bull-or-bear"
                 />
                 <button
                   type="button"

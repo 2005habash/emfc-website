@@ -8,9 +8,9 @@ import { ACTIVITIES } from "./playground";
 export const RANKS = [
   { title: "Analyst", at: 0 },
   { title: "Associate", at: 2 },
-  { title: "Vice-President", at: 4 },
-  { title: "Director", at: 6 },
-  { title: "Managing Director", at: 9 },
+  { title: "Vice-President", at: 5 },
+  { title: "Director", at: 8 },
+  { title: "Managing Director", at: 12 },
   { title: "Partner", at: ACTIVITIES.length },
 ] as const;
 

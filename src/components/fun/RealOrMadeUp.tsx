@@ -73,7 +73,7 @@ function verdict(score: number) {
   return "Honestly, half of it does sound made up.";
 }
 
-/** "Real or made up?" on the Resources page: real finance jargon against invented terms. */
+/** "Real or made up?" in the Arcade: real finance jargon against invented terms. */
 export function RealOrMadeUp() {
   useHashTarget("real-or-made-up");
   const [seed, setSeed] = useState(0);
@@ -123,7 +123,7 @@ export function RealOrMadeUp() {
               <div className="flex flex-wrap gap-3">
                 <ShareResult
                   text={`I got ${score} of ${terms.length} on EMFC's Real or made up. Is a Matador bond real?`}
-                  path="/resources#real-or-made-up"
+                  path="/arcade#real-or-made-up"
                 />
                 <button
                   type="button"

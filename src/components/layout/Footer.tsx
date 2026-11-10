@@ -35,6 +35,9 @@ export function Footer() {
               <Link to="/" className="hover:text-white hover:underline">
                 Home
               </Link>
+              <Link to="/board" className="hover:text-white hover:underline">
+                Board
+              </Link>
               <Link to="/departments" className="hover:text-white hover:underline">
                 Departments
               </Link>
@@ -55,8 +58,8 @@ export function Footer() {
               <Link to="/resources" className="hover:text-white hover:underline">
                 Resources
               </Link>
-              <Link to="/play" className="hover:text-white hover:underline">
-                Off the clock
+              <Link to="/arcade" className="hover:text-white hover:underline">
+                Arcade
               </Link>
               <Link to="/glossary" className="hover:text-white hover:underline">
                 Glossary
