@@ -36,7 +36,11 @@ const sections = [
   },
   {
     title: "Where it is kept",
-    body: "Sign-ups and enquiries are stored in the club's database, hosted by Supabase, and only the club's administrators can read them. We use no advertising or tracking cookies; the site only remembers whether you chose light or dark mode, in your own browser.",
+    body: "Sign-ups and enquiries are stored in the club's database, hosted by Supabase, and only the club's administrators can read them. We set no advertising or tracking cookies; the site only remembers whether you chose light or dark mode, in your own browser.",
+  },
+  {
+    title: "Market prices",
+    body: "The prices running along the top of each page come from TradingView, in a frame loaded from TradingView's own servers. Like any website, TradingView sees your IP address when the frame loads, and it may set its own cookies inside the frame under its own privacy policy. EMFC receives nothing from it.",
   },
   {
     title: "Your choices",
@@ -53,7 +57,7 @@ function PrivacyPage() {
           <h1 className="font-serif text-[52px]/[0.98] tracking-[-0.01em] md:text-[76px]/[0.98]">
             Your <Em>data</Em>
           </h1>
-          <p className="text-[15px]/[1.7] text-mute">Last updated 3 November 2026.</p>
+          <p className="text-[15px]/[1.7] text-mute">Last updated 10 November 2026.</p>
         </div>
         <div className="flex flex-col lg:col-span-7 lg:col-start-6">
           {sections.map((s) => (

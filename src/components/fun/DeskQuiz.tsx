@@ -1,6 +1,6 @@
 import { Link } from "@tanstack/react-router";
-import { ArrowLeft, ArrowRight, RotateCcw } from "lucide-react";
-import { useState } from "react";
+import { ArrowLeft, ArrowRight, Download, RotateCcw } from "lucide-react";
+import { useEffect, useState } from "react";
 import { Em, Eyebrow, Portrait } from "@/components/site/ui";
 import { departments } from "@/lib/departments";
 import { leadershipOf, memberByName } from "@/lib/team";
@@ -9,6 +9,9 @@ import { deskFor, QUIZ } from "./quiz-data";
 import { toyFor, TOYS } from "./toys/catalog";
 import { ShareResult } from "./toys/parts";
 import { useHashTarget } from "./useHashTarget";
+import { markPlayed } from "./career";
+import { shareImage } from "./cards";
+import { drawDeskCard } from "./deskCard";
 
 const LETTERS = ["A", "B", "C", "D"];
 
@@ -135,6 +138,21 @@ function Result({ answers, onAgain }: { answers: number[]; onAgain: () => void }
   const groupLead = d.groups?.find((g) => g.desks.includes(k.slug))?.lead;
   const person = memberByName(k.lead ?? groupLead ?? "") ?? leadershipOf(d.slug)[0];
   const toy = toyFor(`${d.slug}/${k.slug}`);
+  useEffect(() => markPlayed("quiz"), []);
+  const [busy, setBusy] = useState(false);
+  const card = async () => {
+    setBusy(true);
+    try {
+      const blob = await drawDeskCard(k.name, d.name, HABITAT[d.slug] ?? k.line);
+      await shareImage(
+        blob,
+        "emfc-my-desk.png",
+        `I'm ${k.name}. Which EMFC desk are you? emfc.es/departments`,
+      );
+    } finally {
+      setBusy(false);
+    }
+  };
 
   return (
     <div className="flex animate-fade-up flex-col gap-7 border border-white/20 p-6 [animation-duration:0.5s] md:p-9">
@@ -200,6 +218,15 @@ function Result({ answers, onAgain }: { answers: number[]; onAgain: () => void }
           path="/departments#quiz"
           label="Share"
         />
+        <button
+          type="button"
+          onClick={card}
+          disabled={busy}
+          className="btn btn-sm btn-outline-white"
+        >
+          <Download className="h-3.5 w-3.5" strokeWidth={1.75} />
+          Desk card
+        </button>
         <button type="button" onClick={onAgain} className="btn btn-sm text-mist hover:text-white">
           <RotateCcw className="h-3.5 w-3.5" strokeWidth={1.75} />
           Again

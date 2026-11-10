@@ -1,4 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { CoffeeRoulette } from "@/components/fun/CoffeeRoulette";
+import { PhotoFrame } from "@/components/fun/PhotoFrame";
 import { ArrowRight } from "lucide-react";
 import { motion, useReducedMotion } from "framer-motion";
 import { SiteLayout } from "@/components/layout/SiteLayout";
@@ -246,6 +248,8 @@ function Team() {
           </div>
         </Reveal>
       </section>
+      <CoffeeRoulette />
+      <PhotoFrame />
     </SiteLayout>
   );
 }

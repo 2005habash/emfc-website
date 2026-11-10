@@ -5,6 +5,7 @@ import { Eyebrow } from "@/components/site/ui";
 import { SITE_URL } from "@/lib/site";
 import { cn } from "@/lib/utils";
 import { useHashTarget } from "../useHashTarget";
+import { markPlayed } from "../career";
 
 /**
  * The frame every desk toy shares: what it is and its levers on the left, the result on navy on the
@@ -36,7 +37,9 @@ export function ToyShell({
             {title}
           </h2>
           <p className="max-w-[460px] text-[15px]/[1.7] text-mute md:text-base/[1.7]">{intro}</p>
-          <div className="mt-2 flex flex-col gap-6">{levers}</div>
+          <div className="mt-2 flex flex-col gap-6" onInputCapture={() => markPlayed(id)}>
+            {levers}
+          </div>
           <p className="text-[13px]/[1.6] text-mute">{note}</p>
         </div>
         <div

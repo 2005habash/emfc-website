@@ -200,9 +200,13 @@ export function Nav({ overlay = false }: { overlay?: boolean }) {
           to="/"
           onClick={handleNav("/")}
           aria-label="EMFC home"
-          className="flex animate-logo-in items-center gap-3 lg:gap-3.5"
+          className="group/logo flex animate-logo-in items-center gap-3 lg:gap-3.5"
         >
-          <img src={IMAGES.bullMark} alt="" className="h-10 w-auto lg:h-[46px]" />
+          <img
+            src={IMAGES.bullMark}
+            alt=""
+            className="h-10 w-auto transition-transform duration-500 ease-out lg:h-[46px] group-hover/logo:-translate-y-0.5 group-hover/logo:-rotate-6 group-hover/logo:scale-105"
+          />
           <span className="font-serif text-[28px]/none font-semibold tracking-[0.08em] lg:text-[34px]/none">
             EMFC
           </span>

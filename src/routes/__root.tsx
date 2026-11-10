@@ -12,6 +12,7 @@ import { useEffect, type ReactNode } from "react";
 import appCss from "../styles.css?url";
 import { Toaster } from "@/components/ui/sonner";
 import { Delisted } from "@/components/fun/Delisted";
+import { MarketTicker } from "@/components/fun/MarketTicker";
 import { takeReferrer, track } from "@/lib/analytics";
 import { absoluteUrl, IMAGES } from "@/lib/site";
 
@@ -142,6 +143,7 @@ function useAnalytics() {
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
   useAnalytics();
   useEffect(() => {
     // Links in the admin emails (new password, confirm your email) belong on the admin page. If the
@@ -154,6 +156,9 @@ function RootComponent() {
   }, []);
   return (
     <QueryClientProvider client={queryClient}>
+      {/* Market prices above the menu bar on every page but the admin page. Mounted here, not in
+          SiteLayout, so it keeps running from page to page instead of reloading. */}
+      {pathname !== "/club-office" && <MarketTicker />}
       <Outlet />
       <Toaster />
     </QueryClientProvider>

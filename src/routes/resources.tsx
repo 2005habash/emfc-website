@@ -1,5 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Flashcards } from "@/components/fun/Flashcards";
+import { RealOrMadeUp } from "@/components/fun/RealOrMadeUp";
+import { Superday } from "@/components/fun/Superday";
 import { TECHNICALS } from "@/components/fun/technicals";
 import { ArrowDown, ArrowRight, ArrowUpRight, FileText, Linkedin } from "lucide-react";
 import { useState, type CSSProperties } from "react";
@@ -236,7 +238,11 @@ function ResourcesPage() {
         </div>
       </section>
 
+      <Superday />
+
       <Flashcards />
+
+      <RealOrMadeUp />
 
       {/* ESADE databases */}
       <section id="databases" className="gutter flex scroll-mt-24 flex-col gap-10 py-16 lg:gap-14 lg:py-24">

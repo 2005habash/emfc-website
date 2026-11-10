@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { BullOrBear } from "@/components/fun/BullOrBear";
 import { ArrowRight } from "lucide-react";
 import { FundFull } from "@/components/fund/FundFull";
 import { SiteLayout } from "@/components/layout/SiteLayout";
@@ -86,6 +87,7 @@ function FundComingSoon() {
           </div>
         </Reveal>
       </section>
+      <BullOrBear />
     </SiteLayout>
   );
 }

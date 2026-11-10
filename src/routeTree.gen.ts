@@ -14,6 +14,7 @@ import { Route as ClubOfficeRouteImport } from './routes/club-office'
 import { Route as EventsRouteImport } from './routes/events'
 import { Route as FundRouteImport } from './routes/fund'
 import { Route as KostyaRouteImport } from './routes/kostya'
+import { Route as PlayRouteImport } from './routes/play'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as PuzzleRouteImport } from './routes/puzzle'
 import { Route as ResourcesRouteImport } from './routes/resources'
@@ -48,6 +49,11 @@ const FundRoute = FundRouteImport.update({
 const KostyaRoute = KostyaRouteImport.update({
   id: '/kostya',
   path: '/kostya',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PlayRoute = PlayRouteImport.update({
+  id: '/play',
+  path: '/play',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PrivacyRoute = PrivacyRouteImport.update({
@@ -108,6 +114,7 @@ export interface FileRoutesByFullPath {
   '/events': typeof EventsRoute
   '/fund': typeof FundRoute
   '/kostya': typeof KostyaRoute
+  '/play': typeof PlayRoute
   '/privacy': typeof PrivacyRoute
   '/puzzle': typeof PuzzleRoute
   '/resources': typeof ResourcesRoute
@@ -125,6 +132,7 @@ export interface FileRoutesByTo {
   '/events': typeof EventsRoute
   '/fund': typeof FundRoute
   '/kostya': typeof KostyaRoute
+  '/play': typeof PlayRoute
   '/privacy': typeof PrivacyRoute
   '/puzzle': typeof PuzzleRoute
   '/resources': typeof ResourcesRoute
@@ -143,6 +151,7 @@ export interface FileRoutesById {
   '/events': typeof EventsRoute
   '/fund': typeof FundRoute
   '/kostya': typeof KostyaRoute
+  '/play': typeof PlayRoute
   '/privacy': typeof PrivacyRoute
   '/puzzle': typeof PuzzleRoute
   '/resources': typeof ResourcesRoute
@@ -162,6 +171,7 @@ export interface FileRouteTypes {
     | '/events'
     | '/fund'
     | '/kostya'
+    | '/play'
     | '/privacy'
     | '/puzzle'
     | '/resources'
@@ -179,6 +189,7 @@ export interface FileRouteTypes {
     | '/events'
     | '/fund'
     | '/kostya'
+    | '/play'
     | '/privacy'
     | '/puzzle'
     | '/resources'
@@ -196,6 +207,7 @@ export interface FileRouteTypes {
     | '/events'
     | '/fund'
     | '/kostya'
+    | '/play'
     | '/privacy'
     | '/puzzle'
     | '/resources'
@@ -214,6 +226,7 @@ export interface RootRouteChildren {
   EventsRoute: typeof EventsRoute
   FundRoute: typeof FundRoute
   KostyaRoute: typeof KostyaRoute
+  PlayRoute: typeof PlayRoute
   PrivacyRoute: typeof PrivacyRoute
   PuzzleRoute: typeof PuzzleRoute
   ResourcesRoute: typeof ResourcesRoute
@@ -261,6 +274,13 @@ declare module '@tanstack/react-router' {
       path: '/kostya'
       fullPath: '/kostya'
       preLoaderRoute: typeof KostyaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/play': {
+      id: '/play'
+      path: '/play'
+      fullPath: '/play'
+      preLoaderRoute: typeof PlayRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/privacy': {
@@ -342,6 +362,7 @@ const rootRouteChildren: RootRouteChildren = {
   EventsRoute: EventsRoute,
   FundRoute: FundRoute,
   KostyaRoute: KostyaRoute,
+  PlayRoute: PlayRoute,
   PrivacyRoute: PrivacyRoute,
   PuzzleRoute: PuzzleRoute,
   ResourcesRoute: ResourcesRoute,
