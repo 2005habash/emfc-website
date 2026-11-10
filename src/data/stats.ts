@@ -5,8 +5,6 @@
 
 export const STATS = {
   members: 73,
-  departments: 6,
-  desks: 15,
   nationalities: 29,
   internationalPct: 88,
   languages: 16,

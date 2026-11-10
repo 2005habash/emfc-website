@@ -318,7 +318,8 @@
     color: #ffffff;
   }
   .btn-outline-white:hover {
-    background: rgb(255 255 255 / 0.12);
+    background: #ffffff;
+    color: #000b3d;
   }
   .btn-outline-ink {
     border: 1px solid var(--c-ink);

@@ -8,11 +8,13 @@ import { FirmLogo } from "@/components/site/FirmLogo";
 import { CountUp, Em, Eyebrow, Numeral, PhotoCaption, Portrait } from "@/components/site/ui";
 import { loadEvents } from "@/lib/content";
 import { STATS } from "@/data/stats";
-import { departments } from "@/lib/departments";
+import { departments, DESK_COUNT } from "@/lib/departments";
 import {
   CO_PRESIDENT_QUOTE,
   FUND_PAGE_LIVE,
   IMAGES,
+  InWords,
+  inWords,
   MEMBER_FIRMS,
   NEXT_INTAKE_OPENS,
   ROMAN,
@@ -24,7 +26,7 @@ import { cn } from "@/lib/utils";
 import { phoneSlice, sized } from "@/lib/images";
 
 /** What search engines and link previews show for emfc.es: the club's figures, which change with STATS. */
-const DESCRIPTION = `The finance club at ESADE Business School in Barcelona: ${STATS.members} master's students from ${STATS.nationalities} nationalities, ${STATS.experiencePct}% with professional experience, in ${STATS.departments} departments and ${STATS.desks} desks, built around careers, companies and community.`;
+const DESCRIPTION = `The finance club at ESADE Business School in Barcelona: ${STATS.members} master's students from ${STATS.nationalities} nationalities, ${STATS.experiencePct}% with professional experience, in ${departments.length} departments and ${DESK_COUNT} desks, built around careers, companies and community.`;
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -91,7 +93,8 @@ function Home() {
 }
 
 function Hero() {
-  // Vasco's eight figures (5 November 2026), in his order.
+  // Vasco's figures (5 November 2026), in his order: the first six of his eight, in one row (10
+  // November 2026), so the hero ends sooner and the firms our members worked at come into view.
   const facts = [
     { value: <CountUp to={STATS.members} />, label: "Members" },
     { value: <CountUp to={STATS.nationalities} />, label: "Nationalities" },
@@ -102,18 +105,6 @@ function Hero() {
     },
     { value: <CountUp to={STATS.internships} suffix="+" />, label: "Internships completed" },
     { value: <CountUp to={STATS.firms} />, label: "Firms where members have worked" },
-    {
-      value: <CountUp to={STATS.universities} />,
-      label: `Universities, in ${STATS.universityCountries} countries`,
-    },
-    {
-      value: (
-        <>
-          {STATS.departments} and {STATS.desks}
-        </>
-      ),
-      label: "Departments and desks",
-    },
   ];
   return (
     <section className="relative overflow-hidden bg-[#000B3D] text-white">
@@ -144,7 +135,8 @@ function Hero() {
         Plaça d'Espanya, Barcelona
       </PhotoCaption>
 
-      <div className="gutter relative flex min-h-[780px] flex-col justify-end gap-6 pt-32 md:min-h-[860px] md:gap-7">
+      {/* On a wide screen the hero leaves room below it for the firms band to show on the first screen. */}
+      <div className="gutter relative flex min-h-[780px] flex-col justify-end gap-6 pt-32 md:min-h-[min(860px,calc(100svh-150px))] md:gap-7">
         <Eyebrow tone="hero" className="animate-rise">
           Established 2026, ESADE Business School, Barcelona
         </Eyebrow>
@@ -169,17 +161,20 @@ function Hero() {
             </Link>
           </div>
         </div>
-        <dl className="mt-2 grid animate-rise grid-cols-2 border-t border-white/30 [animation-delay:680ms] md:mt-4 md:grid-cols-4">
+        <dl className="mt-2 grid animate-rise grid-cols-2 border-t border-white/30 [animation-delay:680ms] md:mt-4 md:grid-cols-3 lg:grid-cols-6">
           {facts.map((f, i) => (
             <div
               key={f.label}
               className={cn(
-                "flex flex-col gap-2 py-5 md:pb-7 md:pt-6",
-                // Two to a row on phones, four on wider screens, with a line between rows and columns.
-                i % 2 === 1 && "border-l border-white/30 pl-5",
-                i < facts.length - 2 && "border-b border-white/30",
-                i >= 4 && "md:border-b-0",
-                i % 4 === 0 ? "md:border-l-0 md:pl-0" : "md:border-l md:border-white/30 md:pl-8",
+                // Two to a row on phones, three on tablets, all six in one row on wider screens, with a
+                // line between rows and columns.
+                "flex flex-col gap-2 border-white/30 py-5 md:pb-7 md:pt-6",
+                i % 2 === 1 && "border-l pl-5",
+                i < 4 && "border-b",
+                i % 3 === 0 ? "md:border-l-0 md:pl-0" : "md:border-l md:pl-6",
+                i < 3 ? "md:border-b" : "md:border-b-0",
+                i === 0 ? "lg:border-l-0 lg:pl-0" : "lg:border-l lg:pl-6",
+                "lg:border-b-0",
               )}
             >
               <dd className="font-serif text-[38px]/none font-medium md:text-5xl/none">
@@ -302,10 +297,11 @@ function Departments() {
             Our Departments
           </h2>
           <p className="text-[15px]/[1.7] text-mute md:text-[17px]/[1.7]">
-            Six departments and fifteen desks, led by two Co-Presidents.
+            {InWords(departments.length)} departments and {inWords(DESK_COUNT)} desks, led by two
+            Co-Presidents.
           </p>
           <Link
-            to="/departments"
+            to="/arcade"
             hash="quiz"
             className="caps inline-flex items-center gap-2 text-[10.5px] tracking-[0.18em] underline underline-offset-[5px]"
           >
@@ -316,7 +312,7 @@ function Departments() {
 
         <Reveal className="mt-10 flex flex-col gap-2 bg-[#000B3D] px-6 py-5 text-center text-white md:mt-14 md:px-12">
           <span className="caps text-[10px] tracking-[0.24em] text-bull-light md:text-[10.5px]">
-            Co-Presidents
+            Co-Presidents and Founders
           </span>
           <span className="font-serif text-[22px]/[1.25] font-medium md:text-[28px]/[1.2]">
             {PRESIDENTS.map((p) => p.name).join(" and ")}
@@ -509,6 +505,7 @@ function People() {
                 <Portrait
                   key={p.slug}
                   member={p}
+                  sizes="56px"
                   className={cn("h-14 w-14 rounded-full border-2 border-night", i > 0 && "-ml-3.5")}
                 />
               ))}

@@ -5,7 +5,7 @@ import { flushSync } from "react-dom";
 import { toast } from "@/lib/toast";
 import { cn } from "@/lib/utils";
 import { Giggle } from "@/components/fun/Giggle";
-import { departments, type Department } from "@/lib/departments";
+import { departments } from "@/lib/departments";
 import { IMAGES, NAV_LINKS, SOCIAL } from "@/lib/site";
 import { sized } from "@/lib/images";
 
@@ -48,15 +48,6 @@ function ThemeToggle() {
   );
 }
 
-/** A department's desks, with Fixed Income's under their two groups. */
-function deskGroups(d: Department) {
-  if (!d.groups) return [{ name: undefined, desks: d.desks }];
-  return d.groups.map((g) => ({
-    name: g.name,
-    desks: g.desks.map((slug) => d.desks.find((k) => k.slug === slug)!),
-  }));
-}
-
 /**
  * Arrow keys inside the Departments menu: up and down go through a column's links (and on to the
  * next column), left and right jump to the neighbouring column, Home and End to the first and last link.
@@ -89,7 +80,7 @@ function DepartmentsMenu({ id, onNavigate }: { id: string; onNavigate: () => voi
     <div
       id={id}
       onKeyDown={moveInMenu}
-      className="absolute inset-x-0 top-full border-b border-white/20 bg-[#000B3D] text-left normal-case tracking-normal shadow-[0_24px_48px_rgb(0_0_0/0.25)]"
+      className="absolute inset-x-0 top-full border-b border-white/20 bg-[#000B3D] text-left normal-case tracking-normal text-white shadow-[0_24px_48px_rgb(0_0_0/0.25)]"
     >
       <div className="gutter grid grid-cols-6 gap-6 py-9 xl:gap-8">
         {departments.map((d) => (
@@ -103,27 +94,20 @@ function DepartmentsMenu({ id, onNavigate }: { id: string; onNavigate: () => voi
               {d.name}
             </Link>
             {d.desks.length > 0 ? (
-              <div className="flex flex-col gap-3">
-                {deskGroups(d).map((g) => (
-                  <ul key={g.name ?? d.slug} className="flex flex-col gap-2">
-                    {g.name && (
-                      <li className="font-serif text-[15px] italic text-bull-light">{g.name}</li>
-                    )}
-                    {g.desks.map((k) => (
-                      <li key={k.slug}>
-                        <Link
-                          to="/departments/$department/$desk"
-                          params={{ department: d.slug, desk: k.slug }}
-                          onClick={onNavigate}
-                          className="caps text-[10.5px]/[1.5] tracking-[0.14em] text-[#C9CEDD] underline-offset-4 hover:text-white hover:underline"
-                        >
-                          {k.name}
-                        </Link>
-                      </li>
-                    ))}
-                  </ul>
+              <ul className="flex flex-col gap-2">
+                {d.desks.map((k) => (
+                  <li key={k.slug}>
+                    <Link
+                      to="/departments/$department/$desk"
+                      params={{ department: d.slug, desk: k.slug }}
+                      onClick={onNavigate}
+                      className="caps text-[10.5px]/[1.5] tracking-[0.14em] text-[#C9CEDD] underline-offset-4 hover:text-white hover:underline"
+                    >
+                      {k.name}
+                    </Link>
+                  </li>
                 ))}
-              </div>
+              </ul>
             ) : (
               <p className="text-[13px]/[1.55] text-[#A9B0C6]">{d.function}</p>
             )}
@@ -185,9 +169,15 @@ export function Nav({ overlay = false }: { overlay?: boolean }) {
     setMenu(false);
   };
 
-  const linkClass = "flex h-11 items-center px-1.5 underline-offset-8 xl:px-2.5";
-  const active = { className: "text-white underline decoration-bull-light" };
-  const inactive = { className: "text-[#E3E6EF] hover:underline" };
+  // Each item is a pill: white with navy text when hovered, and for the page you're on.
+  const pill =
+    "rounded-full transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white";
+  const linkClass = cn(pill, "flex h-9 items-center px-2.5 xl:px-3.5");
+  const on = "bg-white text-[#000B3D]";
+  const off = "text-[#E3E6EF] hover:bg-white hover:text-[#000B3D]";
+  const active = { className: on };
+  const inactive = { className: off };
+  const departmentsOn = menu || pathname.startsWith("/departments");
 
   return (
     <header
@@ -231,7 +221,10 @@ export function Nav({ overlay = false }: { overlay?: boolean }) {
               <div
                 key={l.to}
                 ref={menuRef}
-                className="flex items-center"
+                className={cn(
+                  "flex h-9 items-center rounded-full transition-colors",
+                  departmentsOn ? on : off,
+                )}
                 onMouseEnter={() => hover(true)}
                 onMouseLeave={() => hover(false)}
                 onFocus={(e) => {
@@ -245,7 +238,11 @@ export function Nav({ overlay = false }: { overlay?: boolean }) {
                 }}
                 onKeyDown={(e) => {
                   // Down arrow on "Departments" or its chevron opens the menu and moves into it.
-                  if (e.key !== "ArrowDown" || (e.target as HTMLElement).closest("#departments-menu")) return;
+                  if (
+                    e.key !== "ArrowDown" ||
+                    (e.target as HTMLElement).closest("#departments-menu")
+                  )
+                    return;
                   e.preventDefault();
                   flushSync(() => setMenu(true));
                   document.querySelector<HTMLAnchorElement>("#departments-menu a")?.focus();
@@ -254,9 +251,7 @@ export function Nav({ overlay = false }: { overlay?: boolean }) {
                 <Link
                   to={l.to}
                   onClick={handleNav(l.to)}
-                  activeProps={active}
-                  inactiveProps={inactive}
-                  className={cn(linkClass, "pr-1 xl:pr-1")}
+                  className={cn(pill, "flex h-9 items-center pl-2.5 pr-1 xl:pl-3.5")}
                 >
                   {l.label}
                 </Link>
@@ -266,14 +261,16 @@ export function Nav({ overlay = false }: { overlay?: boolean }) {
                   aria-controls="departments-menu"
                   aria-label={menu ? "Close the departments menu" : "Open the departments menu"}
                   onClick={() => setMenu((m) => !m)}
-                  className="flex h-11 w-7 items-center justify-center text-[#E3E6EF] hover:text-white"
+                  className={cn(pill, "flex h-9 w-7 items-center justify-center pr-1")}
                 >
                   <ChevronDown
                     className={cn("h-3.5 w-3.5 transition-transform", menu && "rotate-180")}
                     strokeWidth={1.75}
                   />
                 </button>
-                {menu && <DepartmentsMenu id="departments-menu" onNavigate={() => setMenu(false)} />}
+                {menu && (
+                  <DepartmentsMenu id="departments-menu" onNavigate={() => setMenu(false)} />
+                )}
               </div>
             ) : (
               <Link
@@ -353,7 +350,10 @@ export function Nav({ overlay = false }: { overlay?: boolean }) {
                     className="flex h-11 w-11 items-center justify-center rounded-full border border-white/30"
                   >
                     <ChevronDown
-                      className={cn("h-4 w-4 transition-transform", mobileDepartments && "rotate-180")}
+                      className={cn(
+                        "h-4 w-4 transition-transform",
+                        mobileDepartments && "rotate-180",
+                      )}
                       strokeWidth={1.6}
                     />
                   </button>

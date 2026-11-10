@@ -16,7 +16,6 @@ import cormorant from "@fontsource-variable/cormorant-garamond/files/cormorant-g
 import cormorantItalic from "@fontsource-variable/cormorant-garamond/files/cormorant-garamond-latin-wght-italic.woff2?url";
 import { Toasts } from "@/components/site/Toasts";
 import { Delisted } from "@/components/fun/Delisted";
-import { MarketTicker } from "@/components/fun/MarketTicker";
 import { takeReferrer, track } from "@/lib/analytics";
 import { absoluteUrl, IMAGES } from "@/lib/site";
 
@@ -171,7 +170,6 @@ function useAnalytics() {
 }
 
 function RootComponent() {
-  const pathname = useRouterState({ select: (s) => s.location.pathname });
   useAnalytics();
   useEffect(() => {
     // Links in the admin emails (new password, confirm your email) belong on the admin page. If the
@@ -186,9 +184,6 @@ function RootComponent() {
   }, []);
   return (
     <>
-      {/* Market prices above the menu bar on every page but the admin page. Mounted here, not in
-          SiteLayout, so it keeps running from page to page instead of reloading. */}
-      {pathname !== "/club-office" && <MarketTicker />}
       <Outlet />
       <Toasts />
     </>

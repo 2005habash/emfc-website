@@ -160,7 +160,7 @@ export function PaperLbo() {
         </p>
         <ShareResult
           text={`I made a ${irr} IRR on EMFC's paper LBO. Can you beat it?`}
-          path="/departments/private-markets/private-equity#paper-lbo"
+          path="/arcade#paper-lbo"
         />
       </div>
     </ToyShell>

@@ -8,7 +8,6 @@ import { SITE_URL } from "@/lib/site";
 // without a change here. The admin page is left out. A new top-level page needs adding to PAGES.
 const PAGES = [
   "/",
-  "/board",
   "/departments",
   "/events",
   "/resources",

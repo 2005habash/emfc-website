@@ -122,11 +122,14 @@ export function Portrait({
   alternate = false,
   className,
   sizes = "(min-width: 768px) 280px, 56vw",
+  colour = false,
 }: {
   member: Pick<Member, "name" | "photo">;
   alt?: string;
   alternate?: boolean;
   className?: string;
+  /** In colour from the start, as in a profile (elsewhere photos turn to colour when hovered). */
+  colour?: boolean;
   /** How wide the photo is shown (the HTML sizes attribute), so the browser fetches a fitting copy. */
   sizes?: string;
 }) {
@@ -144,7 +147,10 @@ export function Portrait({
           alt={alt ?? member.name}
           loading="lazy"
           decoding="async"
-          className="h-full w-full object-cover object-top mix-blend-multiply grayscale contrast-[1.05] transition duration-500 group-hover:grayscale-0"
+          className={cn(
+            "h-full w-full object-cover object-top mix-blend-multiply contrast-[1.05] transition duration-500",
+            !colour && "grayscale group-hover:grayscale-0",
+          )}
         />
       ) : (
         <span
@@ -237,6 +243,7 @@ function ProfileDialog({ member }: { member: Member }) {
       <div className="grid sm:grid-cols-[220px_1fr]">
         <Portrait
           member={member}
+          colour
           className="aspect-square w-full sm:aspect-auto sm:h-full"
           sizes="(min-width: 640px) 460px, 92vw"
         />

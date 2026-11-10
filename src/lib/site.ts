@@ -35,7 +35,12 @@ export const SITE_URL = "https://www.emfc.es";
 /** Today's date in Barcelona (YYYY-MM-DD). Events are "upcoming" or "past" by Barcelona's calendar,
  * the same on the server and in the browser, wherever either is. */
 export const todayInBarcelona = (at: Date = new Date()) =>
-  new Intl.DateTimeFormat("en-CA", { timeZone: "Europe/Madrid", year: "numeric", month: "2-digit", day: "2-digit" }).format(at);
+  new Intl.DateTimeFormat("en-CA", {
+    timeZone: "Europe/Madrid",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).format(at);
 
 /** Only links that are safe to put in a page: https, mailto or a path on this site. Anything else
  * (for example a "javascript:" link typed into the admin page) is dropped. */
@@ -44,41 +49,42 @@ export const safeUrl = (url: string | null | undefined) => {
   return u && /^(https:\/\/|mailto:|\/(?!\/))/i.test(u) ? u : undefined;
 };
 
-export const absoluteUrl = (path: string) => (/^https?:\/\//.test(path) ? path : `${SITE_URL}${path}`);
+export const absoluteUrl = (path: string) =>
+  /^https?:\/\//.test(path) ? path : `${SITE_URL}${path}`;
 
 /**
  * "Where our members have worked", the homepage strip: the best-known firms on members' profiles, 20 of
- * them, ordered so that firms of the same kind are never side by side (Vasco, 6 November 2026; the
- * content package statistics, club Drive). Each shows as its logo (src/data/logos.ts). Lazard Asset
- * Management is on a member's profile; the strip shows the group's Lazard logo.
+ * them, each shown as its logo (src/data/logos.ts). The order is Vasco's (10 November 2026): the band
+ * starts moving at once, so Santander goes first and eyes land on J.P. Morgan and Goldman Sachs; the
+ * most prestigious come together at the front, and the Big Four last. Lazard Asset Management is on a
+ * member's profile; the strip shows the group's Lazard logo.
  */
 export const MEMBER_FIRMS = [
-  "J.P. Morgan",
-  "Ardian",
-  "Goldman Sachs",
-  "Deloitte",
-  "UBS",
-  "Lazard",
-  "BNP Paribas",
-  "Amundi",
-  "HSBC",
-  "PwC",
   "Santander",
-  "Meridiam",
-  "Crédit Agricole",
-  "EY",
-  "Natixis CIB",
-  "Allianz Global Investors",
-  "UniCredit",
-  "KPMG",
+  "J.P. Morgan",
+  "Goldman Sachs",
+  "Ardian",
+  "Lazard",
+  "UBS",
   "William Blair",
+  "BNP Paribas",
+  "HSBC",
+  "Natixis CIB",
+  "Crédit Agricole",
+  "UniCredit",
+  "Amundi",
+  "Allianz Global Investors",
+  "Meridiam",
   "Euronext",
+  "Deloitte",
+  "PwC",
+  "EY",
+  "KPMG",
 ] as const;
 
 /** The main menu. "giggle" marks the Arcade, whose name hops when hovered. */
 export const NAV_LINKS = [
   { to: "/", label: "Home" },
-  { to: "/board", label: "Board" },
   { to: "/departments", label: "Departments", menu: "departments" },
   { to: "/events", label: "Events" },
   { to: "/resources", label: "Resources" },
@@ -104,3 +110,33 @@ export const formatDay = (iso: string, opts: Intl.DateTimeFormatOptions = {}) =>
       ...opts,
     })
     .replace(/\bSept\b/, "Sep");
+
+const WORDS = [
+  "no",
+  "one",
+  "two",
+  "three",
+  "four",
+  "five",
+  "six",
+  "seven",
+  "eight",
+  "nine",
+  "ten",
+  "eleven",
+  "twelve",
+  "thirteen",
+  "fourteen",
+  "fifteen",
+  "sixteen",
+  "seventeen",
+  "eighteen",
+  "nineteen",
+  "twenty",
+];
+
+/** A small number in words, the way the site's text writes them ("six departments"); larger ones in digits. */
+export const inWords = (n: number) => WORDS[n] ?? String(n);
+
+/** The same, with a capital: the start of a sentence. */
+export const InWords = (n: number) => inWords(n).replace(/^./, (c) => c.toUpperCase());

@@ -70,29 +70,14 @@ function DeskCard({ d, k }: { d: Department; k: Desk }) {
 
 function Desks({ d }: { d: Department }) {
   if (d.desks.length === 0) return null;
-  const groups = d.groups
-    ? d.groups.map((g) => ({ ...g, desks: g.desks.map((s) => d.desks.find((k) => k.slug === s)!) }))
-    : [{ name: undefined, lead: undefined, desks: d.desks }];
   return (
-    <div className="flex flex-col gap-6">
-      {groups.map((g) => (
-        <div key={g.name ?? "desks"} className="flex flex-col gap-3.5">
-          <Eyebrow>
-            {g.name ? (
-              <>
-                {g.name}, led by {g.lead}
-              </>
-            ) : (
-              `${d.desks.length} desks: choose one`
-            )}
-          </Eyebrow>
-          <div className="grid gap-3 sm:grid-cols-2">
-            {g.desks.map((k) => (
-              <DeskCard key={k.slug} d={d} k={k} />
-            ))}
-          </div>
-        </div>
-      ))}
+    <div className="flex flex-col gap-3.5">
+      <Eyebrow>{d.desks.length} desks: choose one</Eyebrow>
+      <div className="grid gap-3 sm:grid-cols-2">
+        {d.desks.map((k) => (
+          <DeskCard key={k.slug} d={d} k={k} />
+        ))}
+      </div>
     </div>
   );
 }
@@ -110,16 +95,12 @@ function DepartmentPage() {
   const events = eventsFor(data.events, d.slug);
   const associates = associatesOf(d.slug);
   // Associates by desk, then the associates without a desk as one group (in Investment Banking, all
-  // of them: one group, Vasco, 5 November 2026). Fixed Income shows its two groups instead of six
-  // small desks; each person's title names their desk.
-  const byDesk = (
-    d.groups
-      ? d.groups.map((g) => ({ name: g.name, members: associates.filter((m) => m.group === g.name) }))
-      : [
-          ...d.desks.map((k) => ({ name: k.name, members: associatesOf(d.slug, k.slug) })),
-          { name: d.desks.length ? "Associates" : undefined, members: associates.filter((m) => !m.desk) },
-        ]
-  ).filter((g) => g.members.length > 0);
+  // of them: one group, Vasco, 5 November 2026). In Fixed Income the desks are its two groups, Public
+  // and Private Credit; each person's title names the market they cover.
+  const byDesk = [
+    ...d.desks.map((k) => ({ name: k.name, members: associatesOf(d.slug, k.slug) })),
+    { name: d.desks.length ? "Associates" : undefined, members: associates.filter((m) => !m.desk) },
+  ].filter((g) => g.members.length > 0);
 
   return (
     <SiteLayout>

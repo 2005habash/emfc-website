@@ -1,6 +1,4 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Flashcards } from "@/components/fun/Flashcards";
-import { TECHNICALS } from "@/components/fun/technicals";
 import { ArrowDown, ArrowRight, ArrowUpRight, FileText, Linkedin } from "lucide-react";
 import { useState, type CSSProperties } from "react";
 import { SiteLayout } from "@/components/layout/SiteLayout";
@@ -173,7 +171,6 @@ function ResourcesPage() {
         items={[
           { href: "#research", count: published.length, label: "Reports", note: "Published by the desks" },
           { href: "#partners", count: PARTNERS.length, label: "Partners", note: PARTNERS.map((p) => p.name).join(" and ") },
-          { href: "#technicals", count: TECHNICALS.length, label: "Technicals", note: "Interview questions to practise" },
           { href: "#databases", count: esadeResources.length, label: "Databases", note: "Through the ESADE library" },
         ]}
       />
@@ -228,8 +225,6 @@ function ResourcesPage() {
           </Reveal>
         </div>
       </section>
-
-      <Flashcards />
 
       {/* ESADE databases */}
       <section id="databases" className="gutter flex scroll-mt-24 flex-col gap-10 py-16 lg:gap-14 lg:py-24">

@@ -1,12 +1,10 @@
 // Security headers for every page the server renders. The Content Security Policy only lets the
 // browser run scripts from this site, Cloudflare's bot check and inline scripts carrying this
 // request's nonce (TanStack's own and the theme script get it through the router), and only talk to
-// this site and the club's Supabase project. Frames: the bot check, and TradingView's ticker tape at
-// the top of each page (src/components/fun/MarketTicker.tsx; its frame only, never its script).
+// this site and the club's Supabase project. Frames: only the bot check.
 // Static files get BASE_SECURITY_HEADERS through the Nitro route rules in vite.config.ts.
 
 const TURNSTILE = "https://challenges.cloudflare.com";
-const TRADINGVIEW_FRAME = "https://www.tradingview-widget.com";
 
 export function contentSecurityPolicy(nonce: string) {
   // Read here rather than when the file loads: vite.config.ts imports this file, and the build
@@ -21,7 +19,7 @@ export function contentSecurityPolicy(nonce: string) {
     `img-src 'self' data: blob: ${supabase}`,
     `media-src 'self' blob: ${supabase}`,
     `connect-src 'self' ${supabase} ${supabaseSocket}`,
-    `frame-src ${TURNSTILE} ${TRADINGVIEW_FRAME}`,
+    `frame-src ${TURNSTILE}`,
     "frame-ancestors 'none'",
     "object-src 'none'",
     "base-uri 'self'",

@@ -2,7 +2,8 @@ import { Link } from "@tanstack/react-router";
 import { ArrowLeft, ArrowRight, Download, RotateCcw } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Em, Eyebrow, Portrait } from "@/components/site/ui";
-import { departments } from "@/lib/departments";
+import { departments, DESK_COUNT } from "@/lib/departments";
+import { inWords } from "@/lib/site";
 import { leadershipOf, memberByName } from "@/lib/team";
 import { cn } from "@/lib/utils";
 import { deskFor, QUIZ } from "./quiz-data";
@@ -23,7 +24,7 @@ const HABITAT: Record<string, string> = {
   "fixed-income": "You know the bond market is where the real action is.",
 };
 
-/** "Which desk are you?": five questions on the Departments page, and a desk to visit at the end. */
+/** "Which desk are you?" in the Arcade: five questions, and a desk to visit at the end. */
 export function DeskQuiz() {
   const [answers, setAnswers] = useState<number[]>([]);
   useHashTarget("quiz");
@@ -34,7 +35,7 @@ export function DeskQuiz() {
     <section id="quiz" className="scroll-mt-36 bg-night text-white lg:scroll-mt-40">
       <div className="gutter grid items-start gap-10 py-16 lg:grid-cols-12 lg:gap-8 lg:py-24">
         <div className="flex flex-col gap-6 lg:col-span-5">
-          <Eyebrow tone="light">Five questions, fifteen desks</Eyebrow>
+          <Eyebrow tone="light">Five questions, {inWords(DESK_COUNT)} desks</Eyebrow>
           <h2 className="font-serif text-[52px]/[0.95] tracking-[-0.015em] md:text-[80px]/[0.95]">
             Which desk <br className="max-sm:hidden" />
             <Em light>are you?</Em>
@@ -62,12 +63,10 @@ export function DeskQuiz() {
             <span className="caps text-[10px] tracking-[0.2em] text-haze">Or play a desk</span>
             <ul className="flex flex-wrap gap-2">
               {TOYS.map((t) => {
-                const [department, desk] = t.desk.split("/");
                 return (
                   <li key={t.id}>
                     <Link
-                      to="/departments/$department/$desk"
-                      params={{ department, desk }}
+                      to="/arcade"
                       hash={t.id}
                       title={t.hook}
                       className="inline-flex rounded-full border border-white/25 px-3.5 py-2 text-[13px] text-mist transition-colors hover:border-bull-light hover:text-white"
@@ -135,8 +134,7 @@ function Result({ answers, onAgain }: { answers: number[]; onAgain: () => void }
   const [dSlug, kSlug] = deskFor(answers).split("/");
   const d = departments.find((x) => x.slug === dSlug)!;
   const k = d.desks.find((x) => x.slug === kSlug)!;
-  const groupLead = d.groups?.find((g) => g.desks.includes(k.slug))?.lead;
-  const person = memberByName(k.lead ?? groupLead ?? "") ?? leadershipOf(d.slug)[0];
+  const person = memberByName(k.lead ?? "") ?? leadershipOf(d.slug)[0];
   const toy = toyFor(`${d.slug}/${k.slug}`);
   useEffect(() => markPlayed("quiz"), []);
   const [busy, setBusy] = useState(false);
@@ -147,7 +145,7 @@ function Result({ answers, onAgain }: { answers: number[]; onAgain: () => void }
       await shareImage(
         blob,
         "emfc-my-desk.png",
-        `I'm ${k.name}. Which EMFC desk are you? emfc.es/departments`,
+        `I'm ${k.name}. Which EMFC desk are you? emfc.es/arcade`,
       );
     } finally {
       setBusy(false);
@@ -163,10 +161,7 @@ function Result({ answers, onAgain }: { answers: number[]; onAgain: () => void }
         <p className="font-serif text-[56px]/[0.92] tracking-[-0.015em] md:text-[84px]/[0.92]">
           {k.name}
         </p>
-        <span className="caps text-[10.5px] tracking-[0.2em] text-haze">
-          {d.name}
-          {k.group ? `, ${k.group}` : ""}
-        </span>
+        <span className="caps text-[10.5px] tracking-[0.2em] text-haze">{d.name}</span>
       </div>
       <p className="text-[16px]/[1.65] text-mist md:text-[17px]/[1.65]">
         {HABITAT[d.slug] ? `${HABITAT[d.slug]} ` : ""}
@@ -174,7 +169,7 @@ function Result({ answers, onAgain }: { answers: number[]; onAgain: () => void }
       </p>
       {person && (
         <div className="group flex items-center gap-4 border-t border-white/15 pt-6">
-          <Portrait member={person} className="h-16 w-16 shrink-0 rounded-full" />
+          <Portrait member={person} sizes="64px" className="h-16 w-16 shrink-0 rounded-full" />
           <div className="flex flex-col gap-1">
             <span className="caps text-[10px] tracking-[0.2em] text-haze">Who to talk to</span>
             <span className="font-serif text-xl/[1.15] md:text-2xl/[1.15]">
@@ -186,8 +181,7 @@ function Result({ answers, onAgain }: { answers: number[]; onAgain: () => void }
       )}
       {toy && (
         <Link
-          to="/departments/$department/$desk"
-          params={{ department: d.slug, desk: k.slug }}
+          to="/arcade"
           hash={toy.id}
           className="group flex items-center justify-between gap-4 border border-bull-light/40 px-5 py-4 transition-colors hover:border-bull-light hover:bg-white/[0.04]"
         >
@@ -215,7 +209,7 @@ function Result({ answers, onAgain }: { answers: number[]; onAgain: () => void }
         </Link>
         <ShareResult
           text={`I'm ${k.name}. Which EMFC desk are you?`}
-          path="/departments#quiz"
+          path="/arcade#quiz"
           label="Share"
         />
         <button

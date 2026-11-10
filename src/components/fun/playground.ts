@@ -1,7 +1,9 @@
 // Everything in the Arcade (src/routes/arcade.tsx), in one list: its shelf of games and the career
-// ladder both read it. Each activity is played on the Arcade page at /arcade#<id>. The desk toys are
-// also on their desk's page, and the desk quiz on the Departments page.
+// ladder both read it. Each activity is played on the Arcade page at /arcade#<id>, and only there:
+// the games stay out of the department and desk pages (Vasco, 10 November 2026).
 
+import { DESK_COUNT } from "@/lib/departments";
+import { inWords } from "@/lib/site";
 import { TOYS } from "./toys/catalog";
 
 export type Kind = "game" | "puzzle" | "make" | "toy";
@@ -24,7 +26,7 @@ export const SHELVES: { kind: Kind; title: string; note: string }[] = [
   {
     kind: "toy",
     title: "Desk toys",
-    note: "Each desk's craft in four levers. Also on the desk's own page.",
+    note: "Each desk's craft in four levers.",
   },
 ];
 
@@ -60,7 +62,7 @@ export const ACTIVITIES: Activity[] = [
   {
     id: "quiz",
     title: "Which desk are you?",
-    hook: "Five questions, fifteen desks, one answer.",
+    hook: `Five questions, ${inWords(DESK_COUNT)} desks, one answer.`,
     kind: "game",
     time: "1 min",
   },
@@ -84,6 +86,13 @@ export const ACTIVITIES: Activity[] = [
     hook: "The model doesn't tie. Find the wrong cell before the MD does.",
     kind: "puzzle",
     time: "3 min",
+  },
+  {
+    id: "technicals",
+    title: "Sixty-second technicals",
+    hook: "The questions finance interviews ask again and again. Answer out loud, then flip.",
+    kind: "puzzle",
+    time: "5 min",
   },
   {
     id: "brainteasers",

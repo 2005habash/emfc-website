@@ -33,7 +33,7 @@ export const Route = createFileRoute("/arcade")({
 
 /**
  * Every activity's game, by its id in playground.ts. Each game's code is fetched when it is first
- * picked, so the shelf opens without carrying all eighteen.
+ * picked, so the shelf opens without carrying every game.
  */
 const game = <T extends Record<string, ComponentType>>(load: () => Promise<T>, name: keyof T) =>
   lazy(() => load().then((m) => ({ default: m[name] })));
@@ -48,6 +48,7 @@ const GAMES: Record<string, ComponentType> = {
   "mouse-free": game(() => import("@/components/fun/MouseFree"), "MouseFree"),
   "find-the-plug": game(() => import("@/components/fun/FindThePlug"), "FindThePlug"),
   brainteasers: game(() => import("@/components/fun/Brainteasers"), "Brainteasers"),
+  technicals: game(() => import("@/components/fun/Flashcards"), "Flashcards"),
   frame: game(() => import("@/components/fun/PhotoFrame"), "PhotoFrame"),
   tombstone: game(() => import("@/components/fun/TombstoneMaker"), "TombstoneMaker"),
   roulette: game(() => import("@/components/fun/CoffeeRoulette"), "CoffeeRoulette"),

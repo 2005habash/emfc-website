@@ -33,6 +33,6 @@ export async function drawDeskCard(desk: string, department: string, line: strin
     y = wrap(ctx, line, 96, y + 130, 820, 56);
     ctx.fillStyle = INK.mist;
     ctx.font = `400 28px ${SANS}`;
-    ctx.fillText("Which desk are you? emfc.es/departments", 96, 1262);
+    ctx.fillText("Which desk are you? emfc.es/arcade", 96, 1262);
   });
 }
