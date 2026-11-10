@@ -2,10 +2,14 @@ import { Link, useRouterState } from "@tanstack/react-router";
 import { ChevronDown, Instagram, Linkedin, Menu, Moon, Sun, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { flushSync } from "react-dom";
+import { toast } from "@/lib/toast";
 import { cn } from "@/lib/utils";
+import { Giggle } from "@/components/fun/Giggle";
 import { departments, type Department } from "@/lib/departments";
 import { IMAGES, NAV_LINKS, SOCIAL } from "@/lib/site";
+import { sized } from "@/lib/images";
 
+/** Light and dark mode, or as the toggle calls them, a bull market and a bear market. */
 function ThemeToggle() {
   const [dark, setDark] = useState(false);
   useEffect(() => {
@@ -20,13 +24,19 @@ function ThemeToggle() {
       // Private mode: the choice just won't be remembered.
     }
     setDark(next);
+    toast(next ? "Bear market" : "Bull market", {
+      id: "theme",
+      description: next ? "Lights down. Stay calm and hold." : "Lights up. Back to the bull.",
+      duration: 2200,
+    });
   };
   return (
     <button
       type="button"
       onClick={toggle}
       aria-pressed={dark}
-      aria-label={dark ? "Switch to light mode" : "Switch to dark mode"}
+      aria-label={dark ? "Switch to light mode (bull market)" : "Switch to dark mode (bear market)"}
+      title={dark ? "Bull market" : "Bear market"}
       className="flex h-11 w-11 items-center justify-center rounded-full text-[#E3E6EF] hover:bg-white/10"
     >
       {dark ? (
@@ -175,7 +185,7 @@ export function Nav({ overlay = false }: { overlay?: boolean }) {
     setMenu(false);
   };
 
-  const linkClass = "flex h-11 items-center px-2 underline-offset-8 xl:px-3.5";
+  const linkClass = "flex h-11 items-center px-1.5 underline-offset-8 xl:px-2.5";
   const active = { className: "text-white underline decoration-bull-light" };
   const inactive = { className: "text-[#E3E6EF] hover:underline" };
 
@@ -192,14 +202,20 @@ export function Nav({ overlay = false }: { overlay?: boolean }) {
           to="/"
           onClick={handleNav("/")}
           aria-label="EMFC home"
-          className="flex animate-logo-in items-center gap-3 lg:gap-3.5"
+          className="group/logo flex animate-logo-in items-center gap-3 lg:gap-3.5"
         >
-          <img src={IMAGES.bullMark} alt="" className="h-10 w-auto lg:h-[46px]" />
+          <img
+            {...sized(IMAGES.bullMark, "52px")}
+            alt=""
+            width={560}
+            height={510}
+            className="h-10 w-auto transition-transform duration-500 ease-out lg:h-[46px] group-hover/logo:-translate-y-0.5 group-hover/logo:-rotate-6 group-hover/logo:scale-105"
+          />
           <span className="font-serif text-[28px]/none font-semibold tracking-[0.08em] lg:text-[34px]/none">
             EMFC
           </span>
-          <span className="hidden h-[30px] w-px bg-white/40 sm:block lg:hidden xl:block" />
-          <span className="caps hidden text-[10px]/[1.5] tracking-[0.22em] text-[#E3E6EF] sm:block lg:hidden xl:block xl:text-[10px]/[1.5]">
+          <span className="hidden h-[30px] w-px bg-white/40 sm:block lg:hidden 2xl:block" />
+          <span className="caps hidden text-[10px]/[1.5] tracking-[0.22em] text-[#E3E6EF] sm:block lg:hidden 2xl:block">
             ESADE Master's
             <br />
             Finance Club
@@ -208,7 +224,7 @@ export function Nav({ overlay = false }: { overlay?: boolean }) {
 
         <nav
           aria-label="Primary"
-          className="caps hidden items-center gap-1 text-[11px] tracking-[0.18em] lg:flex xl:gap-1.5 xl:text-xs"
+          className="caps hidden items-center gap-0.5 text-[11px] tracking-[0.14em] lg:flex xl:gap-1 xl:text-xs xl:tracking-[0.16em]"
         >
           {NAV_LINKS.map((l) =>
             "menu" in l ? (
@@ -267,9 +283,9 @@ export function Nav({ overlay = false }: { overlay?: boolean }) {
                 activeOptions={{ exact: l.to === "/" }}
                 activeProps={active}
                 inactiveProps={inactive}
-                className={linkClass}
+                className={cn(linkClass, "giggle" in l && "group")}
               >
-                {l.label}
+                {"giggle" in l ? <Giggle text={l.label} /> : l.label}
               </Link>
             ),
           )}
@@ -281,7 +297,7 @@ export function Nav({ overlay = false }: { overlay?: boolean }) {
             target="_blank"
             rel="noreferrer"
             aria-label="EMFC on Instagram"
-            className="hidden h-11 w-11 items-center justify-center rounded-full text-[#E3E6EF] hover:bg-white/10 sm:flex lg:hidden xl:flex"
+            className="hidden h-11 w-11 items-center justify-center rounded-full text-[#E3E6EF] hover:bg-white/10 sm:flex lg:hidden 2xl:flex"
           >
             <Instagram className="h-[17px] w-[17px]" strokeWidth={1.6} />
           </a>
@@ -290,7 +306,7 @@ export function Nav({ overlay = false }: { overlay?: boolean }) {
             target="_blank"
             rel="noreferrer"
             aria-label="EMFC on LinkedIn"
-            className="hidden h-11 w-11 items-center justify-center rounded-full text-[#E3E6EF] hover:bg-white/10 sm:flex lg:hidden xl:flex"
+            className="hidden h-11 w-11 items-center justify-center rounded-full text-[#E3E6EF] hover:bg-white/10 sm:flex lg:hidden 2xl:flex"
           >
             <Linkedin className="h-[17px] w-[17px]" strokeWidth={1.6} />
           </a>
@@ -381,9 +397,12 @@ export function Nav({ overlay = false }: { overlay?: boolean }) {
                 onClick={handleNav(l.to)}
                 activeOptions={{ exact: l.to === "/" }}
                 activeProps={{ className: "text-bull-light" }}
-                className="border-b border-white/10 py-4 font-serif text-3xl"
+                className={cn(
+                  "border-b border-white/10 py-4 font-serif text-3xl",
+                  "giggle" in l && "group",
+                )}
               >
-                {l.label}
+                {"giggle" in l ? <Giggle text={l.label} /> : l.label}
               </Link>
             ),
           )}

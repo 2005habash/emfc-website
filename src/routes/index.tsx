@@ -1,7 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowRight, ArrowUpRight, Linkedin } from "lucide-react";
-import { motion, useReducedMotion } from "framer-motion";
-import { useEffect, useState } from "react";
+import { useEffect, useState, type CSSProperties } from "react";
 import { SiteLayout } from "@/components/layout/SiteLayout";
 import { Reveal } from "@/components/Reveal";
 import { NewsletterForm } from "@/components/site/NewsletterForm";
@@ -10,9 +9,19 @@ import { CountUp, Em, Eyebrow, Numeral, PhotoCaption, Portrait } from "@/compone
 import { loadEvents } from "@/lib/content";
 import { STATS } from "@/data/stats";
 import { departments } from "@/lib/departments";
-import { CO_PRESIDENT_QUOTE, FUND_PAGE_LIVE, IMAGES, MEMBER_FIRMS, NEXT_INTAKE_OPENS, ROMAN, SOCIAL, todayInBarcelona } from "@/lib/site";
+import {
+  CO_PRESIDENT_QUOTE,
+  FUND_PAGE_LIVE,
+  IMAGES,
+  MEMBER_FIRMS,
+  NEXT_INTAKE_OPENS,
+  ROMAN,
+  SOCIAL,
+  todayInBarcelona,
+} from "@/lib/site";
 import { leadershipOf, PEOPLE_STRIP, PRESIDENTS, type Member } from "@/lib/team";
 import { cn } from "@/lib/utils";
+import { phoneSlice, sized } from "@/lib/images";
 
 /** What search engines and link previews show for emfc.es: the club's figures, which change with STATS. */
 const DESCRIPTION = `The finance club at ESADE Business School in Barcelona: ${STATS.members} master's students from ${STATS.nationalities} nationalities, ${STATS.experiencePct}% with professional experience, in ${STATS.departments} departments and ${STATS.desks} desks, built around careers, companies and community.`;
@@ -87,21 +96,49 @@ function Hero() {
     { value: <CountUp to={STATS.members} />, label: "Members" },
     { value: <CountUp to={STATS.nationalities} />, label: "Nationalities" },
     { value: <CountUp to={STATS.internationalPct} suffix="%" />, label: "International" },
-    { value: <CountUp to={STATS.experiencePct} suffix="%" />, label: "With professional experience" },
+    {
+      value: <CountUp to={STATS.experiencePct} suffix="%" />,
+      label: "With professional experience",
+    },
     { value: <CountUp to={STATS.internships} suffix="+" />, label: "Internships completed" },
     { value: <CountUp to={STATS.firms} />, label: "Firms where members have worked" },
-    { value: <CountUp to={STATS.universities} />, label: `Universities, in ${STATS.universityCountries} countries` },
-    { value: <>{STATS.departments} and {STATS.desks}</>, label: "Departments and desks" },
+    {
+      value: <CountUp to={STATS.universities} />,
+      label: `Universities, in ${STATS.universityCountries} countries`,
+    },
+    {
+      value: (
+        <>
+          {STATS.departments} and {STATS.desks}
+        </>
+      ),
+      label: "Departments and desks",
+    },
   ];
   return (
     <section className="relative overflow-hidden bg-[#000B3D] text-white">
-      <img
-        src={IMAGES.placaEspanya}
-        alt="Plaça d'Espanya in Barcelona at dusk"
-        width={1600}
-        height={900}
-        className="absolute inset-0 h-full w-full animate-kenburns object-cover object-[62%_50%] md:object-[50%_45%]"
-      />
+      {/* A phone's tall screen shows only a narrow slice of the wide photo, so phones download just
+          that slice (tools/size-images.py cuts it around the same 62% the photo is centred on here). */}
+      <picture>
+        {phoneSlice(IMAGES.placaEspanya) && (
+          <source
+            media="(max-width: 639px)"
+            srcSet={phoneSlice(IMAGES.placaEspanya)}
+            type="image/webp"
+          />
+        )}
+        <img
+          {...sized(
+            IMAGES.placaEspanya,
+            "(max-width: 767px) 300vw, (max-width: 1279px) 150vw, 100vw",
+          )}
+          alt="Plaça d'Espanya in Barcelona at dusk"
+          width={1600}
+          height={900}
+          fetchPriority="high"
+          className="absolute inset-0 h-full w-full animate-kenburns object-cover object-[62%_50%] md:object-[50%_45%]"
+        />
+      </picture>
       <div aria-hidden className="absolute inset-0 bg-[rgb(3_10_46/0.5)]" />
       <PhotoCaption className="absolute right-5 top-1/2 hidden -translate-y-1/2 rotate-180 [writing-mode:vertical-rl] lg:block">
         Plaça d'Espanya, Barcelona
@@ -196,10 +233,10 @@ function Intro() {
       <Reveal className="grid gap-8 lg:grid-cols-12">
         <div className="flex flex-col gap-7 lg:col-span-7">
           <Eyebrow>Welcome to EMFC</Eyebrow>
-          <p className="font-serif text-[32px]/[1.1] font-medium tracking-[-0.01em] md:text-[60px]/[1.08]">
+          <h2 className="font-serif text-[32px]/[1.1] font-medium tracking-[-0.01em] md:text-[60px]/[1.08]">
             A finance club built around <Em>careers</Em>, <Em>companies</Em> and the people you meet
             along the way.
-          </p>
+          </h2>
         </div>
         <div className="flex flex-col gap-8 lg:col-span-4 lg:col-start-9 lg:pt-11">
           <p className="text-[15px]/[1.75] text-mute md:text-[17px]/[1.75]">
@@ -233,9 +270,10 @@ function Panorama() {
       className="relative flex h-[320px] flex-col items-center justify-center gap-4 overflow-hidden bg-[#000B3D] px-5 text-center text-white md:h-[420px]"
     >
       <img
-        src={IMAGES.sagradaFamilia}
+        {...sized(IMAGES.sagradaFamilia, "(max-width: 767px) 150vw, 100vw")}
         alt="Aerial view of the Sagrada Família and the Eixample grid at golden hour"
         loading="lazy"
+        decoding="async"
         className="absolute inset-0 h-full w-full object-cover"
       />
       <div aria-hidden className="absolute inset-0 bg-[rgb(3_10_46/0.4)]" />
@@ -255,13 +293,6 @@ function Panorama() {
 }
 
 function Departments() {
-  const reduce = useReducedMotion();
-  const grow = (axis: "scaleX" | "scaleY", delay: number) => ({
-    initial: reduce ? false : { [axis]: 0 },
-    whileInView: { [axis]: 1 },
-    viewport: { once: true },
-    transition: { duration: 0.45, delay, ease: "easeOut" as const },
-  });
   return (
     <section id="departments" className="bg-stone">
       <div className="gutter flex flex-col items-center py-20 lg:py-26">
@@ -273,6 +304,14 @@ function Departments() {
           <p className="text-[15px]/[1.7] text-mute md:text-[17px]/[1.7]">
             Six departments and fifteen desks, led by two Co-Presidents.
           </p>
+          <Link
+            to="/departments"
+            hash="quiz"
+            className="caps inline-flex items-center gap-2 text-[10.5px] tracking-[0.18em] underline underline-offset-[5px]"
+          >
+            Not sure where you fit? Find your desk
+            <ArrowRight className="h-3.5 w-3.5" strokeWidth={1.75} />
+          </Link>
         </Reveal>
 
         <Reveal className="mt-10 flex flex-col gap-2 bg-[#000B3D] px-6 py-5 text-center text-white md:mt-14 md:px-12">
@@ -284,17 +323,22 @@ function Departments() {
           </span>
         </Reveal>
 
-        <div aria-hidden className="relative hidden h-12 w-full lg:block">
-          <motion.div className="absolute left-1/2 top-0 h-6 w-px origin-top bg-bull" {...grow("scaleY", 0.2)} />
-          <motion.div
-            className="absolute left-[calc(100%/6)] right-[calc(100%/6)] top-6 h-px bg-bull"
-            {...grow("scaleX", 0.6)}
+        <Reveal still aria-hidden className="relative hidden h-12 w-full lg:block">
+          <div
+            className="grow-y absolute left-1/2 top-0 h-6 w-px origin-top bg-bull"
+            style={{ "--grow-delay": "0.2s" } as CSSProperties}
           />
-        </div>
+          <div
+            className="grow-x absolute left-[calc(100%/6)] right-[calc(100%/6)] top-6 h-px bg-bull"
+            style={{ "--grow-delay": "0.6s" } as CSSProperties}
+          />
+        </Reveal>
 
         <Reveal className="mt-10 grid w-full gap-4 sm:grid-cols-2 lg:mt-0 lg:grid-cols-3 lg:gap-6">
           {departments.map((d, i) => {
-            const leads = leadershipOf(d.slug).filter((m) => m.position === "head" || m.position === "cio");
+            const leads = leadershipOf(d.slug).filter(
+              (m) => m.position === "head" || m.position === "cio",
+            );
             return (
               <Link
                 key={d.slug}
@@ -311,7 +355,9 @@ function Departments() {
                 </div>
                 <h3 className="mt-1 font-serif text-[32px]/none md:text-[38px]/none">{d.name}</h3>
                 <div className="caps text-[10px]/[1.7] tracking-[0.18em] text-mute md:text-[10.5px]/[1.7]">
-                  {leads.map((m) => `${m.position === "cio" ? "CIO" : "Head"}: ${m.name}`).join(", ")}
+                  {leads
+                    .map((m) => `${m.position === "cio" ? "CIO" : "Head"}: ${m.name}`)
+                    .join(", ")}
                 </div>
                 <div className="caps mt-1 border-t border-line pt-3.5 text-[10px]/[1.7] tracking-[0.16em] md:text-[10.5px]/[1.7]">
                   {d.desks.length ? d.desks.map((k) => k.name).join(", ") : d.function}
@@ -340,9 +386,13 @@ function Membership() {
         <figure className="mt-2 flex flex-col gap-3">
           <div className="h-[220px] overflow-hidden bg-stone md:h-[420px] lg:h-[520px]">
             <img
-              src={IMAGES.portOlimpic}
+              {...sized(
+                IMAGES.portOlimpic,
+                "(min-width: 1024px) 930px, (min-width: 768px) 750px, 100vw",
+              )}
               alt="Barcelona's beachfront and Port Olímpic towers from the air"
               loading="lazy"
+              decoding="async"
               className="h-full w-full object-cover object-[72%_50%]"
             />
           </div>
@@ -385,10 +435,19 @@ function StripTile({ m, i }: { m: Member; i: number }) {
       aria-label={`${m.displayName ?? m.name}, ${m.title}`}
       className="group relative block h-[150px] w-[125px] shrink-0 overflow-hidden md:h-[220px] md:w-[183px]"
     >
-      <Portrait member={m} alternate={i % 2 === 1} className="h-full" />
+      <Portrait
+        member={m}
+        alternate={i % 2 === 1}
+        className="h-full"
+        sizes="(min-width: 768px) 220px, 150px"
+      />
       <span className="absolute inset-x-0 bottom-0 flex translate-y-full flex-col gap-0.5 bg-[#000B3D] px-3 pt-2.5 pb-3 text-white transition-transform duration-300 group-hover:translate-y-0 group-focus-visible:translate-y-0">
-        <span className="font-serif text-base/[1.1] md:text-lg/[1.1]">{m.displayName ?? m.name}</span>
-        <span className="caps text-[10px] tracking-[0.16em] text-[#D5D9E6] md:text-[10px]">{m.title}</span>
+        <span className="font-serif text-base/[1.1] md:text-lg/[1.1]">
+          {m.displayName ?? m.name}
+        </span>
+        <span className="caps text-[10px] tracking-[0.16em] text-[#D5D9E6] md:text-[10px]">
+          {m.title}
+        </span>
       </span>
     </Link>
   );
@@ -400,7 +459,10 @@ function MovingRow({ people, reverse = false }: { people: Member[]; reverse?: bo
     <div className="group/row overflow-hidden motion-reduce:overflow-x-auto">
       <div
         className="flex w-max animate-marquee group-hover/row:[animation-play-state:paused]"
-        style={{ animationDuration: `${people.length * 4.5}s`, animationDirection: reverse ? "reverse" : "normal" }}
+        style={{
+          animationDuration: `${people.length * 4.5}s`,
+          animationDirection: reverse ? "reverse" : "normal",
+        }}
       >
         {[0, 1].map((copy) => (
           <div key={copy} aria-hidden={copy === 1 || undefined} className="flex shrink-0">
@@ -426,8 +488,8 @@ function People() {
             behind <Em light>EMFC.</Em>
           </h2>
           <p className="max-w-[420px] text-[15px]/[1.7] text-mist md:text-base/[1.7]">
-            Master's students from {STATS.nationalities} nationalities, {STATS.experiencePct}% of them
-            with professional experience across banking, markets and private capital.
+            Master's students from {STATS.nationalities} nationalities, {STATS.experiencePct}% of
+            them with professional experience across banking, markets and private capital.
           </p>
           <Link to="/team" className="btn btn-sm btn-outline-white self-start">
             Meet the team
@@ -563,9 +625,10 @@ function Join() {
     <section id="join" className="grid lg:grid-cols-2">
       <div className="relative min-h-[240px] overflow-hidden bg-[#000B3D] lg:min-h-[760px]">
         <img
-          src={IMAGES.parkGuell}
+          {...sized(IMAGES.parkGuell, "(min-width: 1024px) 1350px, 110vw")}
           alt="Park Güell mosaic bench overlooking Barcelona at sunrise"
           loading="lazy"
+          decoding="async"
           className="absolute inset-0 h-full w-full object-cover object-[50%_60%] lg:object-center"
         />
         <PhotoCaption className="absolute bottom-4 left-5 text-white md:bottom-6 md:left-14">
@@ -633,7 +696,9 @@ function Join() {
                 {eventDate.getDate()}
               </span>
               <span className="caps text-[10px] tracking-[0.2em] text-mute md:text-[10px]">
-                {eventDate.toLocaleDateString("en-GB", { month: "short", year: "numeric" }).replace(/\bSept\b/, "Sep")}
+                {eventDate
+                  .toLocaleDateString("en-GB", { month: "short", year: "numeric" })
+                  .replace(/\bSept\b/, "Sep")}
               </span>
             </div>
             <div className="flex min-w-[55%] flex-1 flex-col gap-1.5">

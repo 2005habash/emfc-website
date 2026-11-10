@@ -1,12 +1,13 @@
 import { Link } from "@tanstack/react-router";
 import { ArrowRight } from "lucide-react";
-import { motion, useReducedMotion } from "framer-motion";
+import type { CSSProperties } from "react";
 import { SiteLayout } from "@/components/layout/SiteLayout";
 import { Reveal } from "@/components/Reveal";
 import { Em, Eyebrow, Numeral, PersonCard } from "@/components/site/ui";
 import { getDepartment } from "@/lib/departments";
 import { IMAGES, ROMAN } from "@/lib/site";
 import { leadershipOf } from "@/lib/team";
+import { sized } from "@/lib/images";
 
 const FUND_LINE =
   "0,250 50,238 100,244 150,214 200,222 250,190 300,200 350,166 400,176 450,140 500,150 550,112 600,98 650,76 700,52";
@@ -15,7 +16,6 @@ const BENCH_LINE =
 
 /** The full fund page: portfolio, process and dashboard. Shown once FUND_PAGE_LIVE is true. */
 export function FundFull() {
-  const reduce = useReducedMotion();
   const am = getDepartment("asset-management");
   // The first four items describe the investment process; the fifth is training.
   const steps = am ? am.produces.slice(0, 4) : [];
@@ -26,7 +26,7 @@ export function FundFull() {
       {/* Header */}
       <section className="relative overflow-hidden bg-[#000B3D] text-white">
         <img
-          src={IMAGES.bullMark}
+          {...sized(IMAGES.bullMark, "440px")}
           alt=""
           className="absolute -right-10 bottom-0 h-[240px] w-auto animate-rise opacity-40 [animation-delay:320ms] md:right-10 md:h-[340px] md:opacity-100 lg:right-18 lg:h-[400px]"
         />
@@ -66,13 +66,10 @@ export function FundFull() {
             aria-hidden
             className="absolute left-0 right-0 top-1.5 hidden h-px bg-line lg:block"
           />
-          <motion.div
+          <div
             aria-hidden
-            className="absolute left-0 right-0 top-1.5 hidden h-px origin-left bg-bull lg:block"
-            initial={reduce ? false : { scaleX: 0 }}
-            whileInView={{ scaleX: 1 }}
-            viewport={{ once: true }}
-            transition={{ duration: 1.4, delay: 0.3, ease: "easeOut" }}
+            className="grow-x absolute left-0 right-0 top-1.5 hidden h-px origin-left bg-bull lg:block"
+            style={{ "--grow-time": "1.4s", "--grow-delay": "0.3s" } as CSSProperties}
           />
           {steps.map((s, i) => (
             <div key={s.title} className="relative flex flex-col gap-3.5">
@@ -118,47 +115,55 @@ export function FundFull() {
                 </div>
               </div>
               <div className="flex flex-col gap-2.5 px-6 pb-3 pt-7 md:px-7">
-                <svg
-                  aria-hidden
-                  width="100%"
-                  height="300"
-                  viewBox="0 0 700 300"
-                  preserveAspectRatio="none"
-                  className="h-[200px] md:h-[300px]"
-                >
-                  {[75, 150, 225].map((y) => (
-                    <line
-                      key={y}
-                      x1="0"
-                      x2="700"
-                      y1={y}
-                      y2={y}
-                      stroke="var(--c-line)"
-                      strokeDasharray="2 6"
+                <div className="relative">
+                  <svg
+                    aria-hidden
+                    width="100%"
+                    height="300"
+                    viewBox="0 0 700 300"
+                    preserveAspectRatio="none"
+                    className="h-[200px] md:h-[300px]"
+                  >
+                    {[75, 150, 225].map((y) => (
+                      <line
+                        key={y}
+                        x1="0"
+                        x2="700"
+                        y1={y}
+                        y2={y}
+                        stroke="var(--c-line)"
+                        strokeDasharray="2 6"
+                        vectorEffect="non-scaling-stroke"
+                      />
+                    ))}
+                    <polyline
+                      points={BENCH_LINE}
+                      fill="none"
+                      stroke="var(--c-mute)"
+                      strokeWidth="1.5"
+                      strokeDasharray="5 5"
                       vectorEffect="non-scaling-stroke"
                     />
-                  ))}
-                  <polyline
-                    points={BENCH_LINE}
-                    fill="none"
-                    stroke="var(--c-mute)"
-                    strokeWidth="1.5"
-                    strokeDasharray="5 5"
-                    vectorEffect="non-scaling-stroke"
-                  />
-                  <motion.polyline
-                    points={FUND_LINE}
-                    fill="none"
-                    stroke="var(--c-bull)"
-                    strokeWidth="2.5"
-                    strokeLinejoin="round"
-                    vectorEffect="non-scaling-stroke"
-                    initial={reduce ? false : { pathLength: 0 }}
-                    whileInView={{ pathLength: 1 }}
-                    viewport={{ once: true }}
-                    transition={{ duration: 2, delay: 0.3, ease: "easeOut" }}
-                  />
-                </svg>
+                  </svg>
+                  {/* The fund's line on its own layer, uncovered from the left as it scrolls into view. */}
+                  <svg
+                    aria-hidden
+                    width="100%"
+                    height="300"
+                    viewBox="0 0 700 300"
+                    preserveAspectRatio="none"
+                    className="wipe-in absolute inset-0 h-[200px] md:h-[300px]"
+                  >
+                    <polyline
+                      points={FUND_LINE}
+                      fill="none"
+                      stroke="var(--c-bull)"
+                      strokeWidth="2.5"
+                      strokeLinejoin="round"
+                      vectorEffect="non-scaling-stroke"
+                    />
+                  </svg>
+                </div>
                 <span className="caps text-[10px] tracking-[0.2em] text-mute">
                   Illustrative shape, not performance data
                 </span>

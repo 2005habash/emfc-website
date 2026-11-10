@@ -9,6 +9,7 @@ import { IMAGES, SOCIAL, todayInBarcelona, safeUrl } from "@/lib/site";
 import { cn } from "@/lib/utils";
 import { icsHref } from "@/lib/ics";
 import { TypeDot } from "@/components/site/sections";
+import { sized } from "@/lib/images";
 
 export const Route = createFileRoute("/events")({
   head: () => ({
@@ -149,9 +150,10 @@ function EventFeature({ e, past = false }: { e: EventItem; past?: boolean }) {
             {e.photos.slice(0, 4).map((ph, i) => (
               <img
                 key={ph.src}
-                src={ph.src}
+                {...sized(ph.src, "170px")}
                 alt=""
                 loading="lazy"
+                decoding="async"
                 className={cn(
                   "h-24 w-full min-w-0 flex-1 object-cover transition duration-500 group-hover:brightness-90 md:h-32",
                   i > 1 && "max-sm:hidden",
@@ -225,11 +227,12 @@ function Overview() {
         {upcoming.length === 0 ? (
           <div className="mt-6 flex flex-col justify-between gap-7 bg-stone p-7 md:p-9 lg:max-w-[560px]">
             <p className="font-serif text-[28px]/[1.15] italic md:text-[34px]/[1.15]">
-              No upcoming events scheduled.
+              The pipeline is being built.
             </p>
             <div className="flex flex-col gap-4">
               <p className="text-[15px]/[1.65] text-mute">
-                Follow us on LinkedIn to hear about the next one first.
+                No upcoming events are scheduled yet. Follow us on LinkedIn to hear about the next
+                one first.
               </p>
               <a
                 href={SOCIAL.linkedin}
@@ -390,7 +393,9 @@ function CalendarView() {
             </Link>
           </>
         ) : (
-          <p className="font-serif text-2xl/[1.2] italic">No upcoming events scheduled.</p>
+          <p className="font-serif text-2xl/[1.2] italic">
+            The pipeline is being built: no upcoming events yet.
+          </p>
         )}
       </aside>
     </section>

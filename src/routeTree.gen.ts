@@ -10,11 +10,15 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ArcadeRouteImport } from './routes/arcade'
+import { Route as BoardRouteImport } from './routes/board'
 import { Route as ClubOfficeRouteImport } from './routes/club-office'
 import { Route as EventsRouteImport } from './routes/events'
 import { Route as FundRouteImport } from './routes/fund'
+import { Route as GlossaryRouteImport } from './routes/glossary'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as ResourcesRouteImport } from './routes/resources'
+import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as SponsorshipRouteImport } from './routes/sponsorship'
 import { Route as TeamRouteImport } from './routes/team'
 import { Route as DepartmentsIndexRouteImport } from './routes/departments.index'
@@ -25,6 +29,16 @@ import { Route as DepartmentsDepartmentDeskRouteImport } from './routes/departme
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ArcadeRoute = ArcadeRouteImport.update({
+  id: '/arcade',
+  path: '/arcade',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BoardRoute = BoardRouteImport.update({
+  id: '/board',
+  path: '/board',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ClubOfficeRoute = ClubOfficeRouteImport.update({
@@ -42,6 +56,11 @@ const FundRoute = FundRouteImport.update({
   path: '/fund',
   getParentRoute: () => rootRouteImport,
 } as any)
+const GlossaryRoute = GlossaryRouteImport.update({
+  id: '/glossary',
+  path: '/glossary',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const PrivacyRoute = PrivacyRouteImport.update({
   id: '/privacy',
   path: '/privacy',
@@ -50,6 +69,11 @@ const PrivacyRoute = PrivacyRouteImport.update({
 const ResourcesRoute = ResourcesRouteImport.update({
   id: '/resources',
   path: '/resources',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
+  id: '/sitemap.xml',
+  path: '/sitemap.xml',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SponsorshipRoute = SponsorshipRouteImport.update({
@@ -86,11 +110,15 @@ const DepartmentsDepartmentDeskRoute =
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/arcade': typeof ArcadeRoute
+  '/board': typeof BoardRoute
   '/club-office': typeof ClubOfficeRoute
   '/events': typeof EventsRoute
   '/fund': typeof FundRoute
+  '/glossary': typeof GlossaryRoute
   '/privacy': typeof PrivacyRoute
   '/resources': typeof ResourcesRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/sponsorship': typeof SponsorshipRoute
   '/team': typeof TeamRoute
   '/departments/$department': typeof DepartmentsDepartmentRoute
@@ -100,11 +128,15 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/arcade': typeof ArcadeRoute
+  '/board': typeof BoardRoute
   '/club-office': typeof ClubOfficeRoute
   '/events': typeof EventsRoute
   '/fund': typeof FundRoute
+  '/glossary': typeof GlossaryRoute
   '/privacy': typeof PrivacyRoute
   '/resources': typeof ResourcesRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/sponsorship': typeof SponsorshipRoute
   '/team': typeof TeamRoute
   '/departments/$department': typeof DepartmentsDepartmentRoute
@@ -115,11 +147,15 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/arcade': typeof ArcadeRoute
+  '/board': typeof BoardRoute
   '/club-office': typeof ClubOfficeRoute
   '/events': typeof EventsRoute
   '/fund': typeof FundRoute
+  '/glossary': typeof GlossaryRoute
   '/privacy': typeof PrivacyRoute
   '/resources': typeof ResourcesRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/sponsorship': typeof SponsorshipRoute
   '/team': typeof TeamRoute
   '/departments/$department': typeof DepartmentsDepartmentRoute
@@ -131,11 +167,15 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/arcade'
+    | '/board'
     | '/club-office'
     | '/events'
     | '/fund'
+    | '/glossary'
     | '/privacy'
     | '/resources'
+    | '/sitemap.xml'
     | '/sponsorship'
     | '/team'
     | '/departments/$department'
@@ -145,11 +185,15 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/arcade'
+    | '/board'
     | '/club-office'
     | '/events'
     | '/fund'
+    | '/glossary'
     | '/privacy'
     | '/resources'
+    | '/sitemap.xml'
     | '/sponsorship'
     | '/team'
     | '/departments/$department'
@@ -159,11 +203,15 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
+    | '/arcade'
+    | '/board'
     | '/club-office'
     | '/events'
     | '/fund'
+    | '/glossary'
     | '/privacy'
     | '/resources'
+    | '/sitemap.xml'
     | '/sponsorship'
     | '/team'
     | '/departments/$department'
@@ -174,11 +222,15 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  ArcadeRoute: typeof ArcadeRoute
+  BoardRoute: typeof BoardRoute
   ClubOfficeRoute: typeof ClubOfficeRoute
   EventsRoute: typeof EventsRoute
   FundRoute: typeof FundRoute
+  GlossaryRoute: typeof GlossaryRoute
   PrivacyRoute: typeof PrivacyRoute
   ResourcesRoute: typeof ResourcesRoute
+  SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   SponsorshipRoute: typeof SponsorshipRoute
   TeamRoute: typeof TeamRoute
   DepartmentsDepartmentRoute: typeof DepartmentsDepartmentRoute
@@ -194,6 +246,20 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/arcade': {
+      id: '/arcade'
+      path: '/arcade'
+      fullPath: '/arcade'
+      preLoaderRoute: typeof ArcadeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/board': {
+      id: '/board'
+      path: '/board'
+      fullPath: '/board'
+      preLoaderRoute: typeof BoardRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/club-office': {
@@ -217,6 +283,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof FundRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/glossary': {
+      id: '/glossary'
+      path: '/glossary'
+      fullPath: '/glossary'
+      preLoaderRoute: typeof GlossaryRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/privacy': {
       id: '/privacy'
       path: '/privacy'
@@ -229,6 +302,13 @@ declare module '@tanstack/react-router' {
       path: '/resources'
       fullPath: '/resources'
       preLoaderRoute: typeof ResourcesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sitemap.xml': {
+      id: '/sitemap.xml'
+      path: '/sitemap.xml'
+      fullPath: '/sitemap.xml'
+      preLoaderRoute: typeof SitemapDotxmlRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/sponsorship': {
@@ -278,11 +358,15 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  ArcadeRoute: ArcadeRoute,
+  BoardRoute: BoardRoute,
   ClubOfficeRoute: ClubOfficeRoute,
   EventsRoute: EventsRoute,
   FundRoute: FundRoute,
+  GlossaryRoute: GlossaryRoute,
   PrivacyRoute: PrivacyRoute,
   ResourcesRoute: ResourcesRoute,
+  SitemapDotxmlRoute: SitemapDotxmlRoute,
   SponsorshipRoute: SponsorshipRoute,
   TeamRoute: TeamRoute,
   DepartmentsDepartmentRoute: DepartmentsDepartmentRoute,

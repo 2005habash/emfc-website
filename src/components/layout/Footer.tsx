@@ -2,6 +2,7 @@ import { Link } from "@tanstack/react-router";
 import { Instagram, Linkedin } from "lucide-react";
 import { NewsletterForm } from "@/components/site/NewsletterForm";
 import { IMAGES, SOCIAL } from "@/lib/site";
+import { sized } from "@/lib/images";
 
 export function Footer() {
   return (
@@ -10,7 +11,7 @@ export function Footer() {
         <div className="grid gap-10 md:grid-cols-2 lg:grid-cols-12 lg:gap-8">
           <div className="flex flex-col gap-5 lg:col-span-4">
             <div className="flex items-center gap-3.5">
-              <img src={IMAGES.bullMark} alt="" className="h-[52px] w-auto" />
+              <img {...sized(IMAGES.bullMark, "58px")} alt="" width={560} height={510} loading="lazy" className="h-[52px] w-auto transition-transform duration-500 hover:-translate-y-0.5 hover:-rotate-6" />
               <span className="font-serif text-[40px]/none font-semibold tracking-[0.08em] text-white">
                 EMFC
               </span>
@@ -35,6 +36,9 @@ export function Footer() {
               <Link to="/" className="hover:text-white hover:underline">
                 Home
               </Link>
+              <Link to="/board" className="hover:text-white hover:underline">
+                Board
+              </Link>
               <Link to="/departments" className="hover:text-white hover:underline">
                 Departments
               </Link>
@@ -54,6 +58,12 @@ export function Footer() {
               </Link>
               <Link to="/resources" className="hover:text-white hover:underline">
                 Resources
+              </Link>
+              <Link to="/arcade" className="hover:text-white hover:underline">
+                Arcade
+              </Link>
+              <Link to="/glossary" className="hover:text-white hover:underline">
+                Glossary
               </Link>
               <Link to="/sponsorship" className="hover:text-white hover:underline">
                 Sponsorship
@@ -96,11 +106,12 @@ export function Footer() {
           </div>
           <div className="caps flex flex-col gap-2 border-t border-[#1B2560] pt-5 text-[10px] tracking-[0.2em] text-haze md:flex-row md:justify-between">
             <span>© {new Date().getFullYear()} EMFC, ESADE Master's Finance Club</span>
-            <span className="flex gap-6">
+            <span className="flex flex-wrap gap-x-6 gap-y-2">
               <Link to="/privacy" className="hover:text-white hover:underline">
                 Privacy
               </Link>
               <span>Launched September 2026</span>
+              <span>Not investment advice</span>
               {/* The admin page's sign-in, kept quiet: same colour as the text around it until hovered. */}
               <Link to="/club-office" className="hover:text-white hover:underline">
                 Admin

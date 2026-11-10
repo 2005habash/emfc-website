@@ -75,14 +75,17 @@ export const MEMBER_FIRMS = [
   "Euronext",
 ] as const;
 
+/** The main menu. "giggle" marks the Arcade, whose name hops when hovered. */
 export const NAV_LINKS = [
   { to: "/", label: "Home" },
+  { to: "/board", label: "Board" },
   { to: "/departments", label: "Departments", menu: "departments" },
   { to: "/events", label: "Events" },
   { to: "/resources", label: "Resources" },
   { to: "/fund", label: "Fund" },
   { to: "/team", label: "Team" },
   { to: "/sponsorship", label: "Sponsorship" },
+  { to: "/arcade", label: "Arcade", giggle: true },
 ] as const;
 
 export const ROMAN = ["I", "II", "III", "IV", "V", "VI", "VII", "VIII"] as const;

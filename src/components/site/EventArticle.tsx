@@ -1,5 +1,14 @@
 import { Link } from "@tanstack/react-router";
-import { ArrowLeft, ArrowRight, CalendarPlus, ChevronLeft, ChevronRight, Linkedin, MapPin, X } from "lucide-react";
+import {
+  ArrowLeft,
+  ArrowRight,
+  CalendarPlus,
+  ChevronLeft,
+  ChevronRight,
+  Linkedin,
+  MapPin,
+  X,
+} from "lucide-react";
 import { useEffect, useState } from "react";
 import { TypeDot } from "@/components/site/sections";
 import { Em, Eyebrow } from "@/components/site/ui";
@@ -9,6 +18,7 @@ import { getDepartment } from "@/lib/departments";
 import { icsHref } from "@/lib/ics";
 import { formatDay, IMAGES, safeUrl, todayInBarcelona } from "@/lib/site";
 import { cn } from "@/lib/utils";
+import { sized } from "@/lib/images";
 
 // An event's page: text, place, departments, photos, clips and the recap. Used by the event route and
 // by the admin page's preview, so the preview shows exactly what the site will.
@@ -40,7 +50,11 @@ function Lightbox({
       <DialogContent className="max-h-[94vh] w-[min(94vw,1200px)] max-w-none gap-3 rounded-none border-0 bg-transparent p-0 shadow-none sm:rounded-none [&>button:last-child]:hidden">
         <DialogTitle className="sr-only">{photo?.alt ?? "Photo"}</DialogTitle>
         {photo && (
-          <img src={photo.src} alt={photo.alt} className="max-h-[82vh] w-full object-contain" />
+          <img
+            {...sized(photo.src, "94vw")}
+            alt={photo.alt}
+            className="max-h-[82vh] w-full object-contain"
+          />
         )}
         <div className="flex items-center justify-between gap-4 text-white">
           <span className="text-sm/[1.5] text-white/80">
@@ -77,7 +91,18 @@ function Lightbox({
   );
 }
 
-export function EventArticle({ event: e, older, newer }: { event: EventItem; older?: EventItem; newer?: EventItem }) {
+/** How wide the event's first picture is shown: half the page on a wide screen, all of it on a phone. */
+const COVER_SIZES = "(min-width: 1024px) 50vw, 100vw";
+
+export function EventArticle({
+  event: e,
+  older,
+  newer,
+}: {
+  event: EventItem;
+  older?: EventItem;
+  newer?: EventItem;
+}) {
   const [open, setOpen] = useState<number | null>(null);
   const today = todayInBarcelona();
   const upcoming = e.date >= today;
@@ -85,12 +110,26 @@ export function EventArticle({ event: e, older, newer }: { event: EventItem; old
   const tags = [
     ...e.departments.map((slug) => {
       const d = getDepartment(slug);
-      return d && { key: slug, label: d.name, to: "/departments/$department" as const, params: { department: slug } };
+      return (
+        d && {
+          key: slug,
+          label: d.name,
+          to: "/departments/$department" as const,
+          params: { department: slug },
+        }
+      );
     }),
     ...(e.desks ?? []).map((path) => {
       const [dep, desk] = path.split("/");
       const k = getDepartment(dep)?.desks.find((x) => x.slug === desk);
-      return k && { key: path, label: k.name, to: "/departments/$department/$desk" as const, params: { department: dep, desk } };
+      return (
+        k && {
+          key: path,
+          label: k.name,
+          to: "/departments/$department/$desk" as const,
+          params: { department: dep, desk },
+        }
+      );
     }),
   ].filter(Boolean) as { key: string; label: string; to: string; params: Record<string, string> }[];
 
@@ -119,8 +158,12 @@ export function EventArticle({ event: e, older, newer }: { event: EventItem; old
                 {e.location}
               </span>
             </div>
-            <h1 className="font-serif text-[32px]/[1.04] tracking-[-0.01em] md:text-[48px]/[1] xl:text-[56px]/[0.98]">{e.title}</h1>
-            <p className="max-w-[640px] text-base/[1.7] text-mute md:text-[18px]/[1.7]">{e.description}</p>
+            <h1 className="font-serif text-[32px]/[1.04] tracking-[-0.01em] md:text-[48px]/[1] xl:text-[56px]/[0.98]">
+              {e.title}
+            </h1>
+            <p className="max-w-[640px] text-base/[1.7] text-mute md:text-[18px]/[1.7]">
+              {e.description}
+            </p>
             {e.people && e.people.length > 0 && (
               <ul className="flex flex-col gap-2 border-t border-line pt-5">
                 {e.people.map((p) => (
@@ -132,7 +175,9 @@ export function EventArticle({ event: e, older, newer }: { event: EventItem; old
             )}
             {e.points && e.points.length > 0 && (
               <div className="flex flex-col gap-3 border-t border-line pt-5">
-                <span className="caps text-[10px] tracking-[0.18em] text-mute">What members took away</span>
+                <span className="caps text-[10px] tracking-[0.18em] text-mute">
+                  What members took away
+                </span>
                 <ol className="flex flex-col gap-2.5">
                   {e.points.map((p, i) => (
                     <li key={p} className="grid grid-cols-[28px_1fr] text-[15px]/[1.55]">
@@ -165,7 +210,12 @@ export function EventArticle({ event: e, older, newer }: { event: EventItem; old
               </a>
             )}
             {e.post && (
-              <a href={safeUrl(e.post)} target="_blank" rel="noreferrer" className="btn btn-outline-ink self-start">
+              <a
+                href={safeUrl(e.post)}
+                target="_blank"
+                rel="noreferrer"
+                className="btn btn-outline-ink self-start"
+              >
                 <Linkedin className="h-4 w-4" strokeWidth={1.75} />
                 See the post
               </a>
@@ -179,12 +229,20 @@ export function EventArticle({ event: e, older, newer }: { event: EventItem; old
                 className="block w-full overflow-hidden"
                 aria-label="Open the photos"
               >
-                <img src={cover} alt={e.photos[0].alt} className="aspect-[4/5] w-full object-cover transition duration-700 hover:scale-[1.02]" />
+                <img
+                  {...sized(cover, COVER_SIZES)}
+                  alt={e.photos[0].alt}
+                  fetchPriority="high"
+                  className="aspect-[4/5] w-full object-cover transition duration-700 hover:scale-[1.02]"
+                />
               </button>
             ) : (
               <img
-                src={cover}
-                alt={e.recap?.length ? `The first slide of the EMFC recap of ${e.title}` : "Barcelona"}
+                {...sized(cover, COVER_SIZES)}
+                alt={
+                  e.recap?.length ? `The first slide of the EMFC recap of ${e.title}` : "Barcelona"
+                }
+                fetchPriority="high"
                 className="aspect-[4/5] w-full object-cover"
               />
             )}
@@ -206,13 +264,22 @@ export function EventArticle({ event: e, older, newer }: { event: EventItem; old
                     key={ph.src}
                     type="button"
                     onClick={() => setOpen(i)}
-                    className={cn("group block overflow-hidden", i === 0 && "col-span-2 row-span-2")}
+                    className={cn(
+                      "group block overflow-hidden",
+                      i === 0 && "col-span-2 row-span-2",
+                    )}
                     aria-label={`Open photo ${i + 1}: ${ph.alt}`}
                   >
                     <img
-                      src={ph.src}
+                      {...sized(
+                        ph.src,
+                        i === 0
+                          ? "(min-width: 768px) 50vw, 100vw"
+                          : "(min-width: 768px) 25vw, 50vw",
+                      )}
                       alt={ph.alt}
                       loading="lazy"
+                      decoding="async"
                       className="aspect-square h-full w-full object-cover transition duration-500 group-hover:scale-[1.03]"
                     />
                   </button>
@@ -249,7 +316,12 @@ export function EventArticle({ event: e, older, newer }: { event: EventItem; old
         )}
 
         {e.recap && e.recap.length > 0 && (
-          <section className={cn(e.videos?.length ? "" : "pt-16 lg:pt-20", "gutter flex flex-col gap-10 pb-16 lg:pb-20")}>
+          <section
+            className={cn(
+              e.videos?.length ? "" : "pt-16 lg:pt-20",
+              "gutter flex flex-col gap-10 pb-16 lg:pb-20",
+            )}
+          >
             <div className="flex flex-col gap-5">
               <Eyebrow>As published by EMFC</Eyebrow>
               <h2 className="font-serif text-[44px]/none tracking-[-0.01em] md:text-[56px]/none">
@@ -260,9 +332,10 @@ export function EventArticle({ event: e, older, newer }: { event: EventItem; old
               {e.recap.map((src, i) => (
                 <img
                   key={src}
-                  src={src}
+                  {...sized(src, "(min-width: 768px) 320px, 260px")}
                   alt={`Slide ${i + 1} of the EMFC recap of ${e.title}`}
                   loading="lazy"
+                  decoding="async"
                   className="aspect-[4/5] w-[260px] shrink-0 snap-start object-cover md:w-[320px]"
                 />
               ))}
@@ -271,7 +344,10 @@ export function EventArticle({ event: e, older, newer }: { event: EventItem; old
         )}
 
         {(older || newer) && (
-          <nav aria-label="More events" className="gutter grid gap-3 border-t border-line py-14 sm:grid-cols-2">
+          <nav
+            aria-label="More events"
+            className="gutter grid gap-3 border-t border-line py-14 sm:grid-cols-2"
+          >
             {[
               { x: older, label: "Earlier event", Icon: ArrowLeft },
               { x: newer, label: "Later event", Icon: ArrowRight },

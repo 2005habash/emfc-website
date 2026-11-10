@@ -13,6 +13,8 @@ import {
   SectionHeading,
 } from "@/components/site/sections";
 import { Em, Eyebrow, PersonCard } from "@/components/site/ui";
+import { DeskToy } from "@/components/fun/toys/DeskToy";
+import { Jargon } from "@/components/fun/Jargon";
 import { eventsFor } from "@/data/events";
 import { reportsFor } from "@/data/reports";
 import { loadEvents, loadReports } from "@/lib/content";
@@ -106,7 +108,9 @@ function DeskPage() {
               {k.group ? `${d.name}, ${k.group}` : d.name} desk
             </Eyebrow>
             <h1 className="font-serif text-[56px]/[0.95] tracking-[-0.015em] md:text-8xl/[0.95]">{k.name}</h1>
-            <p className="max-w-[680px] text-base/[1.65] text-mute md:text-[19px]/[1.65]">{k.description}</p>
+            <p className="max-w-[680px] text-base/[1.65] text-mute md:text-[19px]/[1.65]">
+              <Jargon>{k.description}</Jargon>
+            </p>
             {k.does.length > 0 && (
               <div className="mt-2 flex flex-col gap-4">
                 <Eyebrow>What the desk does</Eyebrow>
@@ -114,7 +118,9 @@ function DeskPage() {
                   {k.does.map((item, i) => (
                     <li key={item} className="flex gap-5 border-b border-line py-4">
                       <span className="w-8 shrink-0 font-serif text-xl italic text-bull">{ROMAN[i]}.</span>
-                      <span className="text-[15px]/[1.65] md:text-base/[1.65]">{item}</span>
+                      <span className="text-[15px]/[1.65] md:text-base/[1.65]">
+                        <Jargon>{item}</Jargon>
+                      </span>
                     </li>
                   ))}
                 </ol>
@@ -138,6 +144,9 @@ function DeskPage() {
             {lead && lead.name !== head?.name && <PersonCard member={lead} index={1} />}
           </div>
         </section>
+
+        {/* The desk's toy, for the desks that have one (src/components/fun/toys). */}
+        <DeskToy desk={`${d.slug}/${k.slug}`} />
 
         {/* Target firms */}
         <section className="gutter grid items-start gap-8 lg:grid-cols-12">

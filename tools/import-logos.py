@@ -6,7 +6,7 @@
 # The pack holds each logo as a 2400 px transparent PNG (plus an SVG) and logos.json, which maps each firm's
 # name, exactly as members.ts and departments.ts spell it, to its file. Each PNG is trimmed to the logo
 # (the pack adds an even margin, which would make wide wordmarks look smaller than square marks at the same
-# height), scaled to 640 px on its longer side and saved as lossless WebP, so nothing is recoloured or
+# height), scaled to 400 px on its longer side and saved as lossless WebP, so nothing is recoloured or
 # cropped. Needs Pillow (pip install pillow).
 import json
 import os
@@ -17,7 +17,8 @@ from PIL import Image
 if len(sys.argv) < 2:
     sys.exit('Usage: python3 tools/import-logos.py "<pack>/logos" [<more logo folders>...]')
 OUT_DIR = "public/images/logos"
-LONGEST = 640
+# The site shows a logo at most about 190 px wide, so 400 px covers sharp (2x) screens.
+LONGEST = 400
 os.makedirs(OUT_DIR, exist_ok=True)
 
 # Every logo by firm name (a later folder's replaces an earlier one's), and every firm listed as still to come.

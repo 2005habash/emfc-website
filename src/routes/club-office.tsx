@@ -7,6 +7,7 @@ import { departments } from "@/lib/departments";
 import { Download, LogOut, Loader2, ChevronDown, ChevronRight, ExternalLink, X, FileText, Users, Calendar, TrendingUp, Building2, Archive, ArrowUpDown, ArrowUp, ArrowDown } from "lucide-react";
 import { toast } from "sonner";
 import { toCsv } from "@/lib/csv";
+import { wantToasts } from "@/lib/toast";
 import { zip } from "fflate";
 import { AnalyticsManager } from "@/components/admin/Analytics";
 import { BackupManager, backupDue } from "@/components/admin/Backup";
@@ -51,6 +52,8 @@ type Factor = "setup" | "code" | "done";
 
 function Admin() {
   const navigate = useNavigate();
+  // This page shows toasts all the time, so the toaster is put on the page straight away.
+  useEffect(() => wantToasts(), []);
   const [account, setAccount] = useState<Account | null>(null);
   const [role, setRole] = useState<Role | null | undefined>(undefined);
   const [factor, setFactor] = useState<Factor | undefined>(undefined);
@@ -63,8 +66,12 @@ function Admin() {
   );
   const [notice] = useState(() => {
     if (typeof window === "undefined") return null;
-    const problem = new URLSearchParams(window.location.hash.slice(1)).get("error_description");
-    return problem && `${problem.replace(/\.$/, "")}. Ask for a new link below.`;
+    // The message is the page's own, never the link's text: a made-up link can't put words on this page.
+    const hash = new URLSearchParams(window.location.hash.slice(1));
+    if (!hash.has("error") && !hash.has("error_code")) return null;
+    return hash.get("error_code") === "otp_expired"
+      ? "That link has expired or was already used. Ask for a new one below."
+      : "That link didn't work. Ask for a new one below.";
   });
 
   useEffect(() => {
