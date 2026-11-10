@@ -11,7 +11,6 @@ import { useEffect, type ReactNode } from "react";
 
 import appCss from "../styles.css?url";
 import { Toaster } from "@/components/ui/sonner";
-import { FunLayer } from "@/components/fun/FunLayer";
 import { Delisted } from "@/components/fun/Delisted";
 import { takeReferrer, track } from "@/lib/analytics";
 import { absoluteUrl, IMAGES } from "@/lib/site";
@@ -23,20 +22,31 @@ function NotFoundComponent() {
 function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
   console.error(error);
   const router = useRouter();
+  // The 404 page is "Delisted."; when a page fails to load, trading is halted.
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background px-6">
-      <div className="max-w-md text-center">
-        <h1 className="font-serif text-2xl text-navy">This page didn't load</h1>
-        <p className="mt-2 text-sm text-muted-foreground">Something went wrong on our end.</p>
-        <div className="mt-6 flex justify-center gap-2">
+    <div className="flex min-h-screen items-center bg-night px-6 text-white">
+      <div className="mx-auto flex w-full max-w-[680px] flex-col gap-6">
+        <p className="font-mono text-[12px] uppercase tracking-[0.1em] text-haze md:text-[13px]">
+          Trading halted
+        </p>
+        <h1 className="font-serif text-[64px]/[0.9] tracking-[-0.02em] md:text-[112px]/[0.9]">
+          Circuit breaker<em className="font-normal not-italic text-bull-light">.</em>
+        </h1>
+        <p className="max-w-[480px] text-[17px]/[1.65] text-mist">
+          Something went wrong on our side, so this page has stopped trading for a moment. A retry
+          usually gets it going again.
+        </p>
+        <div className="flex flex-col gap-3 sm:flex-row">
           <button
+            type="button"
             onClick={() => { router.invalidate(); reset(); }}
-            className="inline-flex h-10 items-center rounded-md bg-navy px-5 text-sm font-medium text-primary-foreground"
+            aria-label="Resume trading: try again"
+            className="btn btn-white"
           >
-            Try again
+            Resume trading
           </button>
-          <a href="/" className="inline-flex h-10 items-center rounded-md border border-border px-5 text-sm">
-            Go home
+          <a href="/" className="btn btn-outline-white">
+            Back to the homepage
           </a>
         </div>
       </div>
@@ -74,7 +84,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
       {
         rel: "stylesheet",
-        href: "https://fonts.googleapis.com/css2?family=Geist:wght@300..700&family=Geist+Mono:wght@400;500&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&display=swap",
+        href: "https://fonts.googleapis.com/css2?family=Geist:wght@300..700&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&display=swap",
       },
     ],
   }),
@@ -132,7 +142,6 @@ function useAnalytics() {
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
-  const pathname = useRouterState({ select: (s) => s.location.pathname });
   useAnalytics();
   useEffect(() => {
     // Links in the admin emails (new password, confirm your email) belong on the admin page. If the
@@ -146,8 +155,6 @@ function RootComponent() {
   return (
     <QueryClientProvider client={queryClient}>
       <Outlet />
-      {/* The terminal, bull run and other easter eggs, everywhere but the admin page. */}
-      {pathname !== "/club-office" && <FunLayer />}
       <Toaster />
     </QueryClientProvider>
   );

@@ -1,5 +1,4 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { EventsChart } from "@/components/fun/EventsChart";
 import { ArrowLeft, ArrowRight, ArrowUpRight, CalendarPlus, Images, Linkedin, MapPin } from "lucide-react";
 import { useState } from "react";
 import { SiteLayout } from "@/components/layout/SiteLayout";
@@ -37,7 +36,6 @@ const fmt = (d: Date, o: Intl.DateTimeFormatOptions) => d.toLocaleDateString("en
 
 function EventsPage() {
   const [view, setView] = useState<"overview" | "calendar">("overview");
-  const events = Route.useLoaderData();
 
   return (
     <SiteLayout>
@@ -56,8 +54,6 @@ function EventsPage() {
         Our events bring members together with industry, peers and ideas. Many sessions are open to
         the wider ESADE community.
       </PageHero>
-
-      <EventsChart events={events} />
 
       <div className="gutter flex flex-col gap-6 pt-10 lg:flex-row lg:items-center lg:justify-between lg:gap-8">
         <div
@@ -229,11 +225,12 @@ function Overview() {
         {upcoming.length === 0 ? (
           <div className="mt-6 flex flex-col justify-between gap-7 bg-stone p-7 md:p-9 lg:max-w-[560px]">
             <p className="font-serif text-[28px]/[1.15] italic md:text-[34px]/[1.15]">
-              No upcoming events scheduled.
+              The pipeline is being built.
             </p>
             <div className="flex flex-col gap-4">
               <p className="text-[15px]/[1.65] text-mute">
-                Follow us on LinkedIn to hear about the next one first.
+                No upcoming events are scheduled yet. Follow us on LinkedIn to hear about the next
+                one first.
               </p>
               <a
                 href={SOCIAL.linkedin}
@@ -394,7 +391,9 @@ function CalendarView() {
             </Link>
           </>
         ) : (
-          <p className="font-serif text-2xl/[1.2] italic">No upcoming events scheduled.</p>
+          <p className="font-serif text-2xl/[1.2] italic">
+            The pipeline is being built: no upcoming events yet.
+          </p>
         )}
       </aside>
     </section>

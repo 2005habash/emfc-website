@@ -42,7 +42,7 @@ function FundComingSoon() {
         <div className="gutter relative flex min-h-[460px] flex-col items-start justify-end gap-6 pb-14 pt-20 lg:min-h-[520px] lg:pb-16">
           <span className="caps inline-flex animate-rise items-center gap-2.5 rounded-full border border-bull-light px-4 py-2 text-[10px] tracking-[0.22em] text-bull-light md:text-[10.5px]">
             <span className="h-1.5 w-1.5 rounded-full bg-bull-light" />
-            Coming soon
+            In its quiet period
           </span>
           <h1 className="animate-rise font-serif text-[64px]/[0.9] tracking-[-0.015em] [animation-delay:150ms] md:text-[128px]/[0.9]">
             The EMFC <Em light>Fund</Em>

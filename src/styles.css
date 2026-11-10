@@ -62,7 +62,7 @@
 
   --font-sans: "Geist", system-ui, sans-serif;
   --font-serif: "Cormorant Garamond", Georgia, serif;
-  --font-mono: "Geist Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
 
   --animate-kenburns: kenburns 30s ease-in-out infinite alternate;
   --animate-rise: rise 1s cubic-bezier(0.2, 0.7, 0.2, 1) both;
@@ -323,24 +323,7 @@ html.motion:not(.reveal-ready) [data-reveal]:not([data-shown]) {
   }
 }
 
-/* The playful layer (src/components/fun): the bull run, and the crash line on the 404 page. */
-@keyframes bull-run {
-  from {
-    transform: translateX(-30vw);
-  }
-  to {
-    transform: translateX(130vw);
-  }
-}
-@keyframes gallop {
-  0%,
-  100% {
-    transform: translateY(0) rotate(-2deg);
-  }
-  50% {
-    transform: translateY(-12%) rotate(3deg);
-  }
-}
+/* The crash line on the 404 page (src/components/fun/Delisted.tsx). */
 @keyframes draw-line {
   from {
     stroke-dashoffset: var(--line-length, 1000);

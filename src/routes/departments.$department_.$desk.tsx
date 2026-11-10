@@ -13,7 +13,7 @@ import {
   SectionHeading,
 } from "@/components/site/sections";
 import { Em, Eyebrow, PersonCard } from "@/components/site/ui";
-import { PaperLbo } from "@/components/fun/PaperLbo";
+import { DeskToy } from "@/components/fun/toys/DeskToy";
 import { eventsFor } from "@/data/events";
 import { reportsFor } from "@/data/reports";
 import { loadEvents, loadReports } from "@/lib/content";
@@ -140,8 +140,8 @@ function DeskPage() {
           </div>
         </section>
 
-        {/* The Private Equity desk's toy: a paper LBO to play with. */}
-        {d.slug === "private-markets" && k.slug === "private-equity" && <PaperLbo />}
+        {/* The desk's toy, for the desks that have one (src/components/fun/toys). */}
+        <DeskToy desk={`${d.slug}/${k.slug}`} />
 
         {/* Target firms */}
         <section className="gutter grid items-start gap-8 lg:grid-cols-12">

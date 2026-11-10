@@ -1,7 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import { Instagram, Linkedin } from "lucide-react";
 import { NewsletterForm } from "@/components/site/NewsletterForm";
-import { openTerminal, startBullRun } from "@/components/fun/signals";
 import { IMAGES, SOCIAL } from "@/lib/site";
 
 export function Footer() {
@@ -11,16 +10,7 @@ export function Footer() {
         <div className="grid gap-10 md:grid-cols-2 lg:grid-cols-12 lg:gap-8">
           <div className="flex flex-col gap-5 lg:col-span-4">
             <div className="flex items-center gap-3.5">
-              {/* An easter egg: poking the bull sets off a bull run. */}
-              <button
-                type="button"
-                onClick={startBullRun}
-                aria-label="Poke the bull"
-                title="Poke the bull"
-                className="-m-1 rounded-full p-1 transition-transform duration-300 hover:-rotate-6 hover:scale-105 active:scale-95"
-              >
-                <img src={IMAGES.bullMark} alt="" className="h-[52px] w-auto" />
-              </button>
+              <img src={IMAGES.bullMark} alt="" className="h-[52px] w-auto" />
               <span className="font-serif text-[40px]/none font-semibold tracking-[0.08em] text-white">
                 EMFC
               </span>
@@ -106,16 +96,11 @@ export function Footer() {
           </div>
           <div className="caps flex flex-col gap-2 border-t border-[#1B2560] pt-5 text-[10px] tracking-[0.2em] text-haze md:flex-row md:justify-between">
             <span>© {new Date().getFullYear()} EMFC, ESADE Master's Finance Club</span>
-            <span className="flex flex-wrap gap-x-6 gap-y-2">
+            <span className="flex gap-6">
               <Link to="/privacy" className="hover:text-white hover:underline">
                 Privacy
               </Link>
               <span>Launched September 2026</span>
-              <button type="button" onClick={() => openTerminal()} className="caps tracking-[0.2em] hover:text-white hover:underline">
-                <span className="max-md:hidden">Press / for the </span>
-                <span className="md:hidden">The </span>
-                terminal
-              </button>
               {/* The admin page's sign-in, kept quiet: same colour as the text around it until hovered. */}
               <Link to="/club-office" className="hover:text-white hover:underline">
                 Admin

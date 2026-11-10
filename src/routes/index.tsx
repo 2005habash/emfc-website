@@ -6,7 +6,6 @@ import { SiteLayout } from "@/components/layout/SiteLayout";
 import { Reveal } from "@/components/Reveal";
 import { NewsletterForm } from "@/components/site/NewsletterForm";
 import { FirmLogo } from "@/components/site/FirmLogo";
-import { Ticker } from "@/components/fun/Ticker";
 import { CountUp, Em, Eyebrow, Numeral, PhotoCaption, Portrait } from "@/components/site/ui";
 import { loadEvents } from "@/lib/content";
 import { STATS } from "@/data/stats";
@@ -67,11 +66,9 @@ const benefits = [
 ];
 
 function Home() {
-  const events = Route.useLoaderData();
   return (
     <SiteLayout overlayNav>
       <Hero />
-      <Ticker events={events} />
       <FirmsBand />
       <Intro />
       <People />
@@ -276,6 +273,14 @@ function Departments() {
           <p className="text-[15px]/[1.7] text-mute md:text-[17px]/[1.7]">
             Six departments and fifteen desks, led by two Co-Presidents.
           </p>
+          <Link
+            to="/departments"
+            hash="quiz"
+            className="caps inline-flex items-center gap-2 text-[10.5px] tracking-[0.18em] underline underline-offset-[5px]"
+          >
+            Not sure where you fit? Find your desk
+            <ArrowRight className="h-3.5 w-3.5" strokeWidth={1.75} />
+          </Link>
         </Reveal>
 
         <Reveal className="mt-10 flex flex-col gap-2 bg-[#000B3D] px-6 py-5 text-center text-white md:mt-14 md:px-12">

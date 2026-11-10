@@ -1,9 +1,8 @@
 import { Link, useRouterState } from "@tanstack/react-router";
-import { ChevronDown, Instagram, Linkedin, Menu, Moon, SquareTerminal, Sun, X } from "lucide-react";
+import { ChevronDown, Instagram, Linkedin, Menu, Moon, Sun, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { flushSync } from "react-dom";
 import { toast } from "sonner";
-import { isDark, onTheme, openTerminal, setTheme } from "@/components/fun/signals";
 import { cn } from "@/lib/utils";
 import { departments, type Department } from "@/lib/departments";
 import { IMAGES, NAV_LINKS, SOCIAL } from "@/lib/site";
@@ -12,13 +11,17 @@ import { IMAGES, NAV_LINKS, SOCIAL } from "@/lib/site";
 function ThemeToggle() {
   const [dark, setDark] = useState(false);
   useEffect(() => {
-    setDark(isDark());
-    // The terminal can change the theme too (BEAR, LIGHT): stay in step with it.
-    return onTheme(setDark);
+    setDark(document.documentElement.classList.contains("dark"));
   }, []);
   const toggle = () => {
     const next = !dark;
-    setTheme(next);
+    document.documentElement.classList.toggle("dark", next);
+    try {
+      localStorage.setItem("emfc-theme", next ? "dark" : "light");
+    } catch {
+      // Private mode: the choice just won't be remembered.
+    }
+    setDark(next);
     toast(next ? "Bear market" : "Bull market", {
       id: "theme",
       description: next ? "Lights down. Stay calm and hold." : "Lights up. Back to the bull.",
@@ -299,15 +302,6 @@ export function Nav({ overlay = false }: { overlay?: boolean }) {
           >
             <Linkedin className="h-[17px] w-[17px]" strokeWidth={1.6} />
           </a>
-          <button
-            type="button"
-            onClick={() => openTerminal()}
-            aria-label="Open the EMFC Terminal"
-            title="EMFC Terminal (press /)"
-            className="flex h-11 w-11 items-center justify-center rounded-full text-[#E3E6EF] hover:bg-white/10"
-          >
-            <SquareTerminal className="h-[18px] w-[18px]" strokeWidth={1.6} />
-          </button>
           <ThemeToggle />
           <button
             type="button"

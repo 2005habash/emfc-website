@@ -1,13 +1,13 @@
 import { Link } from "@tanstack/react-router";
-import { ArrowLeft, ArrowRight, RotateCcw, Share2 } from "lucide-react";
+import { ArrowLeft, ArrowRight, RotateCcw } from "lucide-react";
 import { useState } from "react";
-import { toast } from "sonner";
 import { Em, Eyebrow, Portrait } from "@/components/site/ui";
 import { departments } from "@/lib/departments";
-import { SITE_URL } from "@/lib/site";
 import { leadershipOf, memberByName } from "@/lib/team";
 import { cn } from "@/lib/utils";
 import { deskFor, QUIZ } from "./quiz-data";
+import { toyFor, TOYS } from "./toys/catalog";
+import { ShareResult } from "./toys/parts";
 
 const LETTERS = ["A", "B", "C", "D"];
 
@@ -53,6 +53,27 @@ export function DeskQuiz() {
               </li>
             ))}
           </ol>
+          <div className="mt-4 flex flex-col gap-3 border-t border-white/15 pt-6">
+            <span className="caps text-[10px] tracking-[0.2em] text-haze">Or play a desk</span>
+            <ul className="flex flex-wrap gap-2">
+              {TOYS.map((t) => {
+                const [department, desk] = t.desk.split("/");
+                return (
+                  <li key={t.id}>
+                    <Link
+                      to="/departments/$department/$desk"
+                      params={{ department, desk }}
+                      hash={t.id}
+                      title={t.hook}
+                      className="inline-flex rounded-full border border-white/25 px-3.5 py-2 text-[13px] text-mist transition-colors hover:border-bull-light hover:text-white"
+                    >
+                      {t.title}
+                    </Link>
+                  </li>
+                );
+              })}
+            </ul>
+          </div>
         </div>
 
         <div className="lg:col-span-6 lg:col-start-7" aria-live="polite">
@@ -111,21 +132,7 @@ function Result({ answers, onAgain }: { answers: number[]; onAgain: () => void }
   const k = d.desks.find((x) => x.slug === kSlug)!;
   const groupLead = d.groups?.find((g) => g.desks.includes(k.slug))?.lead;
   const person = memberByName(k.lead ?? groupLead ?? "") ?? leadershipOf(d.slug)[0];
-
-  const share = async () => {
-    const text = `I'm ${k.name}. Which EMFC desk are you?`;
-    const url = `${SITE_URL}/departments#quiz`;
-    try {
-      if (navigator.share) {
-        await navigator.share({ title: "Which EMFC desk are you?", text, url });
-        return;
-      }
-      await navigator.clipboard.writeText(`${text} ${url}`);
-      toast("Copied", { description: "Paste it wherever your friends are." });
-    } catch {
-      // The visitor closed the share sheet, or the browser refused the clipboard: nothing to do.
-    }
-  };
+  const toy = toyFor(`${d.slug}/${k.slug}`);
 
   return (
     <div className="flex animate-fade-up flex-col gap-7 border border-white/20 p-6 [animation-duration:0.5s] md:p-9">
@@ -157,6 +164,26 @@ function Result({ answers, onAgain }: { answers: number[]; onAgain: () => void }
           </div>
         </div>
       )}
+      {toy && (
+        <Link
+          to="/departments/$department/$desk"
+          params={{ department: d.slug, desk: k.slug }}
+          hash={toy.id}
+          className="group flex items-center justify-between gap-4 border border-bull-light/40 px-5 py-4 transition-colors hover:border-bull-light hover:bg-white/[0.04]"
+        >
+          <span className="flex flex-col gap-1">
+            <span className="caps text-[10px] tracking-[0.2em] text-bull-light">
+              The desk&apos;s challenge
+            </span>
+            <span className="font-serif text-[22px]/[1.15]">{toy.title}</span>
+            <span className="text-[13px] text-mist">{toy.hook}</span>
+          </span>
+          <ArrowRight
+            className="h-4 w-4 shrink-0 transition-transform group-hover:translate-x-1"
+            strokeWidth={1.75}
+          />
+        </Link>
+      )}
       <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap">
         <Link
           to="/departments/$department/$desk"
@@ -166,10 +193,11 @@ function Result({ answers, onAgain }: { answers: number[]; onAgain: () => void }
           Visit the desk
           <ArrowRight className="h-3.5 w-3.5" strokeWidth={1.75} />
         </Link>
-        <button type="button" onClick={share} className="btn btn-sm btn-outline-white">
-          <Share2 className="h-3.5 w-3.5" strokeWidth={1.75} />
-          Share
-        </button>
+        <ShareResult
+          text={`I'm ${k.name}. Which EMFC desk are you?`}
+          path="/departments#quiz"
+          label="Share"
+        />
         <button type="button" onClick={onAgain} className="btn btn-sm text-mist hover:text-white">
           <RotateCcw className="h-3.5 w-3.5" strokeWidth={1.75} />
           Again

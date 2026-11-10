@@ -1,8 +1,7 @@
 import { Link } from "@tanstack/react-router";
-import { ArrowRight, SquareTerminal } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { SiteLayout } from "@/components/layout/SiteLayout";
 import { Em } from "@/components/site/ui";
-import { openTerminal } from "./signals";
 
 /** The 404 page: the address the visitor asked for has been delisted. */
 export function Delisted() {
@@ -29,14 +28,9 @@ export function Delisted() {
                 Buy the dip
                 <ArrowRight className="h-4 w-4" strokeWidth={1.75} />
               </Link>
-              <button
-                type="button"
-                onClick={() => openTerminal("HELP")}
-                className="btn btn-outline-white"
-              >
-                <SquareTerminal className="h-4 w-4" strokeWidth={1.6} />
-                Ask the terminal
-              </button>
+              <Link to="/departments" hash="quiz" className="btn btn-outline-white">
+                Find your desk instead
+              </Link>
             </div>
           </div>
           <div className="lg:col-span-6">
