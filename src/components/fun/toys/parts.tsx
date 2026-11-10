@@ -4,6 +4,7 @@ import { toast } from "sonner";
 import { Eyebrow } from "@/components/site/ui";
 import { SITE_URL } from "@/lib/site";
 import { cn } from "@/lib/utils";
+import { useHashTarget } from "../useHashTarget";
 
 /**
  * The frame every desk toy shares: what it is and its levers on the left, the result on navy on the
@@ -25,6 +26,7 @@ export function ToyShell({
   note: ReactNode;
   children: ReactNode;
 }) {
+  useHashTarget(id);
   return (
     <section id={id} className="scroll-mt-36 bg-stone lg:scroll-mt-40">
       <div className="gutter grid items-start gap-10 py-16 lg:grid-cols-12 lg:gap-8 lg:py-24">

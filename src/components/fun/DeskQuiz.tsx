@@ -8,6 +8,7 @@ import { cn } from "@/lib/utils";
 import { deskFor, QUIZ } from "./quiz-data";
 import { toyFor, TOYS } from "./toys/catalog";
 import { ShareResult } from "./toys/parts";
+import { useHashTarget } from "./useHashTarget";
 
 const LETTERS = ["A", "B", "C", "D"];
 
@@ -22,6 +23,7 @@ const HABITAT: Record<string, string> = {
 /** "Which desk are you?": five questions on the Departments page, and a desk to visit at the end. */
 export function DeskQuiz() {
   const [answers, setAnswers] = useState<number[]>([]);
+  useHashTarget("quiz");
   const step = answers.length;
   const done = step === QUIZ.length;
 
