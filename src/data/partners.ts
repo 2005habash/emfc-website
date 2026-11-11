@@ -12,10 +12,9 @@ export type Partner = {
   tagline: string;
   /** What it does for members, in a sentence or two. */
   summary: string;
+  /** Where the button goes: the club's own partnership link where the partner has one. */
   link: string;
   cta: string;
-  /** A code that comes with the club's link, shown next to the button. */
-  code?: string;
 };
 
 export const PARTNERS: Partner[] = [
@@ -27,9 +26,10 @@ export const PARTNERS: Partner[] = [
     tagline: "Every internship. Every day.",
     summary:
       "A free tracker of finance internships in Europe: open roles at more than 900 firms, checked every hour, with alerts and a tracker for your applications.",
-    link: "https://www.trakvia.de/r/EMSFC26",
+    // The club's partnership link (11 November 2026): it opens Trakvia's invitation from the club,
+    // with the club's logo. Trakvia has nowhere to type a code, so none is shown.
+    link: "https://www.trakvia.de/r/MSFC26",
     cta: "Join Trakvia",
-    code: "EMSFC26",
   },
   {
     name: "Greenroom",

@@ -323,16 +323,11 @@ function PartnerCard({ partner: p }: { partner: Partner }) {
       </span>
       <p className="font-serif text-[20px]/[1.25] italic">“{p.tagline}”</p>
       <p className="text-[14px]/[1.65] text-mute">{p.summary}</p>
-      <div className="mt-auto flex flex-wrap items-center gap-x-5 gap-y-3 pt-2">
+      <div className="mt-auto flex pt-2">
         <a href={p.link} target="_blank" rel="noreferrer" className="btn btn-sm btn-ink">
           {p.cta}
           <ArrowUpRight className="h-3.5 w-3.5" strokeWidth={1.75} />
         </a>
-        {p.code && (
-          <span className="caps text-[10px] tracking-[0.18em] text-mute">
-            EMFC code <span className="text-ink">{p.code}</span>
-          </span>
-        )}
       </div>
     </div>
   );
