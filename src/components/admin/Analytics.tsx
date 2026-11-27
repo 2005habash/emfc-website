@@ -18,6 +18,7 @@ type Summary = {
     report_downloads: number;
     /** Missing until the partner clicks migration (20261127120000) has run. */
     partner_clicks?: number;
+    firm_visitors?: number;
     enquiries: number;
     newsletter_signups: number;
   };
@@ -27,6 +28,9 @@ type Summary = {
   linkedin: Row[];
   reports: Row[];
   partners?: Row[];
+  /** Visits from firms' own office networks: visitors per day, added up. */
+  firms?: Row[];
+  firm_profiles?: Row[];
   referrers: Row[];
   countries: Row[];
   devices: Row[];
@@ -161,13 +165,14 @@ export function AnalyticsManager() {
         <Loader2 className="mx-auto h-6 w-6 animate-spin text-muted-foreground" />
       ) : (
         <>
-          <div className="grid grid-cols-2 gap-3 md:grid-cols-4 xl:grid-cols-8">
+          <div className="grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-9">
             <Tile label="Visitors" value={t.visitors} note="per day, added up" />
             <Tile label="Page views" value={t.page_views} />
             <Tile label="Profile opens" value={t.profile_opens} />
             <Tile label="LinkedIn clicks" value={t.linkedin_clicks} note="from profiles" />
             <Tile label="Report downloads" value={t.report_downloads} />
             <Tile label="Partner clicks" value={t.partner_clicks ?? 0} note="Trakvia, Greenroom" />
+            <Tile label="Firm visitors" value={t.firm_visitors ?? 0} note="from firm networks" />
             <Tile label="Sponsorship enquiries" value={t.enquiries} />
             <Tile label="Newsletter sign-ups" value={t.newsletter_signups} />
           </div>
@@ -178,6 +183,8 @@ export function AnalyticsManager() {
             <Ranked title="LinkedIn clicks, by member" rows={data.linkedin} empty="No LinkedIn clicks yet." />
             <Ranked title="Report downloads" rows={data.reports} empty="No downloads yet." />
             <Ranked title="Partner clicks, by partner" rows={data.partners ?? []} empty="No partner clicks yet." />
+            <Ranked title="Firms that visited (visitors)" rows={data.firms ?? []} empty="No visits from firm networks yet." />
+            <Ranked title="Profiles opened from firm networks" rows={data.firm_profiles ?? []} empty="No profiles opened from firm networks yet." />
             <Ranked title="Sites that sent visitors" rows={data.referrers} empty="No visits from other sites yet." />
             <Ranked title="Countries (visitors)" rows={data.countries} label={countryName} empty="No visits yet." />
             <Ranked title="Devices (visitors)" rows={data.devices} empty="No visits yet." />
