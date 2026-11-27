@@ -201,13 +201,36 @@ export function PersonCard({
   size?: keyof typeof sizes;
 }) {
   const s = sizes[size];
+  const [open, setOpen] = useState(false);
+  const [card, setCard] = useState<HTMLButtonElement | null>(null);
+  // A link to /team#<slug> (the homepage portrait strip) opens this person's profile. Only the first
+  // card on the page for that person opens, in case they appear in two lists.
+  useEffect(() => {
+    if (!card || window.location.hash !== `#${member.slug}`) return;
+    if (document.querySelector(`[data-profile="${member.slug}"]`) !== card) return;
+    card.scrollIntoView({ block: "center" });
+    setOpen(true);
+    track({ kind: "profile_open", path: window.location.pathname, target: member.name });
+  }, [card, member.slug, member.name]);
   return (
     <Dialog
-      onOpenChange={(open) =>
-        open && track({ kind: "profile_open", path: window.location.pathname, target: member.name })
-      }
+      open={open}
+      onOpenChange={(next) => {
+        setOpen(next);
+        if (next)
+          track({ kind: "profile_open", path: window.location.pathname, target: member.name });
+        // Closing a profile opened from a link drops the #slug, so a reload shows the plain page.
+        else if (window.location.hash === `#${member.slug}`)
+          history.replaceState(
+            history.state,
+            "",
+            window.location.pathname + window.location.search,
+          );
+      }}
     >
       <DialogTrigger
+        ref={setCard}
+        data-profile={member.slug}
         className={cn(
           "group flex cursor-pointer flex-col text-left outline-none focus-visible:ring-2 focus-visible:ring-bull focus-visible:ring-offset-4 focus-visible:ring-offset-paper",
           s.gap,
