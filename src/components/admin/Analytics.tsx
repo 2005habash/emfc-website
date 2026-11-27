@@ -97,13 +97,13 @@ function Daily({ daily }: { daily: Summary["daily"] }) {
             key={d.day}
             className="group relative flex-1 rounded-t-sm bg-navy/80 hover:bg-navy"
             style={{ height: `${Math.max(2, (d.visitors / max) * 100)}%`, opacity: d.visitors ? 1 : 0.25 }}
-            title={`${formatDay(d.day)}: ${d.visitors} visitors, ${d.views} page views`}
+            title={`${formatDay(d.day.slice(0, 10))}: ${d.visitors} visitors, ${d.views} page views`}
           />
         ))}
       </div>
       <div className="mt-2 flex justify-between text-[11px] text-muted-foreground">
-        <span>{daily[0] && formatDay(daily[0].day)}</span>
-        <span>{daily.at(-1) && formatDay(daily.at(-1)!.day)}</span>
+        <span>{daily[0] && formatDay(daily[0].day.slice(0, 10))}</span>
+        <span>{daily.at(-1) && formatDay(daily.at(-1)!.day.slice(0, 10))}</span>
       </div>
     </section>
   );

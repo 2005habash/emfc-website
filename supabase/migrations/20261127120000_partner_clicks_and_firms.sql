@@ -44,7 +44,7 @@ begin
       'newsletter_signups', (select count(*) from public.newsletter_signups where created_at >= since)
     ),
     'daily', coalesce((
-      select jsonb_agg(jsonb_build_object('day', d.day, 'views', coalesce(v.views, 0), 'visitors', coalesce(v.visitors, 0)) order by d.day)
+      select jsonb_agg(jsonb_build_object('day', d.day::date, 'views', coalesce(v.views, 0), 'visitors', coalesce(v.visitors, 0)) order by d.day)
       from generate_series((since at time zone 'Europe/Madrid')::date, (now() at time zone 'Europe/Madrid')::date, interval '1 day') as d(day)
       left join (select day, count(*) as views, count(distinct visitor) as visitors from views group by day) v on v.day = d.day
     ), '[]'::jsonb),
