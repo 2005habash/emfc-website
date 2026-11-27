@@ -428,7 +428,8 @@ function StripTile({ m, i }: { m: Member; i: number }) {
   return (
     <Link
       to="/team"
-      aria-label={`${m.displayName ?? m.name}, ${m.title}`}
+      hash={m.slug}
+      aria-label={`${m.displayName ?? m.name}, ${m.title}. Open profile`}
       className="group relative block h-[150px] w-[125px] shrink-0 overflow-hidden md:h-[220px] md:w-[183px]"
     >
       <Portrait

@@ -39,23 +39,24 @@ export const deskTeam = (department: string, desk: string) => {
 /**
  * The order of the portraits on the homepage strip: spread evenly across both rows, as Vasco asked on
  * 5 November 2026 (site review S4), and arranged by looking at the portraits. The site keeps only this
- * order, nothing about anyone. Departments stay mixed. Anyone with a photo who is not in the list yet
+ * order, nothing about anyone. Positions 6 to 10 of the top row are set by Zaid (27 November 2026). Departments stay mixed. Anyone with a photo who is not in the list yet
  * (a new member) follows at the end until the order is redone.
  */
 const STRIP_ORDER = [
-  "diogo-oliveira", "kateryna-mohylevska", "yonatan-bendler", "jan-heibel", "cosimo-dini", "maria-anjos",
-  "luka-thomson", "nick-kriz", "anastasia-murgida", "david-villar", "paul-christian-abel", "vasco-lemos",
-  "maria-fe-lopez-de-romana", "constantin-molineus", "fabian-luis-seher", "carolina-gouveia",
-  "luis-laboreiro", "nin-sacristan", "moritz-muellner", "sara-berglind-omarsdottir-saenz", "moritz-fritsch",
-  "joao-salgado", "carmen-amelia-albuja", "zaid-habash", "alexander-schilling", "joan-brugada",
-  "martina-guardiola", "aditya-sunil-shajwani", "philip-ignatzi", "alice-lafreniere", "erik-oostendorp",
-  "joao-rawes-freitas", "paul-emil-manner", "lara-koch", "anubhav-tamak", "jack-hermansson",
-  "giulia-weber-colussi", "luca-flusche", "alessandro-patta", "lili-anna-paczolay-nagy", "jules-coppens",
-  "kian-chirani", "hunter-crawford", "rui-long", "hugo-heise", "jose-rangel", "tea-polimac", "taha-aksu",
-  "louis-pfaar", "jakob-sebastian-kroen", "maria-heuveldop-pfeiffer", "jose-ruivo", "tim-constantin-ziegler",
-  "maria-jastrzebska", "mustafa-batuhan-ayd-n", "miguel-gomes", "henri-de-canecaude", "viola-suter",
-  "pol-bonet-malga", "liam-thiele", "margarida-loureiro", "marwin-aprin", "maximilian-merlin-kammermeier",
-  "walden-sanchez", "maria-marti", "paul-spieker", "alexander-kostyuk", "isabelle-oliger", "caetano-cunha",
+  "kateryna-mohylevska", "yonatan-bendler", "jan-heibel", "cosimo-dini", "maria-anjos", "diogo-oliveira",
+  "zaid-habash", "fabian-luis-seher", "luis-laboreiro", "constantin-molineus", "luka-thomson",
+  "nick-kriz", "anastasia-murgida", "david-villar", "paul-christian-abel", "vasco-lemos",
+  "maria-fe-lopez-de-romana", "carolina-gouveia", "nin-sacristan", "moritz-muellner",
+  "sara-berglind-omarsdottir-saenz", "moritz-fritsch", "joao-salgado", "carmen-amelia-albuja",
+  "alexander-schilling", "joan-brugada", "martina-guardiola", "aditya-sunil-shajwani", "philip-ignatzi",
+  "alice-lafreniere", "erik-oostendorp", "joao-rawes-freitas", "paul-emil-manner", "lara-koch",
+  "anubhav-tamak", "jack-hermansson", "giulia-weber-colussi", "luca-flusche", "alessandro-patta",
+  "lili-anna-paczolay-nagy", "jules-coppens", "kian-chirani", "hunter-crawford", "rui-long",
+  "hugo-heise", "jose-rangel", "tea-polimac", "taha-aksu", "louis-pfaar", "jakob-sebastian-kroen",
+  "maria-heuveldop-pfeiffer", "jose-ruivo", "tim-constantin-ziegler", "maria-jastrzebska",
+  "mustafa-batuhan-ayd-n", "miguel-gomes", "henri-de-canecaude", "viola-suter", "pol-bonet-malga",
+  "liam-thiele", "margarida-loureiro", "marwin-aprin", "maximilian-merlin-kammermeier", "walden-sanchez",
+  "maria-marti", "paul-spieker", "alexander-kostyuk", "isabelle-oliger", "caetano-cunha",
   "christopher-weigt", "shaivam-sundeep-ravani", "kleio-naziri", "aaron-kark",
 ];
 
