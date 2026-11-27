@@ -10,7 +10,7 @@ import { todayInBarcelona } from "@/lib/site";
 // counted.
 
 const Event = z.object({
-  kind: z.enum(["page_view", "profile_open", "linkedin_click", "report_download"]),
+  kind: z.enum(["page_view", "profile_open", "linkedin_click", "report_download", "partner_click"]),
   path: z.string().max(300),
   target: z.string().max(300).optional(),
   referrer: z.string().max(200).optional(),

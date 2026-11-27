@@ -9,6 +9,7 @@ import { Em, Eyebrow, PageHero } from "@/components/site/ui";
 import { Dialog, DialogContent, DialogDescription, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { PARTNERS, type Partner } from "@/data/partners";
 import { sortReports, type Report } from "@/data/reports";
+import { track } from "@/lib/analytics";
 import { loadReports } from "@/lib/content";
 import { departments, getDepartment } from "@/lib/departments";
 import { IMAGES, safeUrl } from "@/lib/site";
@@ -324,7 +325,13 @@ function PartnerCard({ partner: p }: { partner: Partner }) {
       <p className="font-serif text-[20px]/[1.25] italic">“{p.tagline}”</p>
       <p className="text-[14px]/[1.65] text-mute">{p.summary}</p>
       <div className="mt-auto flex pt-2">
-        <a href={p.link} target="_blank" rel="noreferrer" className="btn btn-sm btn-ink">
+        <a
+          href={p.link}
+          target="_blank"
+          rel="noreferrer"
+          onClick={() => track({ kind: "partner_click", path: window.location.pathname, target: p.name })}
+          className="btn btn-sm btn-ink"
+        >
           {p.cta}
           <ArrowUpRight className="h-3.5 w-3.5" strokeWidth={1.75} />
         </a>
