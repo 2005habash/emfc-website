@@ -5,12 +5,14 @@ import { todayInBarcelona } from "@/lib/site";
 // Anonymous site analytics, shown on the admin page's Analytics tab. Each event is saved to the
 // analytics_events table without names, IP addresses or cookies: the country and device come from
 // the request, and "visitor" is a daily code made with a key only the server knows, so a person counts
-// once a day and can't be followed across days or traced back to an address. Only the server writes
+// once a day and can't be followed across days or traced back to an address. "firm" is set only when the
+// visit comes from a firm's own office network (src/lib/server/firm.ts), from a fixed list of large firms;
+// the address is compared on the server and never kept. Only the server writes
 // the table; one visitor can record at most 150 events in 10 minutes. Bots and link previews are not
 // counted.
 
 const Event = z.object({
-  kind: z.enum(["page_view", "profile_open", "linkedin_click", "report_download"]),
+  kind: z.enum(["page_view", "profile_open", "linkedin_click", "report_download", "partner_click"]),
   path: z.string().max(300),
   target: z.string().max(300).optional(),
   referrer: z.string().max(200).optional(),
@@ -27,6 +29,8 @@ export const recordEvent = createServerFn({ method: "POST" })
     if (!userAgent || BOT.test(userAgent)) return { ok: false };
     const visitor = await guard.fingerprint("visitor", todayInBarcelona(), ip, userAgent);
     if (!(await guard.takeSlot("analytics", visitor, 10, 150))) return { ok: false };
+    const { firmOf } = await import("@/lib/server/firm");
+    const firm = firmOf(ip);
     const device = /iPad|Tablet/i.test(userAgent) ? "tablet" : /Mobi|Android|iPhone/i.test(userAgent) ? "mobile" : "desktop";
     const { error } = await guard.admin.from("analytics_events" as never).insert({
       kind: data.kind,
@@ -35,6 +39,7 @@ export const recordEvent = createServerFn({ method: "POST" })
       referrer: data.referrer ?? null,
       country,
       device,
+      firm,
       visitor,
     } as never);
     if (error) console.error("[analytics] Could not save the event", error.message);

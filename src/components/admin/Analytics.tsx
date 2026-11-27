@@ -16,6 +16,9 @@ type Summary = {
     profile_opens: number;
     linkedin_clicks: number;
     report_downloads: number;
+    /** Missing until the partner clicks migration (20261127120000) has run. */
+    partner_clicks?: number;
+    firm_visitors?: number;
     enquiries: number;
     newsletter_signups: number;
   };
@@ -24,6 +27,10 @@ type Summary = {
   profiles: Row[];
   linkedin: Row[];
   reports: Row[];
+  partners?: Row[];
+  /** Visits from firms' own office networks: visitors per day, added up. */
+  firms?: Row[];
+  firm_profiles?: Row[];
   referrers: Row[];
   countries: Row[];
   devices: Row[];
@@ -90,13 +97,13 @@ function Daily({ daily }: { daily: Summary["daily"] }) {
             key={d.day}
             className="group relative flex-1 rounded-t-sm bg-navy/80 hover:bg-navy"
             style={{ height: `${Math.max(2, (d.visitors / max) * 100)}%`, opacity: d.visitors ? 1 : 0.25 }}
-            title={`${formatDay(d.day)}: ${d.visitors} visitors, ${d.views} page views`}
+            title={`${formatDay(d.day.slice(0, 10))}: ${d.visitors} visitors, ${d.views} page views`}
           />
         ))}
       </div>
       <div className="mt-2 flex justify-between text-[11px] text-muted-foreground">
-        <span>{daily[0] && formatDay(daily[0].day)}</span>
-        <span>{daily.at(-1) && formatDay(daily.at(-1)!.day)}</span>
+        <span>{daily[0] && formatDay(daily[0].day.slice(0, 10))}</span>
+        <span>{daily.at(-1) && formatDay(daily.at(-1)!.day.slice(0, 10))}</span>
       </div>
     </section>
   );
@@ -158,12 +165,14 @@ export function AnalyticsManager() {
         <Loader2 className="mx-auto h-6 w-6 animate-spin text-muted-foreground" />
       ) : (
         <>
-          <div className="grid grid-cols-2 gap-3 md:grid-cols-4 xl:grid-cols-7">
+          <div className="grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-9">
             <Tile label="Visitors" value={t.visitors} note="per day, added up" />
             <Tile label="Page views" value={t.page_views} />
             <Tile label="Profile opens" value={t.profile_opens} />
             <Tile label="LinkedIn clicks" value={t.linkedin_clicks} note="from profiles" />
             <Tile label="Report downloads" value={t.report_downloads} />
+            <Tile label="Partner clicks" value={t.partner_clicks ?? 0} note="Trakvia, Greenroom" />
+            <Tile label="Firm visitors" value={t.firm_visitors ?? 0} note="from firm networks" />
             <Tile label="Sponsorship enquiries" value={t.enquiries} />
             <Tile label="Newsletter sign-ups" value={t.newsletter_signups} />
           </div>
@@ -173,6 +182,9 @@ export function AnalyticsManager() {
             <Ranked title="Profiles opened" rows={data.profiles} empty="No profiles opened yet." />
             <Ranked title="LinkedIn clicks, by member" rows={data.linkedin} empty="No LinkedIn clicks yet." />
             <Ranked title="Report downloads" rows={data.reports} empty="No downloads yet." />
+            <Ranked title="Partner clicks, by partner" rows={data.partners ?? []} empty="No partner clicks yet." />
+            <Ranked title="Firms that visited (visitors)" rows={data.firms ?? []} empty="No visits from firm networks yet." />
+            <Ranked title="Profiles opened from firm networks" rows={data.firm_profiles ?? []} empty="No profiles opened from firm networks yet." />
             <Ranked title="Sites that sent visitors" rows={data.referrers} empty="No visits from other sites yet." />
             <Ranked title="Countries (visitors)" rows={data.countries} label={countryName} empty="No visits yet." />
             <Ranked title="Devices (visitors)" rows={data.devices} empty="No visits yet." />

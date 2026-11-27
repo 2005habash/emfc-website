@@ -32,7 +32,7 @@ const sections = [
   },
   {
     title: "Visit counts",
-    body: "To see which pages and profiles people find useful, the site counts visits anonymously: the page, the country and the kind of device, with no names, IP addresses or cookies. A visitor is counted once a day with a code that changes every day, so nobody can be followed over time. Only the club's administrators see the totals.",
+    body: "To see which pages and profiles people find useful, the site counts visits anonymously: the page, the country and the kind of device, with no names, IP addresses or cookies. A visitor is counted once a day with a code that changes every day, so nobody can be followed over time. If a visit comes from the office network of a large firm (for example a bank or a consultancy that runs its own network), the site also notes that firm's name, so the club can see which firms follow its work. It never records who the visitor is, and the IP address is only compared with a public list of firm networks, never stored or shared. Only the club's administrators see the totals.",
   },
   {
     title: "Where it is kept",
@@ -53,7 +53,7 @@ function PrivacyPage() {
           <h1 className="font-serif text-[52px]/[0.98] tracking-[-0.01em] md:text-[76px]/[0.98]">
             Your <Em>data</Em>
           </h1>
-          <p className="text-[15px]/[1.7] text-mute">Last updated 10 November 2026.</p>
+          <p className="text-[15px]/[1.7] text-mute">Last updated 27 November 2026.</p>
         </div>
         <div className="flex flex-col lg:col-span-7 lg:col-start-6">
           {sections.map((s) => (
